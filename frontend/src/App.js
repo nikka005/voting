@@ -3,24 +3,28 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from './components/ui/sonner';
 
-// Pages
+// ===== PUBLIC PANEL (Voting Site) =====
 import HomePage from './pages/HomePage';
 import ContestantsPage from './pages/ContestantsPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import VotingPage from './pages/VotingPage';
+
+// ===== USER PANEL (Contestant Dashboard) =====
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ContestantDashboard from './pages/ContestantDashboard';
+
+// ===== ADMIN PANEL (Master Control) =====
 import AdminPanel from './pages/AdminPanel';
 
-// Protected Route Components
+// Protected Route - Requires Authentication
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-pink-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -36,13 +40,14 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   return children;
 };
 
+// Guest Route - Redirects if already logged in
 const GuestRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-pink-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -57,13 +62,27 @@ const GuestRoute = ({ children }) => {
 function AppRoutes() {
   return (
     <Routes>
-      {/* Public Routes */}
+      {/* ============================================
+          PUBLIC PANEL - Voting Site (Domain 1)
+          ============================================ */}
+      
+      {/* Home - Browse & Discover */}
       <Route path="/" element={<HomePage />} />
+      
+      {/* Contestants - Browse all approved contestants */}
       <Route path="/contestants" element={<ContestantsPage />} />
+      
+      {/* Leaderboard - Real-time rankings */}
       <Route path="/leaderboard" element={<LeaderboardPage />} />
+      
+      {/* Voting Page - Individual contestant voting (e.g., /2026/john-doe) */}
       <Route path="/:year/:slug" element={<VotingPage />} />
 
-      {/* Guest Routes (redirect if logged in) */}
+      {/* ============================================
+          USER PANEL - Contestant Dashboard (Domain 2)
+          ============================================ */}
+      
+      {/* Login */}
       <Route
         path="/login"
         element={
@@ -72,6 +91,8 @@ function AppRoutes() {
           </GuestRoute>
         }
       />
+      
+      {/* Register - Join the contest */}
       <Route
         path="/register"
         element={
@@ -80,8 +101,8 @@ function AppRoutes() {
           </GuestRoute>
         }
       />
-
-      {/* Protected Routes */}
+      
+      {/* Contestant Dashboard - Manage profile, photos, Q&A */}
       <Route
         path="/dashboard"
         element={
@@ -90,6 +111,12 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      {/* ============================================
+          ADMIN PANEL - Master Control (Domain 2)
+          ============================================ */}
+      
+      {/* Admin Panel - Full control of contestants, votes, rounds, categories */}
       <Route
         path="/admin"
         element={
@@ -99,7 +126,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Fallback */}
+      {/* Fallback - Redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -114,9 +141,10 @@ function App() {
           position="top-right" 
           toastOptions={{
             style: {
-              background: '#0a0a0a',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: '#fff',
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              color: '#0f172a',
+              borderRadius: '16px',
             },
           }}
         />
