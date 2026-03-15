@@ -381,33 +381,67 @@ export default function VotingPage() {
                   </div>
                 </div>
 
-                {/* Paid Voting Options (Ready for future) */}
+                {/* Paid Voting Options */}
                 <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200">
                   <div className="flex items-center gap-2 mb-6">
                     <Star className="w-5 h-5 text-violet-500" />
                     <h3 className="font-syne text-lg font-bold text-slate-900">Support with Extra Votes</h3>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {[
-                      { votes: 10, price: '$5' },
-                      { votes: 25, price: '$10' },
-                      { votes: 50, price: '$20' },
-                      { votes: 100, price: '$35' },
-                    ].map((option, idx) => (
+                    {votePackages.length > 0 ? votePackages.map((pkg) => (
                       <button
-                        key={idx}
-                        onClick={() => toast.info('Paid voting coming soon!')}
-                        className="p-4 rounded-2xl border-2 border-slate-200 hover:border-pink-300 hover:bg-pink-50 transition-all text-center group"
+                        key={pkg.id}
+                        onClick={() => handlePurchaseVotes(pkg.id)}
+                        disabled={purchasingPackage === pkg.id}
+                        className={`relative p-4 rounded-2xl border-2 transition-all text-center group ${
+                          pkg.popular 
+                            ? 'border-pink-400 bg-pink-50 hover:border-pink-500 hover:bg-pink-100' 
+                            : 'border-slate-200 hover:border-pink-300 hover:bg-pink-50'
+                        }`}
                       >
-                        <div className="font-syne text-2xl font-bold text-slate-900 group-hover:text-pink-600">
-                          {option.votes}
-                        </div>
-                        <div className="text-xs text-slate-500">votes</div>
-                        <div className="text-sm font-bold text-pink-600 mt-2">{option.price}</div>
+                        {pkg.popular && (
+                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 text-[10px] font-bold bg-gradient-to-r from-pink-500 to-violet-500 text-white rounded-full">
+                            POPULAR
+                          </span>
+                        )}
+                        {purchasingPackage === pkg.id ? (
+                          <Loader2 className="w-8 h-8 mx-auto text-pink-500 animate-spin" />
+                        ) : (
+                          <>
+                            <div className="font-syne text-2xl font-bold text-slate-900 group-hover:text-pink-600">
+                              {pkg.votes}
+                            </div>
+                            <div className="text-xs text-slate-500">votes</div>
+                            <div className="text-sm font-bold text-pink-600 mt-2">${pkg.price}</div>
+                          </>
+                        )}
                       </button>
-                    ))}
+                    )) : (
+                      <>
+                        {[
+                          { votes: 10, price: 5 },
+                          { votes: 50, price: 20, popular: true },
+                          { votes: 100, price: 35 },
+                          { votes: 250, price: 75 },
+                        ].map((option, idx) => (
+                          <div
+                            key={idx}
+                            className={`p-4 rounded-2xl border-2 text-center ${
+                              option.popular ? 'border-pink-400 bg-pink-50' : 'border-slate-200'
+                            }`}
+                          >
+                            <div className="font-syne text-2xl font-bold text-slate-900">{option.votes}</div>
+                            <div className="text-xs text-slate-500">votes</div>
+                            <div className="text-sm font-bold text-pink-600 mt-2">${option.price}</div>
+                          </div>
+                        ))}
+                      </>
+                    )}
                   </div>
-                  <p className="text-center text-slate-400 text-xs mt-4">Paid voting coming soon</p>
+                  <div className="flex items-center justify-center gap-2 mt-4 text-slate-500 text-xs">
+                    <CreditCard className="w-3 h-3" />
+                    <span>Secure payment via Stripe</span>
+                  </div>
                 </div>
 
                 {/* Notification Signup */}
