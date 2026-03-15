@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Textarea } from '../components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
-import { Switch } from '../components/ui/switch';
-import { adminAPI, contestantsAPI, categoriesAPI, roundsAPI } from '../lib/api';
-import { formatNumber, formatDate } from '../lib/utils';
+import { useAuth } from '../../context/AuthContext';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Textarea } from '../../components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
+import { Switch } from '../../components/ui/switch';
+import { adminAPI, contestantsAPI, categoriesAPI, roundsAPI } from '../../lib/api';
+import { formatNumber, formatDate } from '../../lib/utils';
 import { toast } from 'sonner';
 import {
   Users, Heart, Crown, Clock, Plus, Trash2, Check, X, Edit, Loader2, Search,
