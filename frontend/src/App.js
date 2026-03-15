@@ -113,12 +113,22 @@ function AppRoutes() {
       />
 
       {/* ============================================
-          ADMIN PANEL - Master Control (Domain 2)
+          ADMIN PANEL - Backbone Master Control (Domain 2)
           ============================================ */}
       
       {/* Admin Panel - Full control of contestants, votes, rounds, categories */}
       <Route
         path="/admin"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminPanel />
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Admin Backbone - Alternative route */}
+      <Route
+        path="/backbone"
         element={
           <ProtectedRoute requiredRole="admin">
             <AdminPanel />
