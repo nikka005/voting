@@ -38,11 +38,11 @@ export const formatDate = (dateString) => {
   });
 };
 
-// Placeholder images
+// Placeholder images - vibrant studio portraits
 export const placeholderImages = [
-  'https://images.unsplash.com/photo-1768818536330-62ae6edf84ba?crop=entropy&cs=srgb&fm=jpg&q=85&w=400',
-  'https://images.unsplash.com/photo-1736092306548-ad514f4386bc?crop=entropy&cs=srgb&fm=jpg&q=85&w=400',
-  'https://images.unsplash.com/photo-1736092306940-3f96ee4bce29?crop=entropy&cs=srgb&fm=jpg&q=85&w=400',
+  'https://images.unsplash.com/photo-1607332646821-cd217e4faf64?crop=entropy&cs=srgb&fm=jpg&q=85&w=400',
+  'https://images.unsplash.com/photo-1607332646791-929f9ddcf96a?crop=entropy&cs=srgb&fm=jpg&q=85&w=400',
+  'https://images.unsplash.com/photo-1653256170871-d0a26c41f49c?crop=entropy&cs=srgb&fm=jpg&q=85&w=400',
 ];
 
 export const getPlaceholderImage = (index = 0) => {
