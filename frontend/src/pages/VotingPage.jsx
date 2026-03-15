@@ -4,7 +4,7 @@ import { Layout } from '../components/Layout';
 import { VotingModal } from '../components/VotingModal';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { contestantsAPI } from '../lib/api';
+import { contestantsAPI, votingAPI } from '../lib/api';
 import { formatNumber, getPlaceholderImage } from '../lib/utils';
 import { 
   Heart, 
@@ -24,7 +24,9 @@ import {
   Award,
   ExternalLink,
   Mail,
-  Check
+  Check,
+  CreditCard,
+  Sparkles
 } from 'lucide-react';
 import { toast } from 'sonner';
 
