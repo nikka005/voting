@@ -564,6 +564,7 @@ async def get_contestant(contestant_id: str):
         social_instagram=contestant.get("social_instagram", ""),
         social_facebook=contestant.get("social_facebook", ""),
         social_twitter=contestant.get("social_twitter", ""),
+        social_tiktok=contestant.get("social_tiktok", ""),
         age=contestant.get("age"),
         location=contestant.get("location", ""),
         category_id=contestant.get("category_id"),
@@ -572,7 +573,8 @@ async def get_contestant(contestant_id: str):
         status=contestant["status"],
         voting_link=f"{base_url}/{contestant['slug']}",
         created_at=contestant["created_at"],
-        round=contestant.get("round")
+        round=contestant.get("round"),
+        qa_items=contestant.get("qa_items", [])
     )
 
 @api_router.get("/contestants/me/profile", response_model=ContestantResponse)
