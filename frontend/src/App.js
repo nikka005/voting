@@ -14,7 +14,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ContestantDashboard from './pages/ContestantDashboard';
 
-// ===== ADMIN PANEL (Master Control) =====
+// ===== ADMIN PANEL (Backbone - Master Control) =====
 import AdminPanel from './pages/AdminPanel';
 
 // Protected Route - Requires Authentication
