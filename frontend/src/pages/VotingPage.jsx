@@ -68,8 +68,12 @@ export default function VotingPage() {
   useEffect(() => {
     const fetchContestant = async () => {
       try {
-        const response = await contestantsAPI.getBySlug(year, slug);
-        setContestant(response.data);
+        const [contestantRes, packagesRes] = await Promise.all([
+          contestantsAPI.getBySlug(year, slug),
+          votingAPI.getVotePackages()
+        ]);
+        setContestant(contestantRes.data);
+        setVotePackages(packagesRes.data);
       } catch (error) {
         console.error('Failed to fetch contestant:', error);
       } finally {
@@ -78,6 +82,24 @@ export default function VotingPage() {
     };
     fetchContestant();
   }, [year, slug]);
+
+  const handlePurchaseVotes = async (packageId) => {
+    if (!contestant?.id) return;
+    setPurchasingPackage(packageId);
+    try {
+      const response = await votingAPI.createCheckout({
+        package_id: packageId,
+        contestant_id: contestant.id,
+        origin_url: window.location.origin
+      });
+      // Redirect to Stripe checkout
+      window.location.href = response.data.checkout_url;
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error('Failed to start checkout. Please try again.');
+      setPurchasingPackage(null);
+    }
+  };
 
   const handleShare = async () => {
     const url = window.location.href;
