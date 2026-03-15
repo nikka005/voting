@@ -38,6 +38,8 @@ export default function VotingPage() {
   const [votingModalOpen, setVotingModalOpen] = useState(false);
   const [notifyEmail, setNotifyEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [votePackages, setVotePackages] = useState([]);
+  const [purchasingPackage, setPurchasingPackage] = useState(null);
   
   // Countdown state
   const [timeLeft, setTimeLeft] = useState({
