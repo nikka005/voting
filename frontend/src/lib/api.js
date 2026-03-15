@@ -95,6 +95,10 @@ export const adminAPI = {
 export const votingAPI = {
   requestOTP: (data) => api.post('/vote/request-otp', data),
   verifyAndVote: (data) => api.post('/vote/verify', data),
+  // Paid voting
+  getVotePackages: () => api.get('/vote-packages'),
+  createCheckout: (data) => api.post('/checkout/create', data),
+  getCheckoutStatus: (sessionId) => api.get(`/checkout/status/${sessionId}`),
 };
 
 // Leaderboard API
