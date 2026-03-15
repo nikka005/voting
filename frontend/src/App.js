@@ -20,8 +20,8 @@ import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PortalHome from './pages/portal/PortalHome';
 import PortalLogin from './pages/portal/PortalLogin';
 import PortalRegister from './pages/portal/PortalRegister';
-import AdminPanel from './pages/AdminPanel';
-import ContestantDashboard from './pages/ContestantDashboard';
+import AdminPanel from './pages/portal/AdminPanel';
+import ContestantDashboard from './pages/portal/ContestantDashboard';
 
 // ===============================================================
 // PROTECTED ROUTE COMPONENTS
