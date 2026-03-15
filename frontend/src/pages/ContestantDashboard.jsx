@@ -27,7 +27,10 @@ import {
   Upload,
   Loader2,
   AlertCircle,
-  Sparkles
+  Sparkles,
+  Plus,
+  MessageCircle,
+  ExternalLink
 } from 'lucide-react';
 
 export default function ContestantDashboard() {
@@ -48,7 +51,11 @@ export default function ContestantDashboard() {
     social_instagram: '',
     social_facebook: '',
     social_twitter: '',
+    social_tiktok: '',
   });
+  const [qaItems, setQaItems] = useState([]);
+  const [newQuestion, setNewQuestion] = useState('');
+  const [newAnswer, setNewAnswer] = useState('');
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -67,7 +74,9 @@ export default function ContestantDashboard() {
         social_instagram: profileRes.data.social_instagram || '',
         social_facebook: profileRes.data.social_facebook || '',
         social_twitter: profileRes.data.social_twitter || '',
+        social_tiktok: profileRes.data.social_tiktok || '',
       });
+      setQaItems(profileRes.data.qa_items || []);
     } catch (error) {
       console.error('Failed to fetch profile:', error);
       toast.error('Failed to load profile');
@@ -92,6 +101,22 @@ export default function ContestantDashboard() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleAddQA = () => {
+    if (!newQuestion.trim() || !newAnswer.trim()) {
+      toast.error('Please enter both question and answer');
+      return;
+    }
+    setQaItems([...qaItems, { question: newQuestion.trim(), answer: newAnswer.trim() }]);
+    setNewQuestion('');
+    setNewAnswer('');
+    toast.success('Q&A added! Don\'t forget to save.');
+  };
+
+  const handleRemoveQA = (index) => {
+    setQaItems(qaItems.filter((_, i) => i !== index));
+    toast.success('Q&A removed! Don\'t forget to save.');
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -101,6 +126,7 @@ export default function ContestantDashboard() {
         ...formData,
         age: formData.age ? parseInt(formData.age) : null,
         category_id: formData.category_id || null,
+        qa_items: qaItems,
       };
       const response = await contestantsAPI.updateMyProfile(updateData);
       setProfile(response.data);
@@ -231,7 +257,7 @@ export default function ContestantDashboard() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
-                <code className="text-xs text-cyan-700 bg-cyan-100 px-3 py-1.5 rounded-lg truncate max-w-[180px] font-mono">
+                <code className="text-xs text-cyan-700 bg-cyan-100 px-3 py-1.5 rounded-lg truncate max-w-[140px] font-mono">
                   {profile?.slug}
                 </code>
                 <Button
@@ -243,6 +269,13 @@ export default function ContestantDashboard() {
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
+                {profile?.status === 'approved' && (
+                  <a href={`/${profile.slug}`} target="_blank" rel="noopener noreferrer">
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-cyan-600 hover:text-cyan-700 hover:bg-cyan-100">
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                  </a>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -319,12 +352,12 @@ export default function ContestantDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-slate-700 font-semibold">Bio</Label>
+                  <Label className="text-slate-700 font-semibold">Bio / Story</Label>
                   <Textarea
                     name="bio"
                     value={formData.bio}
                     onChange={handleChange}
-                    placeholder="Tell your story..."
+                    placeholder="Tell your story... This will appear at the top of your voting page."
                     rows={4}
                     className="rounded-xl bg-slate-50 border-slate-200 focus:border-pink-500 resize-none"
                     data-testid="profile-bio"
@@ -380,67 +413,121 @@ export default function ContestantDashboard() {
             </CardContent>
           </Card>
 
-          {/* Photos */}
-          <Card className="bg-white border-slate-200 shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-slate-900 font-syne">
-                <Camera className="w-5 h-5 text-pink-500" />
-                Photos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Upload Button */}
-              <label className="block mb-4">
-                <div className="flex items-center justify-center gap-2 p-6 border-2 border-dashed border-pink-200 hover:border-pink-400 bg-pink-50/50 cursor-pointer transition-colors rounded-2xl">
-                  {uploading ? (
-                    <Loader2 className="w-6 h-6 text-pink-500 animate-spin" />
-                  ) : (
-                    <>
-                      <Upload className="w-6 h-6 text-pink-500" />
-                      <span className="text-pink-600 font-semibold">Upload Photo</span>
-                    </>
-                  )}
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                  disabled={uploading}
-                  data-testid="photo-upload-input"
-                />
-              </label>
-
-              {/* Photo Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                {profile?.photos?.map((photo, index) => (
-                  <div key={index} className="relative group aspect-square rounded-2xl overflow-hidden">
-                    <img
-                      src={photo}
-                      alt={`Photo ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      onClick={() => handleDeletePhoto(index)}
-                      className="absolute top-2 right-2 p-2 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                      data-testid={`delete-photo-${index}`}
-                    >
-                      <Trash2 className="w-4 h-4 text-white" />
-                    </button>
+          <div className="space-y-6">
+            {/* Photos */}
+            <Card className="bg-white border-slate-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-slate-900 font-syne">
+                  <Camera className="w-5 h-5 text-pink-500" />
+                  Photos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* Upload Button */}
+                <label className="block mb-4">
+                  <div className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-pink-200 hover:border-pink-400 bg-pink-50/50 cursor-pointer transition-colors rounded-2xl">
+                    {uploading ? (
+                      <Loader2 className="w-6 h-6 text-pink-500 animate-spin" />
+                    ) : (
+                      <>
+                        <Upload className="w-5 h-5 text-pink-500" />
+                        <span className="text-pink-600 font-semibold">Upload Photo</span>
+                      </>
+                    )}
                   </div>
-                ))}
-              </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                    disabled={uploading}
+                    data-testid="photo-upload-input"
+                  />
+                </label>
 
-              {(!profile?.photos || profile.photos.length === 0) && (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pink-100 flex items-center justify-center">
-                    <Camera className="w-8 h-8 text-pink-400" />
-                  </div>
-                  <p className="text-slate-500">No photos uploaded yet. Add photos to attract more votes!</p>
+                {/* Photo Grid */}
+                <div className="grid grid-cols-3 gap-3">
+                  {profile?.photos?.map((photo, index) => (
+                    <div key={index} className="relative group aspect-square rounded-xl overflow-hidden">
+                      <img
+                        src={photo}
+                        alt={`Photo ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        onClick={() => handleDeletePhoto(index)}
+                        className="absolute top-1 right-1 p-1.5 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                        data-testid={`delete-photo-${index}`}
+                      >
+                        <Trash2 className="w-3 h-3 text-white" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+
+                {(!profile?.photos || profile.photos.length === 0) && (
+                  <p className="text-center text-slate-400 text-sm py-4">Upload photos to showcase on your voting page</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Q&A Section */}
+            <Card className="bg-white border-slate-200 shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-slate-900 font-syne">
+                  <MessageCircle className="w-5 h-5 text-pink-500" />
+                  Q&A Section
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-500 mb-4">Add questions and answers that will appear on your voting page (like "What fuels your passion?", "What would you do with the prize?")</p>
+                
+                {/* Existing Q&As */}
+                {qaItems.length > 0 && (
+                  <div className="space-y-3 mb-4">
+                    {qaItems.map((qa, index) => (
+                      <div key={index} className="p-3 bg-slate-50 rounded-xl relative group">
+                        <h4 className="font-semibold text-pink-600 text-sm mb-1">{qa.question}</h4>
+                        <p className="text-slate-600 text-sm">{qa.answer}</p>
+                        <button
+                          onClick={() => handleRemoveQA(index)}
+                          className="absolute top-2 right-2 p-1 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add New Q&A */}
+                <div className="space-y-3 p-4 border border-dashed border-slate-200 rounded-xl">
+                  <Input
+                    value={newQuestion}
+                    onChange={(e) => setNewQuestion(e.target.value)}
+                    placeholder="Question (e.g., What fuels your passion?)"
+                    className="h-10 rounded-lg bg-white border-slate-200 text-sm"
+                  />
+                  <Textarea
+                    value={newAnswer}
+                    onChange={(e) => setNewAnswer(e.target.value)}
+                    placeholder="Your answer..."
+                    rows={3}
+                    className="rounded-lg bg-white border-slate-200 text-sm resize-none"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleAddQA}
+                    variant="outline"
+                    className="w-full border-pink-200 text-pink-600 hover:bg-pink-50"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Q&A
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </Layout>
