@@ -64,20 +64,20 @@ const PublicHeader = () => {
           {/* Right Side */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
-              <Link to={isAdmin ? '/admin' : '/dashboard'}>
+              <Link to="/portal">
                 <Button variant="outline" size="sm" className="border-pink-200 text-pink-600 hover:bg-pink-50 rounded-full">
                   <LayoutDashboard className="w-4 h-4 mr-2" />
-                  {isAdmin ? 'Admin Panel' : 'My Dashboard'}
+                  Management Portal
                 </Button>
               </Link>
             ) : (
               <>
-                <Link to="/login">
+                <Link to="/portal/login">
                   <Button variant="ghost" size="sm" className="text-slate-600 hover:text-pink-600">
                     Login
                   </Button>
                 </Link>
-                <Link to="/register">
+                <Link to="/portal/register">
                   <Button size="sm" className="btn-gradient px-6 btn-jelly" data-testid="register-btn">
                     Join Contest
                   </Button>
