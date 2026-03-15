@@ -89,6 +89,12 @@ export const adminAPI = {
     api.put(`/admin/contestants/${id}/round?round_name=${roundName}`),
   deleteContestant: (id) => api.delete(`/admin/contestants/${id}`),
   seedAdmin: () => api.post('/seed/admin'),
+  // Fraud detection
+  getFraudLogs: () => api.get('/admin/fraud-logs'),
+  blockIP: (ip, reason) => api.post(`/admin/block-ip?ip=${ip}&reason=${reason}`),
+  blockEmail: (email, reason) => api.post(`/admin/block-email?email=${email}&reason=${reason}`),
+  // Payment transactions
+  getPaymentTransactions: () => api.get('/admin/payment-transactions'),
 };
 
 // Voting API
