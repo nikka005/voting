@@ -78,6 +78,10 @@ function AppRoutes() {
       
       {/* Voting Page - Individual contestant voting (e.g., /2026/john-doe) */}
       <Route path="/:year/:slug" element={<VotingPage />} />
+      
+      {/* Payment Success Page */}
+      <Route path="/payment/success" element={<PaymentSuccessPage />} />
+      <Route path="/payment/cancel" element={<Navigate to="/" replace />} />
 
       {/* ============================================
           USER PANEL - Contestant Dashboard (Domain 2)
