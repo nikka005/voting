@@ -119,7 +119,7 @@ const PublicHeader = () => {
             <div className="border-t border-slate-100 pt-3 space-y-2">
               {user ? (
                 <Link
-                  to={isAdmin ? '/admin' : '/dashboard'}
+                  to={isAdmin ? '/portal/admin' : '/portal/dashboard'}
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-3 text-pink-600 hover:bg-pink-50 rounded-xl"
                 >
@@ -129,14 +129,14 @@ const PublicHeader = () => {
               ) : (
                 <>
                   <Link
-                    to="/login"
+                    to="/portal/login"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl"
                   >
                     Login
                   </Link>
                   <Link
-                    to="/register"
+                    to="/portal/register"
                     onClick={() => setMobileMenuOpen(false)}
                     className="block px-4 py-3 btn-gradient text-center rounded-full font-bold"
                   >
