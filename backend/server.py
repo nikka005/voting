@@ -61,14 +61,20 @@ class UserResponse(BaseModel):
     role: str
     created_at: str
 
+class QAItem(BaseModel):
+    question: str
+    answer: str
+
 class ContestantCreate(BaseModel):
     bio: Optional[str] = ""
     social_instagram: Optional[str] = ""
     social_facebook: Optional[str] = ""
     social_twitter: Optional[str] = ""
+    social_tiktok: Optional[str] = ""
     age: Optional[int] = None
     location: Optional[str] = ""
     category_id: Optional[str] = None
+    qa_items: Optional[List[QAItem]] = []
 
 class ContestantUpdate(BaseModel):
     full_name: Optional[str] = None
@@ -76,10 +82,12 @@ class ContestantUpdate(BaseModel):
     social_instagram: Optional[str] = None
     social_facebook: Optional[str] = None
     social_twitter: Optional[str] = None
+    social_tiktok: Optional[str] = None
     age: Optional[int] = None
     location: Optional[str] = None
     category_id: Optional[str] = None
     photos: Optional[List[str]] = None
+    qa_items: Optional[List[dict]] = None
 
 class ContestantResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
