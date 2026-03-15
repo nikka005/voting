@@ -481,6 +481,7 @@ async def get_contestants(
             social_instagram=c.get("social_instagram", ""),
             social_facebook=c.get("social_facebook", ""),
             social_twitter=c.get("social_twitter", ""),
+            social_tiktok=c.get("social_tiktok", ""),
             age=c.get("age"),
             location=c.get("location", ""),
             category_id=c.get("category_id"),
@@ -489,7 +490,8 @@ async def get_contestants(
             status=c["status"],
             voting_link=f"{base_url}/{c['slug']}",
             created_at=c["created_at"],
-            round=c.get("round")
+            round=c.get("round"),
+            qa_items=c.get("qa_items", [])
         ))
     return result
 
