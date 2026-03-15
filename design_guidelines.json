@@ -1,0 +1,156 @@
+{
+  "identity": {
+    "name": "E1",
+    "role": "Creative Designer (Top 1%)",
+    "principles": [
+      "Fusion over Imitation",
+      "Emotion First",
+      "Content is King",
+      "Zoom In",
+      "Negative Space",
+      "Contrast"
+    ],
+    "anti_patterns": [
+      "Purple/Teal CTAs",
+      "Inter everywhere",
+      "Center-Everything Disease",
+      "Gradient Overload"
+    ]
+  },
+  "project": {
+    "name": "Lumina - Premium Beauty Contest Platform",
+    "theme_strategy": "The Midnight Gala (Dark Mode Dominant)",
+    "emotional_tone": "Luxury, Aspiration, Fairness, Cinematic",
+    "archetype": "JEWEL & LUXURY"
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Bodoni Moda, serif",
+      "weights": ["400", "700"],
+      "usage": "All section titles, hero text, contestant names. Use italic variant for emphasis.",
+      "letter_spacing": "tracking-tight"
+    },
+    "body": {
+      "font_family": "Manrope, sans-serif",
+      "weights": ["300", "400", "600"],
+      "usage": "Paragraphs, UI elements, stats, buttons.",
+      "letter_spacing": "tracking-wide"
+    },
+    "google_fonts_import": "https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Manrope:wght@200..800&display=swap"
+  },
+  "colors": {
+    "palette": {
+      "background": {
+        "default": "#050505",
+        "paper": "#0A0A0A",
+        "subtle": "#121212"
+      },
+      "foreground": {
+        "default": "#F5F5F5",
+        "muted": "#A1A1AA",
+        "inverse": "#000000"
+      },
+      "primary": {
+        "default": "#D4AF37",
+        "hover": "#F4C430",
+        "foreground": "#000000"
+      },
+      "secondary": {
+        "default": "#FFFFFF",
+        "foreground": "#000000"
+      },
+      "accent": {
+        "default": "#B76E79",
+        "glow": "rgba(212, 175, 55, 0.5)"
+      },
+      "border": {
+        "default": "#27272A",
+        "active": "#D4AF37"
+      }
+    },
+    "gradients": {
+      "gold_shimmer": "linear-gradient(45deg, #D4AF37 0%, #F4C430 50%, #D4AF37 100%)",
+      "dark_fade": "linear-gradient(to bottom, rgba(5,5,5,0) 0%, #050505 100%)"
+    }
+  },
+  "layout_system": {
+    "grid_mode": "MODE A: THE TETRIS GRID",
+    "spacing": {
+      "container_padding": "p-6 md:p-12 lg:p-24",
+      "section_gap": "gap-12 md:gap-24",
+      "element_gap": "gap-6"
+    },
+    "containers": {
+      "max_width": "max-w-7xl",
+      "alignment": "mx-auto"
+    }
+  },
+  "visual_enhancers": {
+    "textures": {
+      "noise": "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMDUwNTA1Ii8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiMyMjIiLz4KPC9zdmc+')",
+      "gold_overlay": "Use the gold abstract image with mix-blend-mode: overlay opacity-20"
+    },
+    "effects": {
+      "glassmorphism": "backdrop-blur-xl bg-black/40 border border-white/10",
+      "glow": "shadow-[0_0_30px_-10px_rgba(212,175,55,0.3)]",
+      "text_shadow": "text-shadow-sm"
+    },
+    "border_radius": {
+      "default": "rounded-none",
+      "buttons": "rounded-full",
+      "cards": "rounded-sm"
+    }
+  },
+  "components": {
+    "ContestantCard": {
+      "style": "Vertical editorial card. Image takes 80% height. Name and Vote button at bottom overlay.",
+      "interaction": "Hover: Image scales up 1.05x, Gold border traces the edge.",
+      "props": "image, name, category, vote_count, id"
+    },
+    "VoteButton": {
+      "style": "Pill shaped, Gold background, Black text, uppercase, tracking-widest, font-bold.",
+      "interaction": "Hover: Scale 1.05, Shadow Glow."
+    },
+    "LeaderboardRow": {
+      "style": "Minimalist row. Rank number in Serif (large). Avatar circle. Name. Vote bar (thin gold line).",
+      "highlight": "Top 3 get gold/silver/bronze glow effects."
+    },
+    "HeroSection": {
+      "style": "Full screen height. Parallax background. Centered Serif Headline (huge). Floating 'Enter' button.",
+      "background": "Use 'Gold Flowing Lines' image with heavy dark overlay."
+    }
+  },
+  "assets": {
+    "images": {
+      "hero_bg": "https://images.unsplash.com/photo-1761437855598-011cf89b2ad4?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "texture_accent": "https://images.unsplash.com/photo-1760172287483-02d382f63a6f?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "contestants": [
+        "https://images.unsplash.com/photo-1768818536330-62ae6edf84ba?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "https://images.unsplash.com/photo-1736092306548-ad514f4386bc?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "https://images.unsplash.com/photo-1736092306940-3f96ee4bce29?crop=entropy&cs=srgb&fm=jpg&q=85"
+      ]
+    },
+    "icons": {
+      "library": "lucide-react",
+      "style": "Stroke width 1px or 1.5px. Elegant and thin."
+    }
+  },
+  "instructions_to_main_agent": [
+    "1. INSTALL FONTS: Add the Google Fonts import to index.css immediately.",
+    "2. CONFIGURE TAILWIND: Update tailwind.config.js with the 'Midnight Gala' palette and font families.",
+    "3. CREATE LAYOUT: Build a 'Layout' component that enforces the dark theme and noise texture background.",
+    "4. BUILD COMPONENTS: Start with the 'ContestantCard' and 'VoteButton' as they are core to the experience.",
+    "5. DO NOT USE DEFAULT SHADCN STYLES: Override them. No rounded-md default cards. Use sharp edges or pill shapes as defined.",
+    "6. IMAGES: Use the provided Unsplash URLs for placeholders. Do not leave images empty.",
+    "7. DATA-TESTID: Add data-testid to all interactive elements (e.g., 'vote-btn-contestant-1')."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Avoid 'AI Slop' aesthetics (generic centered layouts, gradients).",
+    "Use 2-3x more spacing than typical.",
+    "Dark colors must be rich (tinted), not pure black/grey.",
+    "Micro-animations on every interaction are mandatory.",
+    "Use 'sonner' for toasts.",
+    "Components must use named exports.",
+    "Pages must use default exports."
+  ]
+}
