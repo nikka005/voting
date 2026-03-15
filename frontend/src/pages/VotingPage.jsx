@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { VotingModal } from '../components/VotingModal';
 import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { contestantsAPI } from '../lib/api';
 import { formatNumber, getPlaceholderImage } from '../lib/utils';
 import { 
@@ -11,15 +12,19 @@ import {
   Instagram, 
   Facebook, 
   Twitter, 
-  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   Loader2,
   Trophy,
-  Copy,
-  Check,
-  QrCode,
-  ExternalLink
+  Clock,
+  Bell,
+  Gift,
+  Star,
+  Zap,
+  Award,
+  ExternalLink,
+  Mail,
+  Check
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -29,7 +34,32 @@ export default function VotingPage() {
   const [loading, setLoading] = useState(true);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [votingModalOpen, setVotingModalOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [notifyEmail, setNotifyEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+  
+  // Countdown state
+  const [timeLeft, setTimeLeft] = useState({
+    days: 15,
+    hours: 8,
+    minutes: 42,
+    seconds: 30
+  });
+
+  // Countdown timer effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        let { days, hours, minutes, seconds } = prev;
+        seconds--;
+        if (seconds < 0) { seconds = 59; minutes--; }
+        if (minutes < 0) { minutes = 59; hours--; }
+        if (hours < 0) { hours = 23; days--; }
+        if (days < 0) { days = 0; hours = 0; minutes = 0; seconds = 0; }
+        return { days, hours, minutes, seconds };
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const fetchContestant = async () => {
@@ -59,14 +89,23 @@ export default function VotingPage() {
       }
     } else {
       await navigator.clipboard.writeText(url);
-      setCopied(true);
       toast.success('Voting link copied!');
-      setTimeout(() => setCopied(false), 2000);
     }
   };
 
   const handleVoteSuccess = (newVoteCount) => {
     setContestant(prev => ({ ...prev, vote_count: newVoteCount }));
+  };
+
+  const handleNotifySubscribe = (e) => {
+    e.preventDefault();
+    if (!notifyEmail) {
+      toast.error('Please enter your email');
+      return;
+    }
+    // In production, this would call an API
+    setSubscribed(true);
+    toast.success(`You'll be notified when ${contestant.full_name.split(' ')[0]}'s position changes!`);
   };
 
   const getRankSuffix = (rank) => {
@@ -97,8 +136,7 @@ export default function VotingPage() {
           <p className="text-slate-500 mb-6">This contestant may not exist or hasn't been approved yet.</p>
           <Link to="/contestants">
             <Button className="btn-gradient btn-jelly">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Contestants
+              Browse Contestants
             </Button>
           </Link>
         </div>
@@ -111,172 +149,269 @@ export default function VotingPage() {
 
   return (
     <Layout>
-      <div className="min-h-screen">
-        {/* Hero Section - Similar to mshealthandfit */}
-        <section className="relative bg-gradient-to-br from-pink-50 via-white to-violet-50">
+      <div className="min-h-screen bg-white">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-br from-slate-50 via-pink-50/30 to-violet-50/30 border-b border-slate-100">
           <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
-            {/* Back Link */}
-            <Link 
-              to="/contestants" 
-              className="inline-flex items-center text-slate-500 hover:text-pink-600 transition-colors mb-6 font-medium text-sm"
-              data-testid="back-to-contestants"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Contestants
-            </Link>
-
+            
             {/* Round Badge */}
             {contestant.round && (
-              <div className="inline-block px-4 py-1.5 bg-gradient-to-r from-pink-500 to-violet-500 text-white text-sm font-bold rounded-full mb-4">
+              <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-pink-500 to-violet-500 text-white text-sm font-bold rounded-full mb-6 shadow-lg shadow-pink-500/25">
+                <Award className="w-4 h-4" />
                 {contestant.round}
               </div>
             )}
 
             {/* Name */}
-            <h1 className="font-syne text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-4 leading-tight">
+            <h1 className="font-syne text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight">
               {contestant.full_name}
             </h1>
 
             {/* Bio */}
             {contestant.bio && (
-              <p className="text-lg md:text-xl text-slate-600 max-w-3xl mb-6 leading-relaxed">
+              <p className="text-lg md:text-xl text-slate-600 max-w-4xl mb-8 leading-relaxed">
                 {contestant.bio}
               </p>
             )}
 
-            {/* Share Buttons */}
-            <div className="flex items-center gap-3 mb-8">
+            {/* Share & Social */}
+            <div className="flex flex-wrap items-center gap-3 mb-8">
               <button
                 onClick={handleShare}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full text-sm font-medium text-slate-600 hover:border-pink-300 hover:text-pink-600 transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-full text-sm font-semibold text-slate-700 hover:border-pink-300 hover:text-pink-600 transition-all shadow-sm"
                 data-testid="share-btn"
               >
-                {copied ? <Check className="w-4 h-4 text-green-500" /> : <Share2 className="w-4 h-4" />}
+                <Share2 className="w-4 h-4" />
                 Share
               </button>
               <a
                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-blue-600 hover:border-blue-300 transition-colors shadow-sm"
+                className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"
               >
                 <Facebook className="w-4 h-4" />
               </a>
-              <button
-                onClick={() => toast.info('QR Code feature coming soon!')}
-                className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:border-pink-300 transition-colors shadow-sm"
-              >
-                <QrCode className="w-4 h-4" />
-              </button>
+              {contestant.social_instagram && (
+                <a
+                  href={`https://instagram.com/${contestant.social_instagram}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"
+                  data-testid="instagram-link"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+              )}
+              {contestant.social_twitter && (
+                <a
+                  href={`https://twitter.com/${contestant.social_twitter}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"
+                  data-testid="twitter-link"
+                >
+                  <Twitter className="w-4 h-4" />
+                </a>
+              )}
             </div>
+          </div>
+        </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-              {/* Main Photo */}
-              <div className="relative">
-                <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl shadow-pink-500/10 bg-slate-100">
-                  <img
-                    src={mainPhoto}
-                    alt={contestant.full_name}
-                    className="w-full h-full object-cover"
-                    data-testid="contestant-main-photo"
-                  />
+        {/* Main Content */}
+        <section className="py-10 md:py-16">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+              
+              {/* Left Column - Photo */}
+              <div className="lg:col-span-5">
+                <div className="sticky top-24">
+                  <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl shadow-pink-500/10 bg-slate-100 mb-4">
+                    <img
+                      src={mainPhoto}
+                      alt={contestant.full_name}
+                      className="w-full h-full object-cover"
+                      data-testid="contestant-main-photo"
+                    />
+                  </div>
+                  
+                  {/* Thumbnail Gallery */}
+                  {photos.length > 1 && (
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      {photos.map((photo, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedPhotoIndex(index)}
+                          className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden transition-all ${
+                            selectedPhotoIndex === index 
+                              ? 'ring-3 ring-pink-500 scale-105' 
+                              : 'opacity-70 hover:opacity-100'
+                          }`}
+                        >
+                          <img src={photo} alt="" className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Voting Panel */}
-              <div className="flex flex-col">
-                {/* Rank Card */}
-                <div className="bg-white rounded-3xl shadow-xl shadow-pink-500/5 border border-slate-100 p-6 md:p-8 mb-6">
-                  <div className="text-center mb-6">
-                    <p className="text-slate-500 text-sm mb-2">Currently</p>
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="font-syne text-5xl md:text-6xl font-bold gradient-text">
-                        {contestant.rank || '—'}{contestant.rank ? getRankSuffix(contestant.rank) : ''}
-                      </span>
-                    </div>
-                    {contestant.round && (
-                      <Link to="/leaderboard" className="inline-flex items-center gap-1 text-sm text-pink-600 hover:text-pink-700 mt-2 font-medium">
-                        in the {contestant.round}
-                        <ExternalLink className="w-3 h-3" />
-                      </Link>
-                    )}
-                    {contestant.category_name && !contestant.round && (
-                      <Link to="/leaderboard" className="inline-flex items-center gap-1 text-sm text-pink-600 hover:text-pink-700 mt-2 font-medium">
-                        in {contestant.category_name}
-                        <ExternalLink className="w-3 h-3" />
-                      </Link>
-                    )}
+              {/* Right Column - Voting & Info */}
+              <div className="lg:col-span-7 space-y-6">
+                
+                {/* Current Ranking Card */}
+                <div className="bg-gradient-to-br from-pink-50 to-violet-50 rounded-3xl p-6 md:p-8 border border-pink-100">
+                  <p className="text-slate-500 text-sm mb-2 text-center">Currently</p>
+                  <div className="text-center mb-4">
+                    <span className="font-syne text-6xl md:text-7xl font-bold gradient-text">
+                      {contestant.rank || '—'}{contestant.rank ? getRankSuffix(contestant.rank) : ''}
+                    </span>
                   </div>
+                  {contestant.round ? (
+                    <Link to="/leaderboard" className="flex items-center justify-center gap-1 text-pink-600 hover:text-pink-700 font-medium">
+                      in the {contestant.round}
+                      <ExternalLink className="w-4 h-4" />
+                    </Link>
+                  ) : contestant.category_name ? (
+                    <Link to="/leaderboard" className="flex items-center justify-center gap-1 text-pink-600 hover:text-pink-700 font-medium">
+                      in {contestant.category_name}
+                      <ExternalLink className="w-4 h-4" />
+                    </Link>
+                  ) : (
+                    <p className="text-center text-slate-500">in the competition</p>
+                  )}
+                </div>
 
-                  {/* Vote Button */}
+                {/* Main Vote Button */}
+                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-xl shadow-pink-500/5">
+                  {/* Limited Time Badge */}
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Zap className="w-5 h-5 text-amber-500" />
+                    <span className="text-sm font-bold text-amber-600 uppercase tracking-wide">
+                      Free Voting Open
+                    </span>
+                  </div>
+                  
                   <Button
                     size="lg"
                     onClick={() => setVotingModalOpen(true)}
-                    className="w-full h-16 text-xl btn-gradient btn-jelly shadow-pink-lg"
+                    className="w-full h-16 md:h-20 text-xl md:text-2xl btn-gradient btn-jelly shadow-pink-lg"
                     data-testid="vote-now-btn"
                   >
-                    <Heart className="w-6 h-6 mr-3" />
+                    <Heart className="w-7 h-7 mr-3" />
                     VOTE
                   </Button>
+                  
+                  <p className="text-center text-slate-500 text-sm mt-4">
+                    1 free vote per email every 24 hours
+                  </p>
 
                   {/* Vote Count */}
-                  <div className="mt-6 text-center">
-                    <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-pink-50 to-violet-50 rounded-2xl">
-                      <Trophy className="w-5 h-5 text-amber-500" />
-                      <span className="font-syne text-2xl font-bold text-slate-900">{formatNumber(contestant.vote_count)}</span>
-                      <span className="text-slate-500">votes</span>
+                  <div className="mt-6 pt-6 border-t border-slate-100">
+                    <div className="flex items-center justify-center gap-3">
+                      <Trophy className="w-6 h-6 text-amber-500" />
+                      <span className="font-syne text-3xl font-bold text-slate-900">{formatNumber(contestant.vote_count)}</span>
+                      <span className="text-slate-500">total votes</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Prize Info Card */}
-                <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl border border-amber-100 p-6 mb-6">
-                  <p className="text-slate-700 text-center">
-                    <span className="font-bold">You decide</span> who will be featured and take home the grand prize!
-                  </p>
+                {/* Countdown Timer */}
+                <div className="bg-slate-900 rounded-3xl p-6 md:p-8 text-white">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Clock className="w-5 h-5 text-pink-400" />
+                    <span className="text-sm font-bold uppercase tracking-wide text-pink-400">Voting Ends In</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-3 text-center">
+                    {[
+                      { value: timeLeft.days, label: 'Days' },
+                      { value: timeLeft.hours, label: 'Hours' },
+                      { value: timeLeft.minutes, label: 'Mins' },
+                      { value: timeLeft.seconds, label: 'Secs' },
+                    ].map((item, idx) => (
+                      <div key={idx}>
+                        <div className="font-syne text-3xl md:text-4xl font-bold text-white">
+                          {String(item.value).padStart(2, '0')}
+                        </div>
+                        <div className="text-xs text-slate-400 uppercase tracking-wide">{item.label}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Social Links */}
-                <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
-                  <h3 className="font-syne font-bold text-slate-900 mb-4">Connect</h3>
-                  <div className="flex gap-3">
-                    {contestant.social_instagram && (
-                      <a
-                        href={`https://instagram.com/${contestant.social_instagram}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-lg"
-                        data-testid="instagram-link"
-                      >
-                        <Instagram className="w-5 h-5" />
-                      </a>
-                    )}
-                    {contestant.social_facebook && (
-                      <a
-                        href={`https://facebook.com/${contestant.social_facebook}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-lg"
-                        data-testid="facebook-link"
-                      >
-                        <Facebook className="w-5 h-5" />
-                      </a>
-                    )}
-                    {contestant.social_twitter && (
-                      <a
-                        href={`https://twitter.com/${contestant.social_twitter}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-lg"
-                        data-testid="twitter-link"
-                      >
-                        <Twitter className="w-5 h-5" />
-                      </a>
-                    )}
-                    {!contestant.social_instagram && !contestant.social_facebook && !contestant.social_twitter && (
-                      <p className="text-slate-400 text-sm">No social links added</p>
-                    )}
+                {/* Prize Banner */}
+                <div className="bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 rounded-3xl p-6 md:p-8 border border-amber-200">
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+                      <Gift className="w-7 h-7 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-syne text-lg font-bold text-slate-900 mb-2">Grand Prize</h3>
+                      <p className="text-slate-600">
+                        The winner will be featured on our magazine cover and receive exclusive opportunities!
+                        <span className="text-amber-600 font-semibold"> You decide</span> who takes home the crown.
+                      </p>
+                    </div>
                   </div>
+                </div>
+
+                {/* Paid Voting Options (Ready for future) */}
+                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200">
+                  <div className="flex items-center gap-2 mb-6">
+                    <Star className="w-5 h-5 text-violet-500" />
+                    <h3 className="font-syne text-lg font-bold text-slate-900">Support with Extra Votes</h3>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {[
+                      { votes: 10, price: '$5' },
+                      { votes: 25, price: '$10' },
+                      { votes: 50, price: '$20' },
+                      { votes: 100, price: '$35' },
+                    ].map((option, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => toast.info('Paid voting coming soon!')}
+                        className="p-4 rounded-2xl border-2 border-slate-200 hover:border-pink-300 hover:bg-pink-50 transition-all text-center group"
+                      >
+                        <div className="font-syne text-2xl font-bold text-slate-900 group-hover:text-pink-600">
+                          {option.votes}
+                        </div>
+                        <div className="text-xs text-slate-500">votes</div>
+                        <div className="text-sm font-bold text-pink-600 mt-2">{option.price}</div>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-center text-slate-400 text-xs mt-4">Paid voting coming soon</p>
+                </div>
+
+                {/* Notification Signup */}
+                <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-3xl p-6 md:p-8 border border-violet-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Bell className="w-5 h-5 text-violet-500" />
+                    <h3 className="font-syne text-lg font-bold text-slate-900">Get Notified</h3>
+                  </div>
+                  <p className="text-slate-600 text-sm mb-4">
+                    Get an email when {contestant.full_name.split(' ')[0]}'s position changes in the rankings.
+                  </p>
+                  {subscribed ? (
+                    <div className="flex items-center gap-2 text-green-600 font-medium">
+                      <Check className="w-5 h-5" />
+                      You're subscribed!
+                    </div>
+                  ) : (
+                    <form onSubmit={handleNotifySubscribe} className="flex gap-2">
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        value={notifyEmail}
+                        onChange={(e) => setNotifyEmail(e.target.value)}
+                        className="flex-1 h-12 rounded-xl bg-white border-violet-200 focus:border-violet-500"
+                      />
+                      <Button type="submit" className="h-12 px-6 bg-violet-600 hover:bg-violet-700 rounded-xl">
+                        <Mail className="w-4 h-4" />
+                      </Button>
+                    </form>
+                  )}
                 </div>
               </div>
             </div>
@@ -285,15 +420,18 @@ export default function VotingPage() {
 
         {/* Q&A Section */}
         {contestant.qa_items && contestant.qa_items.length > 0 && (
-          <section className="py-12 md:py-16 bg-white">
+          <section className="py-12 md:py-16 bg-slate-50 border-t border-slate-100">
             <div className="max-w-4xl mx-auto px-4">
-              <div className="space-y-8">
+              <h2 className="font-syne text-2xl md:text-3xl font-bold text-slate-900 mb-8 text-center">
+                Get to Know {contestant.full_name.split(' ')[0]}
+              </h2>
+              <div className="space-y-6">
                 {contestant.qa_items.map((qa, index) => (
-                  <div key={index} className="border-b border-slate-100 pb-8 last:border-0">
+                  <div key={index} className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100">
                     <h3 className="font-syne text-lg md:text-xl font-bold text-pink-600 mb-3">
                       {qa.question}
                     </h3>
-                    <p className="text-slate-600 leading-relaxed">
+                    <p className="text-slate-600 leading-relaxed text-lg">
                       {qa.answer}
                     </p>
                   </div>
@@ -305,18 +443,16 @@ export default function VotingPage() {
 
         {/* Photo Gallery */}
         {photos.length > 1 && (
-          <section className="py-12 md:py-16 bg-slate-50">
+          <section className="py-12 md:py-16 bg-white border-t border-slate-100">
             <div className="max-w-6xl mx-auto px-4">
               <h2 className="font-syne text-2xl md:text-3xl font-bold text-slate-900 mb-8 text-center">Photo Gallery</h2>
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {photos.map((photo, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedPhotoIndex(index)}
-                    className={`aspect-square rounded-xl overflow-hidden transition-all ${
-                      selectedPhotoIndex === index 
-                        ? 'ring-4 ring-pink-500 scale-105 shadow-lg' 
-                        : 'hover:scale-105 hover:shadow-md'
+                    className={`aspect-square rounded-2xl overflow-hidden transition-all hover:scale-105 ${
+                      selectedPhotoIndex === index ? 'ring-4 ring-pink-500 shadow-lg' : ''
                     }`}
                   >
                     <img
@@ -332,21 +468,21 @@ export default function VotingPage() {
         )}
 
         {/* Bottom CTA */}
-        <section className="py-12 md:py-16 bg-gradient-to-br from-pink-500 via-violet-500 to-purple-600">
+        <section className="py-12 md:py-20 bg-gradient-to-br from-pink-500 via-violet-500 to-purple-600">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="font-syne text-2xl md:text-4xl font-bold text-white mb-4">
+            <h2 className="font-syne text-3xl md:text-5xl font-bold text-white mb-4">
               Help {contestant.full_name.split(' ')[0]} Win!
             </h2>
-            <p className="text-white/80 mb-8 max-w-xl mx-auto">
-              Every vote counts. Support {contestant.full_name} by casting your vote today!
+            <p className="text-white/80 mb-8 max-w-xl mx-auto text-lg">
+              Every vote matters. Your support can help {contestant.full_name} take home the crown!
             </p>
             <Button
               size="lg"
               onClick={() => setVotingModalOpen(true)}
-              className="h-14 px-12 text-lg bg-white text-pink-600 hover:bg-white/90 rounded-full font-bold shadow-xl btn-jelly"
+              className="h-16 px-12 text-xl bg-white text-pink-600 hover:bg-white/90 rounded-full font-bold shadow-xl btn-jelly"
               data-testid="bottom-vote-btn"
             >
-              <Heart className="w-5 h-5 mr-2 fill-pink-600" />
+              <Heart className="w-6 h-6 mr-3 fill-pink-600" />
               Vote Now - It's Free!
             </Button>
           </div>
