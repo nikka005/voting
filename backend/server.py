@@ -101,6 +101,7 @@ class ContestantResponse(BaseModel):
     social_instagram: str
     social_facebook: str
     social_twitter: str
+    social_tiktok: Optional[str]
     age: Optional[int]
     location: str
     category_id: Optional[str]
@@ -110,6 +111,8 @@ class ContestantResponse(BaseModel):
     voting_link: str
     created_at: str
     round: Optional[str]
+    rank: Optional[int] = None
+    qa_items: Optional[List[dict]] = []
 
 class CategoryCreate(BaseModel):
     name: str
