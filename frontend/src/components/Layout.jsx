@@ -257,8 +257,9 @@ export const Footer = () => {
 export const Layout = ({ children, hideFooter = false, isManagement = false }) => {
   const location = useLocation();
   
-  // Determine if we're in management area
+  // Determine if we're in management area (includes /portal paths)
   const isManagementArea = isManagement || 
+    location.pathname.startsWith('/portal') ||
     location.pathname.startsWith('/dashboard') || 
     location.pathname.startsWith('/admin');
 
