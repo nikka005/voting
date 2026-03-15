@@ -506,6 +506,14 @@ async def get_contestant_by_slug(year: str, slug: str):
         cat = await db.categories.find_one({"id": contestant["category_id"]}, {"_id": 0})
         category_name = cat["name"] if cat else ""
     
+    # Calculate rank
+    rank = 1
+    higher_vote_count = await db.contestants.count_documents({
+        "status": "approved",
+        "vote_count": {"$gt": contestant.get("vote_count", 0)}
+    })
+    rank = higher_vote_count + 1
+    
     base_url = os.environ.get('FRONTEND_URL', 'https://lumina-contest.com')
     return ContestantResponse(
         id=contestant["id"],
@@ -518,6 +526,7 @@ async def get_contestant_by_slug(year: str, slug: str):
         social_instagram=contestant.get("social_instagram", ""),
         social_facebook=contestant.get("social_facebook", ""),
         social_twitter=contestant.get("social_twitter", ""),
+        social_tiktok=contestant.get("social_tiktok", ""),
         age=contestant.get("age"),
         location=contestant.get("location", ""),
         category_id=contestant.get("category_id"),
@@ -526,7 +535,9 @@ async def get_contestant_by_slug(year: str, slug: str):
         status=contestant["status"],
         voting_link=f"{base_url}/{contestant['slug']}",
         created_at=contestant["created_at"],
-        round=contestant.get("round")
+        round=contestant.get("round"),
+        rank=rank,
+        qa_items=contestant.get("qa_items", [])
     )
 
 @api_router.get("/contestants/{contestant_id}", response_model=ContestantResponse)
