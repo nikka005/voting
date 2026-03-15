@@ -278,12 +278,14 @@ async def register(user: UserCreate):
         "social_instagram": "",
         "social_facebook": "",
         "social_twitter": "",
+        "social_tiktok": "",
         "age": None,
         "location": "",
         "category_id": None,
         "vote_count": 0,
         "status": "pending",
         "round": None,
+        "qa_items": [],
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.contestants.insert_one(contestant_doc)
