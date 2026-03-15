@@ -11,19 +11,15 @@ import {
   Home, 
   User,
   LogOut,
-  LayoutDashboard
+  LayoutDashboard,
+  Settings
 } from 'lucide-react';
 
-export const Header = () => {
-  const { user, logout, isAdmin } = useAuth();
+// ===== PUBLIC HEADER (Voting Site) =====
+const PublicHeader = () => {
+  const { user, isAdmin } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
 
   const navLinks = [
     { href: '/', label: 'Home', icon: Home },
@@ -34,12 +30,12 @@ export const Header = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-xl border-b border-slate-200/50">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group" data-testid="logo-link">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center shadow-pink transition-transform group-hover:scale-110">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center shadow-lg shadow-pink-500/25 transition-transform group-hover:scale-110">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <span className="font-syne text-xl md:text-2xl font-bold gradient-text-pink">
@@ -65,49 +61,24 @@ export const Header = () => {
             ))}
           </nav>
 
-          {/* Auth Buttons */}
+          {/* Right Side */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
-              <>
-                {isAdmin ? (
-                  <Link to="/admin">
-                    <Button variant="ghost" size="sm" data-testid="admin-dashboard-btn" className="text-slate-600 hover:text-pink-600 hover:bg-pink-50">
-                      <LayoutDashboard className="w-4 h-4 mr-2" />
-                      Admin
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link to="/dashboard">
-                    <Button variant="ghost" size="sm" data-testid="contestant-dashboard-btn" className="text-slate-600 hover:text-pink-600 hover:bg-pink-50">
-                      <User className="w-4 h-4 mr-2" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLogout}
-                  data-testid="logout-btn"
-                  className="border-slate-200 text-slate-600 hover:text-pink-600 hover:border-pink-300"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
+              <Link to={isAdmin ? '/admin' : '/dashboard'}>
+                <Button variant="outline" size="sm" className="border-pink-200 text-pink-600 hover:bg-pink-50 rounded-full">
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  {isAdmin ? 'Admin Panel' : 'My Dashboard'}
                 </Button>
-              </>
+              </Link>
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" size="sm" data-testid="login-btn" className="text-slate-600 hover:text-pink-600">
+                  <Button variant="ghost" size="sm" className="text-slate-600 hover:text-pink-600">
                     Login
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button 
-                    size="sm" 
-                    data-testid="register-btn"
-                    className="btn-gradient px-6 btn-jelly"
-                  >
+                  <Button size="sm" className="btn-gradient px-6 btn-jelly" data-testid="register-btn">
                     Join Contest
                   </Button>
                 </Link>
@@ -128,14 +99,14 @@ export const Header = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-slate-100 animate-fade-in-up">
+        <div className="md:hidden bg-white border-t border-slate-100 shadow-lg animate-fade-in-up">
           <div className="px-4 py-4 space-y-2">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-colors ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
                   isActive(link.href)
                     ? 'bg-pink-50 text-pink-600'
                     : 'text-slate-600 hover:bg-slate-50'
@@ -147,29 +118,28 @@ export const Header = () => {
             ))}
             <div className="border-t border-slate-100 pt-3 space-y-2">
               {user ? (
-                <>
-                  <Link
-                    to={isAdmin ? '/admin' : '/dashboard'}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-2xl"
-                  >
-                    {isAdmin ? <LayoutDashboard className="w-5 h-5" /> : <User className="w-5 h-5" />}
-                    {isAdmin ? 'Admin Panel' : 'My Dashboard'}
-                  </Link>
-                  <button
-                    onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                    className="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-2xl w-full"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    Logout
-                  </button>
-                </>
+                <Link
+                  to={isAdmin ? '/admin' : '/dashboard'}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 text-pink-600 hover:bg-pink-50 rounded-xl"
+                >
+                  <LayoutDashboard className="w-5 h-5" />
+                  {isAdmin ? 'Admin Panel' : 'My Dashboard'}
+                </Link>
               ) : (
                 <>
-                  <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-2xl">
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl"
+                  >
                     Login
                   </Link>
-                  <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 btn-gradient text-center rounded-full font-bold">
+                  <Link
+                    to="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-4 py-3 btn-gradient text-center rounded-full font-bold"
+                  >
                     Join Contest
                   </Link>
                 </>
@@ -182,6 +152,64 @@ export const Header = () => {
   );
 };
 
+// ===== MANAGEMENT HEADER (Dashboard/Admin) =====
+const ManagementHeader = () => {
+  const { user, logout, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-syne text-lg font-bold gradient-text-pink">
+              Glamour
+            </span>
+            <span className="px-2 py-0.5 text-xs font-bold bg-slate-100 text-slate-600 rounded-full">
+              {isAdmin ? 'Admin' : 'Dashboard'}
+            </span>
+          </Link>
+
+          {/* Navigation */}
+          <div className="flex items-center gap-4">
+            <Link to="/" className="text-sm text-slate-500 hover:text-pink-600 transition-colors">
+              View Public Site
+            </Link>
+            
+            {user && (
+              <div className="flex items-center gap-3">
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm font-medium text-slate-900">{user.full_name}</p>
+                  <p className="text-xs text-slate-500">{user.email}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="text-slate-500 hover:text-red-500"
+                >
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+// ===== FOOTER =====
 export const Footer = () => {
   return (
     <footer className="border-t border-slate-200 bg-gradient-to-b from-white to-slate-50">
@@ -196,24 +224,23 @@ export const Footer = () => {
               <span className="font-syne text-xl font-bold gradient-text-pink">Glamour</span>
             </Link>
             <p className="text-slate-500 text-sm max-w-sm">
-              The world's most exciting beauty contest platform. Vote for your favorites and help them shine!
+              The world's premier beauty contest platform. Vote for your favorites and help them win!
             </p>
           </div>
 
           <div>
-            <h4 className="font-syne font-bold text-slate-900 mb-4">Quick Links</h4>
+            <h4 className="font-syne font-bold text-slate-900 mb-4">Voting</h4>
             <ul className="space-y-2">
-              <li><Link to="/contestants" className="text-slate-500 hover:text-pink-500 text-sm transition-colors">Contestants</Link></li>
+              <li><Link to="/contestants" className="text-slate-500 hover:text-pink-500 text-sm transition-colors">Browse Contestants</Link></li>
               <li><Link to="/leaderboard" className="text-slate-500 hover:text-pink-500 text-sm transition-colors">Leaderboard</Link></li>
-              <li><Link to="/register" className="text-slate-500 hover:text-pink-500 text-sm transition-colors">Join Contest</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-syne font-bold text-slate-900 mb-4">Contact</h4>
-            <ul className="space-y-2 text-slate-500 text-sm">
-              <li>hello@glamour.vote</li>
-              <li>Support 24/7</li>
+            <h4 className="font-syne font-bold text-slate-900 mb-4">Contestants</h4>
+            <ul className="space-y-2">
+              <li><Link to="/register" className="text-slate-500 hover:text-pink-500 text-sm transition-colors">Join Contest</Link></li>
+              <li><Link to="/login" className="text-slate-500 hover:text-pink-500 text-sm transition-colors">Sign In</Link></li>
             </ul>
           </div>
         </div>
@@ -226,14 +253,22 @@ export const Footer = () => {
   );
 };
 
-export const Layout = ({ children, hideFooter = false }) => {
+// ===== MAIN LAYOUT =====
+export const Layout = ({ children, hideFooter = false, isManagement = false }) => {
+  const location = useLocation();
+  
+  // Determine if we're in management area
+  const isManagementArea = isManagement || 
+    location.pathname.startsWith('/dashboard') || 
+    location.pathname.startsWith('/admin');
+
   return (
     <div className="min-h-screen bg-slate-50 orb-bg">
-      <Header />
-      <main className="pt-16 md:pt-20 relative z-10">
+      {isManagementArea ? <ManagementHeader /> : <PublicHeader />}
+      <main className={`${isManagementArea ? 'pt-16' : 'pt-16 md:pt-20'} relative z-10`}>
         {children}
       </main>
-      {!hideFooter && <Footer />}
+      {!hideFooter && !isManagementArea && <Footer />}
     </div>
   );
 };
