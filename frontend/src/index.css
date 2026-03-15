@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Manrope:wght@200..800&family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Manrope:wght@200..800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -25,264 +25,95 @@
         --border: 214 32% 91%;
         --input: 214 32% 91%;
         --ring: 330 81% 60%;
-        --radius: 1rem;
-        --chart-1: 330 81% 60%;
-        --chart-2: 187 92% 41%;
-        --chart-3: 263 70% 58%;
-        --chart-4: 43 96% 56%;
-        --chart-5: 142 71% 45%;
+        --radius: 0.75rem;
     }
 }
 
 @layer base {
-    * {
-        @apply border-border;
-    }
+    * { @apply border-border; }
     body {
         @apply bg-background text-foreground;
         font-family: 'Manrope', sans-serif;
     }
-    h1, h2, h3, h4, h5, h6 {
-        font-family: 'Syne', sans-serif;
-    }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Syne', sans-serif; }
 }
 
 /* Gradient text */
-.gradient-text {
-    @apply bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent;
-}
-
-.gradient-text-pink {
-    @apply bg-gradient-to-r from-pink-500 to-violet-600 bg-clip-text text-transparent;
-}
+.gradient-text { @apply bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent; }
+.gradient-text-pink { @apply bg-gradient-to-r from-pink-500 to-violet-600 bg-clip-text text-transparent; }
 
 /* Glass effect */
-.glass {
-    @apply bg-white/40 backdrop-blur-2xl border border-white/60;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-}
+.glass { @apply bg-white/60 backdrop-blur-xl border border-white/80; }
 
-.glass-card {
-    @apply bg-white/60 backdrop-blur-xl border border-white/80 shadow-xl;
-}
-
-/* 3D floating orbs background */
-.orb-bg {
-    position: relative;
-    overflow: hidden;
-}
-
+/* 3D orbs background */
+.orb-bg { position: relative; overflow: hidden; }
 .orb-bg::before {
-    content: '';
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, transparent 70%);
-    top: -200px;
-    right: -200px;
-    border-radius: 50%;
-    animation: float 20s ease-in-out infinite;
-    z-index: 0;
+    content: ''; position: absolute; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, transparent 70%);
+    top: -150px; right: -150px; border-radius: 50%;
+    animation: float 20s ease-in-out infinite; z-index: 0;
 }
-
 .orb-bg::after {
-    content: '';
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%);
-    bottom: -150px;
-    left: -150px;
-    border-radius: 50%;
-    animation: float 25s ease-in-out infinite reverse;
-    z-index: 0;
+    content: ''; position: absolute; width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+    bottom: -100px; left: -100px; border-radius: 50%;
+    animation: float 25s ease-in-out infinite reverse; z-index: 0;
 }
-
 @keyframes float {
     0%, 100% { transform: translate(0, 0) scale(1); }
-    25% { transform: translate(30px, -30px) scale(1.05); }
     50% { transform: translate(-20px, 20px) scale(0.95); }
-    75% { transform: translate(20px, 30px) scale(1.02); }
-}
-
-/* Purple orb */
-.orb-purple::before {
-    content: '';
-    position: absolute;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    animation: pulse 15s ease-in-out infinite;
-    z-index: 0;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
 }
 
 /* Gradient buttons */
 .btn-gradient {
-    @apply bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-600 hover:to-violet-700 text-white font-bold rounded-full shadow-lg shadow-pink-500/25 transition-all duration-300;
+    @apply bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-600 hover:to-violet-700 text-white font-semibold rounded-full shadow-lg shadow-pink-500/20 transition-all duration-200;
 }
+.btn-gradient:hover { transform: scale(1.02); }
+.btn-gradient:active { transform: scale(0.98); }
+.btn-jelly { transition: transform 0.15s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+.btn-jelly:active { transform: scale(0.95); }
 
-.btn-gradient:hover {
-    transform: scale(1.05);
-    @apply shadow-xl shadow-pink-500/30;
-}
-
-.btn-gradient:active {
-    transform: scale(0.95);
-}
-
-/* Jelly button effect */
-.btn-jelly {
-    transition: transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.btn-jelly:active {
-    transform: scale(0.9);
-}
-
-/* Card hover effects */
-.card-hover {
-    @apply transition-all duration-500;
-}
-
-.card-hover:hover {
-    transform: translateY(-8px);
-    @apply shadow-2xl shadow-pink-500/10;
-}
+/* Card hover */
+.card-hover { @apply transition-all duration-300; }
+.card-hover:hover { transform: translateY(-4px); @apply shadow-xl; }
 
 /* Contestant card */
-.contestant-card {
-    @apply relative overflow-hidden rounded-3xl bg-white shadow-sm border border-slate-100 transition-all duration-500;
-}
+.contestant-card { @apply relative overflow-hidden rounded-2xl bg-white shadow-sm border border-slate-100 transition-all duration-300; }
+.contestant-card:hover { @apply shadow-lg; transform: translateY(-2px); }
+.contestant-card:hover .contestant-image { transform: scale(1.03); }
 
-.contestant-card:hover {
-    @apply shadow-2xl shadow-pink-500/15;
-    transform: translateY(-4px);
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { @apply bg-slate-100 rounded-full; }
+::-webkit-scrollbar-thumb { @apply bg-gradient-to-b from-pink-400 to-violet-500 rounded-full; }
 
-.contestant-card:hover .contestant-image {
-    transform: scale(1.05);
-}
+/* Rank badges */
+.rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); box-shadow: 0 3px 10px rgba(255, 215, 0, 0.3); }
+.rank-2 { background: linear-gradient(135deg, #C0C0C0, #A8A8A8); }
+.rank-3 { background: linear-gradient(135deg, #CD7F32, #B87333); }
 
-/* Iridescent border on focus */
-.iridescent-focus:focus-within {
-    border-image: linear-gradient(90deg, #EC4899, #8B5CF6, #06B6D4, #EC4899) 1;
-    animation: shimmer 3s linear infinite;
-}
-
-@keyframes shimmer {
-    0% { border-image-source: linear-gradient(90deg, #EC4899, #8B5CF6, #06B6D4, #EC4899); }
-    50% { border-image-source: linear-gradient(90deg, #06B6D4, #EC4899, #8B5CF6, #06B6D4); }
-    100% { border-image-source: linear-gradient(90deg, #EC4899, #8B5CF6, #06B6D4, #EC4899); }
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-track {
-    @apply bg-slate-100 rounded-full;
-}
-
-::-webkit-scrollbar-thumb {
-    @apply bg-gradient-to-b from-pink-400 to-violet-500 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    @apply from-pink-500 to-violet-600;
-}
-
-/* Leaderboard rank styles */
-.rank-1 {
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-}
-
-.rank-2 {
-    background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%);
-    box-shadow: 0 4px 15px rgba(192, 192, 192, 0.4);
-}
-
-.rank-3 {
-    background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
-    box-shadow: 0 4px 15px rgba(205, 127, 50, 0.4);
-}
-
-/* Vote counter animation */
-@keyframes countUp {
-    from { transform: translateY(10px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-.vote-count-animate {
-    animation: countUp 0.3s ease-out;
-}
-
-/* Confetti animation */
-@keyframes confetti-fall {
-    0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-}
-
-/* Fade animations */
+/* Animations */
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+.animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+.stagger-1 { animation-delay: 0.05s; opacity: 0; }
+.stagger-2 { animation-delay: 0.1s; opacity: 0; }
+.stagger-3 { animation-delay: 0.15s; opacity: 0; }
+.stagger-4 { animation-delay: 0.2s; opacity: 0; }
 
-.animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out forwards;
-}
-
-.stagger-1 { animation-delay: 0.1s; opacity: 0; }
-.stagger-2 { animation-delay: 0.2s; opacity: 0; }
-.stagger-3 { animation-delay: 0.3s; opacity: 0; }
-.stagger-4 { animation-delay: 0.4s; opacity: 0; }
-.stagger-5 { animation-delay: 0.5s; opacity: 0; }
-
-/* Loading skeleton */
+/* Skeleton loading */
 .skeleton {
     @apply bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:200%_100%];
-    animation: skeleton-loading 1.5s infinite;
+    animation: skeleton-loading 1.2s infinite;
 }
-
 @keyframes skeleton-loading {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
 
-/* Noise texture overlay for depth */
-.noise-overlay::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
-    opacity: 0.02;
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* Utility for debug wrapper */
-@layer base {
-    [data-debug-wrapper="true"] {
-        display: contents !important;
-    }
-}
-
-/* Mobile optimizations */
+/* Mobile */
 @media (max-width: 768px) {
-    .orb-bg::before, .orb-bg::after {
-        width: 300px;
-        height: 300px;
-    }
+    .orb-bg::before, .orb-bg::after { width: 250px; height: 250px; }
 }
