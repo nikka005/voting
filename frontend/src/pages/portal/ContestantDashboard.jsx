@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { Layout } from '../components/Layout';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Textarea } from '../components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Progress } from '../components/ui/progress';
-import { Switch } from '../components/ui/switch';
-import { contestantsAPI, categoriesAPI, leaderboardAPI } from '../lib/api';
-import { formatNumber, formatDate } from '../lib/utils';
+import { useAuth } from '../../context/AuthContext';
+import { Layout } from '../../components/Layout';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Textarea } from '../../components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Progress } from '../../components/ui/progress';
+import { Switch } from '../../components/ui/switch';
+import { contestantsAPI, categoriesAPI, leaderboardAPI } from '../../lib/api';
+import { formatNumber, formatDate } from '../../lib/utils';
 import { toast } from 'sonner';
 import {
   User, Heart, Link as LinkIcon, Camera, Instagram, Facebook, Twitter,
