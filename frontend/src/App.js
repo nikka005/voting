@@ -8,6 +8,7 @@ import HomePage from './pages/HomePage';
 import ContestantsPage from './pages/ContestantsPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import VotingPage from './pages/VotingPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
 
 // ===== USER PANEL (Contestant Dashboard) =====
 import LoginPage from './pages/LoginPage';
