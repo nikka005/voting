@@ -1,156 +1,126 @@
 {
-  "identity": {
-    "name": "E1",
-    "role": "Creative Designer (Top 1%)",
-    "principles": [
-      "Fusion over Imitation",
-      "Emotion First",
-      "Content is King",
-      "Zoom In",
-      "Negative Space",
-      "Contrast"
-    ],
-    "anti_patterns": [
-      "Purple/Teal CTAs",
-      "Inter everywhere",
-      "Center-Everything Disease",
-      "Gradient Overload"
-    ]
-  },
-  "project": {
-    "name": "Lumina - Premium Beauty Contest Platform",
-    "theme_strategy": "The Midnight Gala (Dark Mode Dominant)",
-    "emotional_tone": "Luxury, Aspiration, Fairness, Cinematic",
-    "archetype": "JEWEL & LUXURY"
+  "project_name": "Premium Beauty Contest Voting Platform",
+  "design_philosophy": {
+    "theme": "Luminous Web3 Pageant",
+    "core_concept": "High-fashion meets digital ownership. Think iridescent foils, milled aluminum, and frosted glass in a brightly lit studio.",
+    "emotional_tone": "Euphoric, Competitive, Premium, Digital-Native",
+    "visual_style": "Light Mode Web3. High-key lighting, pastel neons, aggressive glassmorphism, and bold editorial typography."
   },
   "typography": {
-    "headings": {
-      "font_family": "Bodoni Moda, serif",
-      "weights": ["400", "700"],
-      "usage": "All section titles, hero text, contestant names. Use italic variant for emphasis.",
-      "letter_spacing": "tracking-tight"
+    "font_family": {
+      "headings": "Syne, sans-serif",
+      "body": "Manrope, sans-serif",
+      "accent": "Space Grotesk, sans-serif"
     },
-    "body": {
-      "font_family": "Manrope, sans-serif",
-      "weights": ["300", "400", "600"],
-      "usage": "Paragraphs, UI elements, stats, buttons.",
-      "letter_spacing": "tracking-wide"
+    "scale": {
+      "h1": "text-6xl md:text-8xl font-bold tracking-tighter leading-[0.9]",
+      "h2": "text-4xl md:text-6xl font-bold tracking-tight",
+      "h3": "text-2xl md:text-3xl font-semibold tracking-tight",
+      "body": "text-base md:text-lg leading-relaxed text-slate-600",
+      "caption": "text-xs font-bold uppercase tracking-widest text-slate-400"
     },
-    "google_fonts_import": "https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Manrope:wght@200..800&display=swap"
+    "usage_rules": [
+      "Use 'Syne' for all major headings (H1-H3) to give that 'art-house' feel.",
+      "Use 'Manrope' for all UI text, inputs, and long-form content.",
+      "Headings should often have a subtle gradient text fill (e.g., Pink to Violet)."
+    ]
   },
   "colors": {
     "palette": {
       "background": {
-        "default": "#050505",
-        "paper": "#0A0A0A",
-        "subtle": "#121212"
-      },
-      "foreground": {
-        "default": "#F5F5F5",
-        "muted": "#A1A1AA",
-        "inverse": "#000000"
+        "primary": "#F8FAFC",
+        "secondary": "#F1F5F9",
+        "glass": "rgba(255, 255, 255, 0.6)"
       },
       "primary": {
-        "default": "#D4AF37",
-        "hover": "#F4C430",
-        "foreground": "#000000"
+        "main": "#EC4899",
+        "gradient_start": "#EC4899",
+        "gradient_end": "#8B5CF6",
+        "hover": "#DB2777"
       },
       "secondary": {
-        "default": "#FFFFFF",
-        "foreground": "#000000"
+        "main": "#06B6D4",
+        "accent": "#22D3EE"
       },
-      "accent": {
-        "default": "#B76E79",
-        "glow": "rgba(212, 175, 55, 0.5)"
+      "text": {
+        "primary": "#0F172A",
+        "secondary": "#475569",
+        "muted": "#94A3B8"
       },
       "border": {
-        "default": "#27272A",
-        "active": "#D4AF37"
+        "subtle": "rgba(0, 0, 0, 0.05)",
+        "highlight": "rgba(255, 255, 255, 0.8)"
       }
     },
     "gradients": {
-      "gold_shimmer": "linear-gradient(45deg, #D4AF37 0%, #F4C430 50%, #D4AF37 100%)",
-      "dark_fade": "linear-gradient(to bottom, rgba(5,5,5,0) 0%, #050505 100%)"
+      "brand_text": "bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent",
+      "glass_surface": "bg-white/40 backdrop-blur-xl border border-white/50 shadow-xl shadow-pink-500/5",
+      "button_primary": "bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-600 hover:to-violet-700 text-white shadow-lg shadow-pink-500/25"
     }
   },
-  "layout_system": {
-    "grid_mode": "MODE A: THE TETRIS GRID",
+  "layout": {
+    "grid_system": {
+      "landing": "Grid Mode A (Tetris): Asymmetrical bento grid for showcasing top contestants.",
+      "dashboard": "Grid Mode B (High Density): Clean 4-column grid for stats and management."
+    },
     "spacing": {
-      "container_padding": "p-6 md:p-12 lg:p-24",
+      "container_padding": "p-6 md:p-12",
       "section_gap": "gap-12 md:gap-24",
-      "element_gap": "gap-6"
+      "card_padding": "p-6"
     },
-    "containers": {
-      "max_width": "max-w-7xl",
-      "alignment": "mx-auto"
-    }
-  },
-  "visual_enhancers": {
-    "textures": {
-      "noise": "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjMDUwNTA1Ii8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiMyMjIiLz4KPC9zdmc+')",
-      "gold_overlay": "Use the gold abstract image with mix-blend-mode: overlay opacity-20"
-    },
-    "effects": {
-      "glassmorphism": "backdrop-blur-xl bg-black/40 border border-white/10",
-      "glow": "shadow-[0_0_30px_-10px_rgba(212,175,55,0.3)]",
-      "text_shadow": "text-shadow-sm"
-    },
-    "border_radius": {
-      "default": "rounded-none",
-      "buttons": "rounded-full",
-      "cards": "rounded-sm"
+    "radius": {
+      "default": "rounded-3xl",
+      "button": "rounded-full",
+      "card": "rounded-2xl"
     }
   },
   "components": {
-    "ContestantCard": {
-      "style": "Vertical editorial card. Image takes 80% height. Name and Vote button at bottom overlay.",
-      "interaction": "Hover: Image scales up 1.05x, Gold border traces the edge.",
-      "props": "image, name, category, vote_count, id"
+    "buttons": {
+      "primary": "h-12 px-8 rounded-full font-bold tracking-wide transition-all hover:scale-105 active:scale-95",
+      "secondary": "h-12 px-8 rounded-full bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 font-semibold",
+      "ghost": "hover:bg-pink-50 text-pink-600"
     },
-    "VoteButton": {
-      "style": "Pill shaped, Gold background, Black text, uppercase, tracking-widest, font-bold.",
-      "interaction": "Hover: Scale 1.05, Shadow Glow."
+    "cards": {
+      "contestant": "group relative overflow-hidden rounded-3xl bg-white shadow-sm hover:shadow-2xl hover:shadow-pink-500/10 transition-all duration-500 border border-slate-100",
+      "glass_panel": "rounded-3xl bg-white/30 backdrop-blur-2xl border border-white/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]"
     },
-    "LeaderboardRow": {
-      "style": "Minimalist row. Rank number in Serif (large). Avatar circle. Name. Vote bar (thin gold line).",
-      "highlight": "Top 3 get gold/silver/bronze glow effects."
-    },
-    "HeroSection": {
-      "style": "Full screen height. Parallax background. Centered Serif Headline (huge). Floating 'Enter' button.",
-      "background": "Use 'Gold Flowing Lines' image with heavy dark overlay."
+    "inputs": {
+      "style": "h-12 rounded-xl bg-white/50 border-slate-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 transition-all backdrop-blur-sm"
     }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "HEAVY usage. The UI should feel like layers of frosted glass floating over a dynamic background.",
+    "shadows": "Colored shadows are mandatory. Do not use black shadows. Use `shadow-pink-500/10` or `shadow-cyan-500/10`.",
+    "decorations": [
+      "Floating 3D orbs in the background (CSS radial gradients or Spline).",
+      "Noise texture overlays at 2% opacity to reduce digital flatness.",
+      "Iridescent borders on active states."
+    ]
+  },
+  "motion": {
+    "library": "framer-motion",
+    "transitions": {
+      "hover": "transition-all duration-300 ease-out",
+      "page_load": "initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}"
+    },
+    "micro_interactions": "Buttons should have a 'jelly' effect on click. Cards should lift and glow on hover."
   },
   "assets": {
     "images": {
-      "hero_bg": "https://images.unsplash.com/photo-1761437855598-011cf89b2ad4?crop=entropy&cs=srgb&fm=jpg&q=85",
-      "texture_accent": "https://images.unsplash.com/photo-1760172287483-02d382f63a6f?crop=entropy&cs=srgb&fm=jpg&q=85",
-      "contestants": [
-        "https://images.unsplash.com/photo-1768818536330-62ae6edf84ba?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.unsplash.com/photo-1736092306548-ad514f4386bc?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.unsplash.com/photo-1736092306940-3f96ee4bce29?crop=entropy&cs=srgb&fm=jpg&q=85"
-      ]
+      "hero_bg": "https://images.unsplash.com/photo-1758391407696-d18916c1b23f?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "contestant_1": "https://images.unsplash.com/photo-1607332646821-cd217e4faf64?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "contestant_2": "https://images.unsplash.com/photo-1607332646791-929f9ddcf96a?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "contestant_3": "https://images.unsplash.com/photo-1653256170871-d0a26c41f49c?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "crowd_energy": "https://images.unsplash.com/photo-1580151801377-c082d574faa9?crop=entropy&cs=srgb&fm=jpg&q=85"
     },
-    "icons": {
-      "library": "lucide-react",
-      "style": "Stroke width 1px or 1.5px. Elegant and thin."
-    }
+    "icons": "Lucide React (rounded style)"
   },
-  "instructions_to_main_agent": [
-    "1. INSTALL FONTS: Add the Google Fonts import to index.css immediately.",
-    "2. CONFIGURE TAILWIND: Update tailwind.config.js with the 'Midnight Gala' palette and font families.",
-    "3. CREATE LAYOUT: Build a 'Layout' component that enforces the dark theme and noise texture background.",
-    "4. BUILD COMPONENTS: Start with the 'ContestantCard' and 'VoteButton' as they are core to the experience.",
-    "5. DO NOT USE DEFAULT SHADCN STYLES: Override them. No rounded-md default cards. Use sharp edges or pill shapes as defined.",
-    "6. IMAGES: Use the provided Unsplash URLs for placeholders. Do not leave images empty.",
-    "7. DATA-TESTID: Add data-testid to all interactive elements (e.g., 'vote-btn-contestant-1')."
+  "universal_guidelines": [
+    "LIGHT THEME ONLY. Do not create a dark mode toggle. The brand is strictly 'Daylight Glamour'.",
+    "Avoid pure black (#000000). Use Slate-900 (#0F172A) for maximum contrast text.",
+    "Every interactive element must have a `data-testid`.",
+    "Use `sonner` for all toast notifications.",
+    "Do not use default browser scrollbars. Style them to be thin and pill-shaped."
   ],
-  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
-    "Avoid 'AI Slop' aesthetics (generic centered layouts, gradients).",
-    "Use 2-3x more spacing than typical.",
-    "Dark colors must be rich (tinted), not pure black/grey.",
-    "Micro-animations on every interaction are mandatory.",
-    "Use 'sonner' for toasts.",
-    "Components must use named exports.",
-    "Pages must use default exports."
-  ]
+  "instructions_to_main_agent": "You are building a high-energy, visual-first voting platform. Your priority is VISUAL IMPACT. The 'Voting' action must feel rewarding (confetti, sound, haptics visual). The Leaderboard must look like a stock market ticker but for beauty—dynamic, shifting, and alive. Use the provided image URLs for the MVP. Do not use placeholders."
 }
