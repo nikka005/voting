@@ -212,12 +212,12 @@ fraud_detector = FraudDetector()
 # ============ EMAIL NOTIFICATION TEMPLATES ============
 
 class EmailTemplates:
-    """Email notification templates"""
+    """Email notification templates for Glowing Star Contest"""
     
     @staticmethod
     def otp_template(otp: str, contestant_name: str = "the contestant") -> dict:
         return {
-            "subject": f"Your Voting OTP - Glamour Beauty Contest",
+            "subject": f"Your Voting OTP - Glowing Star Beauty Contest",
             "html": f"""
             <!DOCTYPE html>
             <html>
@@ -225,18 +225,18 @@ class EmailTemplates:
                 <style>
                     body {{ font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; margin: 0; padding: 20px; }}
                     .container {{ max-width: 500px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }}
-                    .header {{ background: linear-gradient(135deg, #ec4899, #8b5cf6); padding: 30px; text-align: center; }}
+                    .header {{ background: linear-gradient(135deg, #f59e0b, #f97316); padding: 30px; text-align: center; }}
                     .header h1 {{ color: white; margin: 0; font-size: 24px; }}
                     .content {{ padding: 30px; }}
-                    .otp-box {{ background: linear-gradient(135deg, #fdf2f8, #f5f3ff); border: 2px dashed #ec4899; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0; }}
-                    .otp {{ font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #ec4899; }}
+                    .otp-box {{ background: linear-gradient(135deg, #fef3c7, #ffedd5); border: 2px dashed #f59e0b; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0; }}
+                    .otp {{ font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #f59e0b; }}
                     .footer {{ background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; }}
                 </style>
             </head>
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>✨ Glamour Beauty Contest</h1>
+                        <h1>⭐ Glowing Star Beauty Contest</h1>
                     </div>
                     <div class="content">
                         <h2>Your Voting Verification Code</h2>
@@ -248,20 +248,20 @@ class EmailTemplates:
                         <p style="color: #64748b; font-size: 14px;">This code expires in 10 minutes. If you didn't request this, please ignore this email.</p>
                     </div>
                     <div class="footer">
-                        <p>Glamour Beauty Contest © 2026</p>
-                        <p>This is an automated message, please do not reply.</p>
+                        <p>Glowing Star Beauty Contest © 2026</p>
+                        <p>glowingstar.vote | This is an automated message, please do not reply.</p>
                     </div>
                 </div>
             </body>
             </html>
             """,
-            "text": f"Your Glamour Beauty Contest voting OTP is: {otp}. This code expires in 10 minutes."
+            "text": f"Your Glowing Star Beauty Contest voting OTP is: {otp}. This code expires in 10 minutes."
         }
     
     @staticmethod
     def vote_confirmation_template(contestant_name: str, vote_count: int) -> dict:
         return {
-            "subject": f"Vote Confirmed! - Glamour Beauty Contest",
+            "subject": f"Vote Confirmed! - Glowing Star Beauty Contest",
             "html": f"""
             <!DOCTYPE html>
             <html>
@@ -273,7 +273,7 @@ class EmailTemplates:
                     .header h1 {{ color: white; margin: 0; font-size: 24px; }}
                     .content {{ padding: 30px; text-align: center; }}
                     .vote-icon {{ font-size: 60px; margin-bottom: 20px; }}
-                    .count {{ font-size: 48px; font-weight: bold; color: #ec4899; }}
+                    .count {{ font-size: 48px; font-weight: bold; color: #f59e0b; }}
                 </style>
             </head>
             <body>
@@ -282,7 +282,7 @@ class EmailTemplates:
                         <h1>✅ Vote Confirmed!</h1>
                     </div>
                     <div class="content">
-                        <div class="vote-icon">💖</div>
+                        <div class="vote-icon">⭐</div>
                         <h2>Thank you for voting!</h2>
                         <p>Your vote for <strong>{contestant_name}</strong> has been recorded.</p>
                         <p>They now have:</p>
@@ -323,14 +323,15 @@ class EmailTemplates:
                     <div class="content">
                         <h2>Hey {contestant_name}!</h2>
                         <p>Amazing news! You've qualified for:</p>
-                        <h3 style="color: #ec4899; font-size: 28px;">{round_name}</h3>
+                        <h3 style="color: #f59e0b; font-size: 28px;">{round_name}</h3>
                         <p>Keep sharing your voting link to climb higher in the rankings!</p>
+                        <p style="margin-top: 20px;"><a href="https://glowingstar.vote" style="color: #f59e0b; font-weight: bold;">Visit glowingstar.vote</a></p>
                     </div>
                 </div>
             </body>
             </html>
             """,
-            "text": f"Congratulations {contestant_name}! You've qualified for {round_name} in the Glamour Beauty Contest!"
+            "text": f"Congratulations {contestant_name}! You've qualified for {round_name} in the Glowing Star Beauty Contest!"
         }
     
     @staticmethod
@@ -344,7 +345,7 @@ class EmailTemplates:
                 <style>
                     body {{ font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; margin: 0; padding: 20px; }}
                     .container {{ max-width: 500px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; }}
-                    .header {{ background: linear-gradient(135deg, #8b5cf6, #ec4899); padding: 30px; text-align: center; }}
+                    .header {{ background: linear-gradient(135deg, #f59e0b, #f97316); padding: 30px; text-align: center; }}
                     .header h1 {{ color: white; margin: 0; }}
                     .content {{ padding: 30px; }}
                     .receipt {{ background: #f8fafc; border-radius: 12px; padding: 20px; margin: 20px 0; }}
@@ -363,12 +364,100 @@ class EmailTemplates:
                             <p><strong>Amount:</strong> ${amount:.2f}</p>
                         </div>
                         <p>Your votes have been added to the contestant's total!</p>
+                        <p style="margin-top: 20px;"><a href="https://glowingstar.vote" style="color: #f59e0b; font-weight: bold;">View on glowingstar.vote</a></p>
                     </div>
                 </div>
             </body>
             </html>
             """,
             "text": f"Payment confirmed! {votes} votes ({package_name}) for ${amount:.2f} have been added."
+        }
+    
+    @staticmethod
+    def welcome_contestant_template(contestant_name: str, voting_link: str) -> dict:
+        return {
+            "subject": f"Welcome to Glowing Star Beauty Contest! ⭐",
+            "html": f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; margin: 0; padding: 20px; }}
+                    .container {{ max-width: 500px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; }}
+                    .header {{ background: linear-gradient(135deg, #f59e0b, #f97316); padding: 40px; text-align: center; }}
+                    .header h1 {{ color: white; margin: 0; font-size: 28px; }}
+                    .star {{ font-size: 60px; margin-bottom: 10px; }}
+                    .content {{ padding: 30px; }}
+                    .cta {{ display: inline-block; background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; margin: 20px 0; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <div class="star">⭐</div>
+                        <h1>Welcome, {contestant_name}!</h1>
+                    </div>
+                    <div class="content">
+                        <h2>You're now a Glowing Star contestant!</h2>
+                        <p>Your profile is being reviewed. Once approved, you'll be able to receive votes from fans worldwide!</p>
+                        <p><strong>Your voting link will be:</strong></p>
+                        <p style="background: #f8fafc; padding: 15px; border-radius: 8px; word-break: break-all;">{voting_link}</p>
+                        <p>Share this link on social media to get votes!</p>
+                        <a href="https://glowingstar.net/portal/dashboard" class="cta">Go to Dashboard</a>
+                        <p style="margin-top: 30px; color: #64748b; font-size: 14px;">Tips for success:</p>
+                        <ul style="color: #64748b; font-size: 14px;">
+                            <li>Complete your profile with photos</li>
+                            <li>Share your voting link on Instagram, Facebook, TikTok</li>
+                            <li>Engage with your supporters</li>
+                        </ul>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """,
+            "text": f"Welcome to Glowing Star Beauty Contest, {contestant_name}! Your voting link: {voting_link}. Complete your profile at glowingstar.net"
+        }
+    
+    @staticmethod
+    def profile_approved_template(contestant_name: str, voting_link: str) -> dict:
+        return {
+            "subject": f"🎉 Your Profile is Approved! Start Getting Votes!",
+            "html": f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; margin: 0; padding: 20px; }}
+                    .container {{ max-width: 500px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; }}
+                    .header {{ background: linear-gradient(135deg, #10b981, #059669); padding: 40px; text-align: center; }}
+                    .header h1 {{ color: white; margin: 0; font-size: 28px; }}
+                    .check {{ font-size: 60px; margin-bottom: 10px; }}
+                    .content {{ padding: 30px; text-align: center; }}
+                    .link-box {{ background: linear-gradient(135deg, #fef3c7, #ffedd5); padding: 20px; border-radius: 12px; margin: 20px 0; }}
+                    .cta {{ display: inline-block; background: linear-gradient(135deg, #f59e0b, #f97316); color: white; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <div class="check">✅</div>
+                        <h1>Profile Approved!</h1>
+                    </div>
+                    <div class="content">
+                        <h2>Congratulations, {contestant_name}!</h2>
+                        <p>Your profile has been approved and you're now live in the contest!</p>
+                        <div class="link-box">
+                            <p style="margin: 0; font-weight: bold; color: #f59e0b;">Your Voting Link:</p>
+                            <p style="margin: 10px 0; word-break: break-all;">{voting_link}</p>
+                        </div>
+                        <p>Share this link everywhere to get votes!</p>
+                        <a href="{voting_link}" class="cta">View My Profile</a>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """,
+            "text": f"Congratulations {contestant_name}! Your profile is approved. Start sharing your voting link: {voting_link}"
         }
 
 email_templates = EmailTemplates()
