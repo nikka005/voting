@@ -78,12 +78,12 @@ export default function PortalRegister() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 flex items-center justify-center">
+              <Star className="w-5 h-5 text-white fill-white" />
             </div>
             <div>
-              <h1 className="font-syne font-bold text-white">Glamour</h1>
-              <span className="text-[10px] font-semibold text-pink-400">JOIN CONTEST</span>
+              <h1 className="font-syne font-bold text-white">Glowing Star</h1>
+              <span className="text-[10px] font-semibold text-amber-400">JOIN CONTEST</span>
             </div>
           </div>
 
