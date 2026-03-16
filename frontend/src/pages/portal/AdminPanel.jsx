@@ -2009,6 +2009,159 @@ function VotingSection({ votes, contestants }) {
   );
 }
 
+// ============ PAYMENTS SECTION ============
+function PaymentsSection({ payments, dashboardStats }) {
+  const [filterType, setFilterType] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
+
+  const paymentStats = dashboardStats?.payments || {};
+  
+  const filteredPayments = (payments || []).filter(p => {
+    if (filterType !== 'all' && p.payment_type !== filterType) return false;
+    if (filterStatus !== 'all') {
+      const status = p.status || p.payment_status;
+      if (status !== filterStatus) return false;
+    }
+    return true;
+  });
+
+  return (
+    <div className="space-y-6" data-testid="payments-section">
+      {/* Payment Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-green-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-green-400">${((paymentStats.total_revenue || 0) / 100).toFixed(0)}</p>
+              <p className="text-xs text-slate-400">Total Revenue</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
+              <Receipt className="w-5 h-5 text-amber-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-amber-400">${((paymentStats.entry_fees_total || 0) / 100).toFixed(0)}</p>
+              <p className="text-xs text-slate-400">Entry Fees</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-4 rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-500/10 border border-violet-500/20">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center">
+              <Heart className="w-5 h-5 text-violet-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-violet-400">${((paymentStats.vote_packages_total || 0) / 100).toFixed(0)}</p>
+              <p className="text-xs text-slate-400">Vote Packages</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+              <CreditCard className="w-5 h-5 text-cyan-400" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-cyan-400">{payments?.length || 0}</p>
+              <p className="text-xs text-slate-400">Total Transactions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3">
+        <Select value={filterType} onValueChange={setFilterType}>
+          <SelectTrigger className="w-40 bg-white/5 border-white/10 text-white">
+            <SelectValue placeholder="Payment Type" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#15151f] border-white/10 text-white">
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="entry_fee">Entry Fees</SelectItem>
+            <SelectItem value="vote_package">Vote Packages</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-40 bg-white/5 border-white/10 text-white">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent className="bg-[#15151f] border-white/10 text-white">
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="failed">Failed</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Transactions Table */}
+      <GlassCard title="Transaction History" icon={CreditCard}>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/10">
+                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Date</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Email</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Type</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Amount</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Status</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-slate-400">Reference</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPayments.map((payment, idx) => {
+                const status = payment.status || payment.payment_status || 'pending';
+                return (
+                  <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td className="py-3 px-4 text-sm">{formatDate(payment.created_at)}</td>
+                    <td className="py-3 px-4 text-sm">{payment.user_email || payment.email || 'N/A'}</td>
+                    <td className="py-3 px-4">
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        payment.payment_type === 'entry_fee' 
+                          ? 'bg-amber-500/20 text-amber-400' 
+                          : 'bg-violet-500/20 text-violet-400'
+                      }`}>
+                        {payment.payment_type === 'entry_fee' ? 'Entry Fee' : 'Vote Package'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-sm font-medium text-green-400">
+                      ${((payment.amount || 0) / 100).toFixed(2)}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        status === 'completed' ? 'bg-green-500/20 text-green-400' :
+                        status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-red-500/20 text-red-400'
+                      }`}>
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-slate-500 font-mono text-xs">
+                      {payment.stripe_session_id?.slice(0, 20) || payment.id?.slice(0, 20) || 'N/A'}...
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {filteredPayments.length === 0 && (
+            <div className="text-center py-12 text-slate-500">
+              <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-20" />
+              <p>No transactions found</p>
+            </div>
+          )}
+        </div>
+      </GlassCard>
+    </div>
+  );
+}
+
 // ============ LEADERBOARD SECTION ============
 function LeaderboardSection({ contestants, categories, rounds }) {
   const [leaderboardType, setLeaderboardType] = useState('global');
