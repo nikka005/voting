@@ -36,10 +36,12 @@ export default function AdminPanel() {
   
   // Core Data States
   const [stats, setStats] = useState(null);
+  const [dashboardStats, setDashboardStats] = useState(null);
   const [contestants, setContestants] = useState([]);
   const [categories, setCategories] = useState([]);
   const [rounds, setRounds] = useState([]);
   const [votes, setVotes] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   
   // UI States
