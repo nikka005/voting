@@ -63,7 +63,7 @@ export default function PaymentSuccessPage() {
             <Card className="bg-white/70 backdrop-blur-xl border-slate-200/50 shadow-xl text-center">
               <CardContent className="pt-12 pb-8 px-8">
                 <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-pink-100 to-violet-100 flex items-center justify-center">
-                  <Loader2 className="w-10 h-10 text-pink-500 animate-spin" />
+                  <Loader2 className="w-10 h-10 text-amber-500 animate-spin" />
                 </div>
                 <h1 className="font-syne text-2xl font-bold text-slate-900 mb-2">Processing Payment</h1>
                 <p className="text-slate-500">Please wait while we verify your payment...</p>
@@ -83,8 +83,8 @@ export default function PaymentSuccessPage() {
                 
                 <div className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200 mb-6">
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <Heart className="w-6 h-6 text-pink-500" />
-                    <span className="text-3xl font-bold text-pink-500">+{result.votes_added}</span>
+                    <Heart className="w-6 h-6 text-amber-500" />
+                    <span className="text-3xl font-bold text-amber-500">+{result.votes_added}</span>
                   </div>
                   <p className="text-sm text-slate-600">votes added</p>
                   {result.new_vote_count && (

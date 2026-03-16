@@ -64,7 +64,7 @@ export default function LeaderboardPage() {
       <Layout>
         <div className="min-h-[60vh] flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="w-10 h-10 text-pink-500 animate-spin mx-auto mb-4" />
+            <Loader2 className="w-10 h-10 text-amber-500 animate-spin mx-auto mb-4" />
             <p className="text-slate-500">Loading leaderboard...</p>
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function LeaderboardPage() {
                   onClick={() => setLeaderboardType(type)}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                     leaderboardType === type
-                      ? 'bg-white text-pink-600 shadow'
+                      ? 'bg-white text-amber-600 shadow'
                       : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
@@ -152,7 +152,7 @@ export default function LeaderboardPage() {
                     </div>
                   </div>
                   <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-100 h-24 flex flex-col justify-center">
-                    <h3 className="font-semibold text-slate-900 truncate group-hover:text-pink-600">{top3[1].full_name}</h3>
+                    <h3 className="font-semibold text-slate-900 truncate group-hover:text-amber-600">{top3[1].full_name}</h3>
                     <p className="text-2xl font-bold text-slate-400">{formatNumber(top3[1].vote_count)}</p>
                   </div>
                 </div>
@@ -174,7 +174,7 @@ export default function LeaderboardPage() {
                   </div>
                   <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 shadow-lg border border-amber-200 h-28 flex flex-col justify-center">
                     <span className="text-xs font-bold text-amber-500 uppercase tracking-wide">Leading</span>
-                    <h3 className="font-syne font-bold text-slate-900 truncate group-hover:text-pink-600">{top3[0].full_name}</h3>
+                    <h3 className="font-syne font-bold text-slate-900 truncate group-hover:text-amber-600">{top3[0].full_name}</h3>
                     <p className="text-3xl font-bold text-amber-500">{formatNumber(top3[0].vote_count)}</p>
                   </div>
                 </div>
@@ -194,7 +194,7 @@ export default function LeaderboardPage() {
                     </div>
                   </div>
                   <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-100 h-24 flex flex-col justify-center">
-                    <h3 className="font-semibold text-slate-900 truncate group-hover:text-pink-600">{top3[2].full_name}</h3>
+                    <h3 className="font-semibold text-slate-900 truncate group-hover:text-amber-600">{top3[2].full_name}</h3>
                     <p className="text-2xl font-bold text-amber-700">{formatNumber(top3[2].vote_count)}</p>
                   </div>
                 </div>
@@ -253,7 +253,7 @@ export default function LeaderboardPage() {
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-slate-900 truncate group-hover:text-pink-600 transition-colors">
+                      <h4 className="font-semibold text-slate-900 truncate group-hover:text-amber-600 transition-colors">
                         {entry.full_name}
                       </h4>
                       <p className="text-sm text-slate-500 truncate">
@@ -263,7 +263,7 @@ export default function LeaderboardPage() {
 
                     {/* Votes */}
                     <div className="text-right">
-                      <p className="font-bold text-pink-500 text-lg">{formatNumber(entry.vote_count)}</p>
+                      <p className="font-bold text-amber-500 text-lg">{formatNumber(entry.vote_count)}</p>
                       {voteDiff !== 0 && (
                         <p className="text-xs text-slate-400">
                           {voteDiff > 0 ? '+' : ''}{formatNumber(Math.abs(voteDiff))} to prev
@@ -301,7 +301,7 @@ export default function LeaderboardPage() {
               { icon: Gift, label: 'Prize Pool', value: '$10,000' },
             ].map((stat, idx) => (
               <div key={idx} className="text-center p-6 rounded-2xl bg-white/5 backdrop-blur border border-white/10">
-                <stat.icon className="w-8 h-8 text-pink-400 mx-auto mb-3" />
+                <stat.icon className="w-8 h-8 text-amber-400 mx-auto mb-3" />
                 <p className="font-syne text-3xl font-bold text-white mb-1">
                   {typeof stat.value === 'number' ? formatNumber(stat.value) : stat.value}
                 </p>

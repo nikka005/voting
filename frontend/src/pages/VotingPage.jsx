@@ -145,7 +145,7 @@ export default function VotingPage() {
     return (
       <Layout>
         <div className="min-h-[60vh] flex items-center justify-center">
-          <Loader2 className="w-10 h-10 text-pink-500 animate-spin" />
+          <Loader2 className="w-10 h-10 text-amber-500 animate-spin" />
         </div>
       </Layout>
     );
@@ -156,7 +156,7 @@ export default function VotingPage() {
       <Layout>
         <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
           <div className="w-24 h-24 mb-6 rounded-full bg-pink-100 flex items-center justify-center">
-            <Heart className="w-12 h-12 text-pink-400" />
+            <Heart className="w-12 h-12 text-amber-400" />
           </div>
           <h1 className="font-syne text-3xl font-bold text-slate-900 mb-4">Contestant Not Found</h1>
           <p className="text-slate-500 mb-6">This contestant may not exist or hasn't been approved yet.</p>
@@ -182,7 +182,7 @@ export default function VotingPage() {
             
             {/* Round Badge */}
             {contestant.round && (
-              <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-pink-500 to-violet-500 text-white text-sm font-bold rounded-full mb-6 shadow-lg shadow-pink-500/25">
+              <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold rounded-full mb-6 shadow-lg shadow-amber-500/25">
                 <Award className="w-4 h-4" />
                 {contestant.round}
               </div>
@@ -204,7 +204,7 @@ export default function VotingPage() {
             <div className="flex flex-wrap items-center gap-3 mb-8">
               <button
                 onClick={handleShare}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-full text-sm font-semibold text-slate-700 hover:border-pink-300 hover:text-pink-600 transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-full text-sm font-semibold text-slate-700 hover:border-amber-300 hover:text-amber-600 transition-all shadow-sm"
                 data-testid="share-btn"
               >
                 <Share2 className="w-4 h-4" />
@@ -223,7 +223,7 @@ export default function VotingPage() {
                   href={`https://instagram.com/${contestant.social_instagram}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"
+                  className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 via-red-500 to-yellow-500 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"
                   data-testid="instagram-link"
                 >
                   <Instagram className="w-4 h-4" />
@@ -252,7 +252,7 @@ export default function VotingPage() {
               {/* Left Column - Photo */}
               <div className="lg:col-span-5">
                 <div className="sticky top-24">
-                  <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl shadow-pink-500/10 bg-slate-100 mb-4">
+                  <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/10 bg-slate-100 mb-4">
                     <img
                       src={mainPhoto}
                       alt={contestant.full_name}
@@ -270,7 +270,7 @@ export default function VotingPage() {
                           onClick={() => setSelectedPhotoIndex(index)}
                           className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden transition-all ${
                             selectedPhotoIndex === index 
-                              ? 'ring-3 ring-pink-500 scale-105' 
+                              ? 'ring-3 ring-amber-500 scale-105' 
                               : 'opacity-70 hover:opacity-100'
                           }`}
                         >
@@ -294,12 +294,12 @@ export default function VotingPage() {
                     </span>
                   </div>
                   {contestant.round ? (
-                    <Link to="/leaderboard" className="flex items-center justify-center gap-1 text-pink-600 hover:text-pink-700 font-medium">
+                    <Link to="/leaderboard" className="flex items-center justify-center gap-1 text-amber-600 hover:text-pink-700 font-medium">
                       in the {contestant.round}
                       <ExternalLink className="w-4 h-4" />
                     </Link>
                   ) : contestant.category_name ? (
-                    <Link to="/leaderboard" className="flex items-center justify-center gap-1 text-pink-600 hover:text-pink-700 font-medium">
+                    <Link to="/leaderboard" className="flex items-center justify-center gap-1 text-amber-600 hover:text-pink-700 font-medium">
                       in {contestant.category_name}
                       <ExternalLink className="w-4 h-4" />
                     </Link>
@@ -309,7 +309,7 @@ export default function VotingPage() {
                 </div>
 
                 {/* Main Vote Button */}
-                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-xl shadow-pink-500/5">
+                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-xl shadow-amber-500/5">
                   {/* Limited Time Badge */}
                   <div className="flex items-center justify-center gap-2 mb-4">
                     <Zap className="w-5 h-5 text-amber-500" />
@@ -345,8 +345,8 @@ export default function VotingPage() {
                 {/* Countdown Timer */}
                 <div className="bg-slate-900 rounded-3xl p-6 md:p-8 text-white">
                   <div className="flex items-center justify-center gap-2 mb-4">
-                    <Clock className="w-5 h-5 text-pink-400" />
-                    <span className="text-sm font-bold uppercase tracking-wide text-pink-400">Voting Ends In</span>
+                    <Clock className="w-5 h-5 text-amber-400" />
+                    <span className="text-sm font-bold uppercase tracking-wide text-amber-400">Voting Ends In</span>
                   </div>
                   <div className="grid grid-cols-4 gap-3 text-center">
                     {[
@@ -384,7 +384,7 @@ export default function VotingPage() {
                 {/* Paid Voting Options */}
                 <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200">
                   <div className="flex items-center gap-2 mb-6">
-                    <Star className="w-5 h-5 text-violet-500" />
+                    <Star className="w-5 h-5 text-orange-500" />
                     <h3 className="font-syne text-lg font-bold text-slate-900">Support with Extra Votes</h3>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -395,24 +395,24 @@ export default function VotingPage() {
                         disabled={purchasingPackage === pkg.id}
                         className={`relative p-4 rounded-2xl border-2 transition-all text-center group ${
                           pkg.popular 
-                            ? 'border-pink-400 bg-pink-50 hover:border-pink-500 hover:bg-pink-100' 
-                            : 'border-slate-200 hover:border-pink-300 hover:bg-pink-50'
+                            ? 'border-amber-400 bg-pink-50 hover:border-amber-500 hover:bg-pink-100' 
+                            : 'border-slate-200 hover:border-amber-300 hover:bg-pink-50'
                         }`}
                       >
                         {pkg.popular && (
-                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 text-[10px] font-bold bg-gradient-to-r from-pink-500 to-violet-500 text-white rounded-full">
+                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 text-[10px] font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full">
                             POPULAR
                           </span>
                         )}
                         {purchasingPackage === pkg.id ? (
-                          <Loader2 className="w-8 h-8 mx-auto text-pink-500 animate-spin" />
+                          <Loader2 className="w-8 h-8 mx-auto text-amber-500 animate-spin" />
                         ) : (
                           <>
-                            <div className="font-syne text-2xl font-bold text-slate-900 group-hover:text-pink-600">
+                            <div className="font-syne text-2xl font-bold text-slate-900 group-hover:text-amber-600">
                               {pkg.votes}
                             </div>
                             <div className="text-xs text-slate-500">votes</div>
-                            <div className="text-sm font-bold text-pink-600 mt-2">${pkg.price}</div>
+                            <div className="text-sm font-bold text-amber-600 mt-2">${pkg.price}</div>
                           </>
                         )}
                       </button>
@@ -427,12 +427,12 @@ export default function VotingPage() {
                           <div
                             key={idx}
                             className={`p-4 rounded-2xl border-2 text-center ${
-                              option.popular ? 'border-pink-400 bg-pink-50' : 'border-slate-200'
+                              option.popular ? 'border-amber-400 bg-pink-50' : 'border-slate-200'
                             }`}
                           >
                             <div className="font-syne text-2xl font-bold text-slate-900">{option.votes}</div>
                             <div className="text-xs text-slate-500">votes</div>
-                            <div className="text-sm font-bold text-pink-600 mt-2">${option.price}</div>
+                            <div className="text-sm font-bold text-amber-600 mt-2">${option.price}</div>
                           </div>
                         ))}
                       </>
@@ -447,7 +447,7 @@ export default function VotingPage() {
                 {/* Notification Signup */}
                 <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-3xl p-6 md:p-8 border border-violet-100">
                   <div className="flex items-center gap-2 mb-4">
-                    <Bell className="w-5 h-5 text-violet-500" />
+                    <Bell className="w-5 h-5 text-orange-500" />
                     <h3 className="font-syne text-lg font-bold text-slate-900">Get Notified</h3>
                   </div>
                   <p className="text-slate-600 text-sm mb-4">
@@ -465,9 +465,9 @@ export default function VotingPage() {
                         placeholder="Enter your email"
                         value={notifyEmail}
                         onChange={(e) => setNotifyEmail(e.target.value)}
-                        className="flex-1 h-12 rounded-xl bg-white border-violet-200 focus:border-violet-500"
+                        className="flex-1 h-12 rounded-xl bg-white border-violet-200 focus:border-orange-500"
                       />
-                      <Button type="submit" className="h-12 px-6 bg-violet-600 hover:bg-violet-700 rounded-xl">
+                      <Button type="submit" className="h-12 px-6 bg-orange-600 hover:bg-violet-700 rounded-xl">
                         <Mail className="w-4 h-4" />
                       </Button>
                     </form>
@@ -488,7 +488,7 @@ export default function VotingPage() {
               <div className="space-y-6">
                 {contestant.qa_items.map((qa, index) => (
                   <div key={index} className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100">
-                    <h3 className="font-syne text-lg md:text-xl font-bold text-pink-600 mb-3">
+                    <h3 className="font-syne text-lg md:text-xl font-bold text-amber-600 mb-3">
                       {qa.question}
                     </h3>
                     <p className="text-slate-600 leading-relaxed text-lg">
@@ -512,7 +512,7 @@ export default function VotingPage() {
                     key={index}
                     onClick={() => setSelectedPhotoIndex(index)}
                     className={`aspect-square rounded-2xl overflow-hidden transition-all hover:scale-105 ${
-                      selectedPhotoIndex === index ? 'ring-4 ring-pink-500 shadow-lg' : ''
+                      selectedPhotoIndex === index ? 'ring-4 ring-amber-500 shadow-lg' : ''
                     }`}
                   >
                     <img
@@ -528,7 +528,7 @@ export default function VotingPage() {
         )}
 
         {/* Bottom CTA */}
-        <section className="py-12 md:py-20 bg-gradient-to-br from-pink-500 via-violet-500 to-purple-600">
+        <section className="py-12 md:py-20 bg-gradient-to-br from-amber-500 via-orange-500 to-purple-600">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2 className="font-syne text-3xl md:text-5xl font-bold text-white mb-4">
               Help {contestant.full_name.split(' ')[0]} Win!
@@ -539,10 +539,10 @@ export default function VotingPage() {
             <Button
               size="lg"
               onClick={() => setVotingModalOpen(true)}
-              className="h-16 px-12 text-xl bg-white text-pink-600 hover:bg-white/90 rounded-full font-bold shadow-xl btn-jelly"
+              className="h-16 px-12 text-xl bg-white text-amber-600 hover:bg-white/90 rounded-full font-bold shadow-xl btn-jelly"
               data-testid="bottom-vote-btn"
             >
-              <Heart className="w-6 h-6 mr-3 fill-pink-600" />
+              <Heart className="w-6 h-6 mr-3 fill-amber-600" />
               Vote Now - It's Free!
             </Button>
           </div>
