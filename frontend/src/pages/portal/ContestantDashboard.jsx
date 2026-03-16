@@ -209,7 +209,7 @@ export default function ContestantDashboard() {
   };
 
   const copyVotingLink = async () => {
-    const link = `${window.location.origin}/${profile?.slug}`;
+    const link = `https://glowingstar.vote/${profile?.slug}`;
     await navigator.clipboard.writeText(link);
     setCopied(true);
     toast.success('Voting link copied!');
@@ -217,7 +217,7 @@ export default function ContestantDashboard() {
   };
 
   const shareToSocial = (platform) => {
-    const link = `${window.location.origin}/${profile?.slug}`;
+    const link = `https://glowingstar.vote/${profile?.slug}`;
     const text = `Vote for ${profile?.full_name} in the Glowing Star Contest!`;
     const urls = {
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`,
