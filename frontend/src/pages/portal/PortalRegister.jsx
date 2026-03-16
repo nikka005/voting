@@ -47,7 +47,7 @@ export default function PortalRegister() {
     try {
       const result = await register(formData.full_name, formData.email, formData.password);
       if (result.success) {
-        toast.success('Registration successful! Welcome to Glamour!');
+        toast.success('Registration successful! Welcome to Glowing Star!');
         navigate('/portal');
       } else {
         setError(result.error || 'Registration failed');
