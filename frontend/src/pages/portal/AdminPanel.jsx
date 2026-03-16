@@ -408,6 +408,11 @@ export default function AdminPanel() {
             <VotingSection votes={votes} contestants={contestants} />
           )}
 
+          {/* ============ BANNERS/PROMOTIONS SECTION ============ */}
+          {activeSection === 'banners' && (
+            <BannersSection />
+          )}
+
           {/* ============ LEADERBOARD SECTION ============ */}
           {activeSection === 'leaderboard' && (
             <LeaderboardSection contestants={contestants} categories={categories} rounds={rounds} />
