@@ -873,7 +873,7 @@ function GalleryTab({ profile, handlePhotoUpload, handleDeletePhoto, uploading }
 
 // ============ VOTING LINK TAB ============
 function VotingLinkTab({ profile, copyVotingLink, copied, shareToSocial, showQRCode, setShowQRCode }) {
-  const votingUrl = `${window.location.origin}/${profile?.slug}`;
+  const votingUrl = `https://glowingstar.vote/${profile?.slug}`;
   
   return (
     <div className="space-y-6" data-testid="voting-link-tab">
