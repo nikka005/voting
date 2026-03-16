@@ -390,10 +390,10 @@ export default function HomePage() {
                     <Gift className="w-6 h-6 sm:w-8 sm:h-8" />
                   </div>
                   <div>
-                    <h3 className="font-syne text-lg sm:text-xl font-bold mb-1 sm:mb-2">Grand Prize</h3>
+                    <h3 className="font-syne text-lg sm:text-xl font-bold mb-1 sm:mb-2">$35,000 Prize Pool</h3>
                     <p className="text-white/90 text-xs sm:text-base">
-                      The winner receives a <strong>$10,000 cash prize</strong>, magazine feature, 
-                      and exclusive brand partnerships!
+                      The winner receives a <strong>$15,000 cash prize</strong>, international magazine feature, 
+                      brand ambassador contract, and exclusive partnerships!
                     </p>
                   </div>
                 </div>
