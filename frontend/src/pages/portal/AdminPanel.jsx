@@ -3041,6 +3041,204 @@ PRIZES:
         </div>
       </GlassCard>
 
+      {/* Payment Gateway Configuration */}
+      <GlassCard title="Payment Gateway (Stripe)" icon={CreditCard}>
+        <div className="space-y-4">
+          <div className="p-4 rounded-xl bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center">
+                <CreditCard className="w-5 h-5 text-violet-400" />
+              </div>
+              <div>
+                <p className="font-medium text-white">Stripe Integration</p>
+                <p className="text-xs text-slate-400">Process payments securely with Stripe</p>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <Label className="text-slate-300">Stripe Publishable Key</Label>
+            <Input 
+              type="text"
+              placeholder="pk_live_..."
+              className="bg-white/5 border-white/10 text-white mt-1 font-mono text-sm" 
+            />
+            <p className="text-xs text-slate-500 mt-1">Used for frontend checkout</p>
+          </div>
+          
+          <div>
+            <Label className="text-slate-300">Stripe Secret Key</Label>
+            <Input 
+              type="password"
+              placeholder="sk_live_..."
+              className="bg-white/5 border-white/10 text-white mt-1 font-mono text-sm" 
+            />
+            <p className="text-xs text-slate-500 mt-1">Keep this secret! Used for backend processing</p>
+          </div>
+          
+          <div>
+            <Label className="text-slate-300">Webhook Secret</Label>
+            <Input 
+              type="password"
+              placeholder="whsec_..."
+              className="bg-white/5 border-white/10 text-white mt-1 font-mono text-sm" 
+            />
+            <p className="text-xs text-slate-500 mt-1">For Stripe webhook verification</p>
+          </div>
+
+          <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+            <div>
+              <p className="font-medium">Test Mode</p>
+              <p className="text-sm text-slate-500">Use Stripe test keys for development</p>
+            </div>
+            <Switch defaultChecked />
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* Vote Packages Configuration */}
+      <GlassCard title="Vote Packages & Pricing" icon={Heart}>
+        <div className="space-y-4">
+          <p className="text-sm text-slate-400">Configure the vote packages available for purchase</p>
+          
+          {[
+            { name: 'Starter Pack', votes: 10, price: 5, popular: false },
+            { name: 'Support Pack', votes: 50, price: 20, popular: true },
+            { name: 'Champion Pack', votes: 100, price: 35, popular: false },
+            { name: 'Ultimate Pack', votes: 500, price: 150, popular: false },
+          ].map((pkg, idx) => (
+            <div key={idx} className={`p-4 rounded-xl border transition-all ${
+              pkg.popular 
+                ? 'bg-gradient-to-r from-pink-500/10 to-violet-500/10 border-pink-500/30' 
+                : 'bg-white/5 border-white/10'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    pkg.popular ? 'bg-pink-500/20' : 'bg-white/10'
+                  }`}>
+                    <Heart className={`w-5 h-5 ${pkg.popular ? 'text-pink-400' : 'text-slate-400'}`} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium">{pkg.name}</p>
+                      {pkg.popular && (
+                        <span className="px-2 py-0.5 text-[10px] bg-pink-500 text-white rounded-full">POPULAR</span>
+                      )}
+                    </div>
+                    <p className="text-sm text-slate-500">{pkg.votes} votes</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-xl font-bold text-green-400">${pkg.price}</p>
+                    <p className="text-xs text-slate-500">${(pkg.price / pkg.votes).toFixed(2)}/vote</p>
+                  </div>
+                  <Button size="icon" variant="ghost" className="h-8 w-8">
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          <Button variant="outline" className="w-full border-dashed border-white/20 text-slate-400 hover:text-white hover:border-white/40">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Vote Package
+          </Button>
+        </div>
+      </GlassCard>
+
+      {/* Email/SMTP Configuration */}
+      <GlassCard title="Email Configuration (SMTP)" icon={Mail}>
+        <div className="space-y-4">
+          <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                <Mail className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div>
+                <p className="font-medium text-white">SendGrid Integration</p>
+                <p className="text-xs text-slate-400">Send transactional emails via SendGrid</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-slate-300">SendGrid API Key</Label>
+            <Input 
+              type="password"
+              placeholder="SG.xxxxxxxxx..."
+              className="bg-white/5 border-white/10 text-white mt-1 font-mono text-sm" 
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-slate-300">From Email</Label>
+              <Input 
+                type="email"
+                placeholder="noreply@glowingstar.net"
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+            <div>
+              <Label className="text-slate-300">From Name</Label>
+              <Input 
+                type="text"
+                placeholder="Glowing Star Contest"
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+            <div>
+              <p className="font-medium">Email Verification Required</p>
+              <p className="text-sm text-slate-500">Require OTP verification for voting</p>
+            </div>
+            <Switch defaultChecked />
+          </div>
+
+          <Button variant="outline" className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10">
+            <Send className="w-4 h-4 mr-2" />
+            Send Test Email
+          </Button>
+        </div>
+      </GlassCard>
+
+      {/* Email Templates */}
+      <GlassCard title="Email Templates" icon={FileText}>
+        <div className="space-y-3">
+          <p className="text-sm text-slate-400 mb-4">Customize email templates sent to users</p>
+          
+          {[
+            { name: 'OTP Verification', desc: 'Sent when voter requests OTP', icon: Shield },
+            { name: 'Vote Confirmation', desc: 'Sent after successful vote', icon: CheckCircle2 },
+            { name: 'Welcome Contestant', desc: 'Sent when contestant registers', icon: Sparkles },
+            { name: 'Profile Approved', desc: 'Sent when admin approves profile', icon: UserCheck },
+            { name: 'Payment Receipt', desc: 'Sent after successful payment', icon: Receipt },
+            { name: 'Round Qualification', desc: 'Sent when contestant advances', icon: Trophy },
+          ].map((template, idx) => (
+            <div key={idx} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+                  <template.icon className="w-5 h-5 text-slate-400" />
+                </div>
+                <div>
+                  <p className="font-medium">{template.name}</p>
+                  <p className="text-sm text-slate-500">{template.desc}</p>
+                </div>
+              </div>
+              <Button size="sm" variant="ghost" className="text-slate-400 hover:text-white">
+                <Edit className="w-4 h-4 mr-1" />
+                Edit
+              </Button>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
+
       {/* Save Button */}
       <div className="flex justify-end">
         <Button 
