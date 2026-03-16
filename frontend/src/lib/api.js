@@ -145,6 +145,22 @@ export const timelineAPI = {
   get: () => api.get('/contest/timeline'),
 };
 
+// Contest Settings API
+export const contestSettingsAPI = {
+  get: () => api.get('/contest/settings'),
+  create: (data) => api.post('/admin/contest/settings', data),
+  update: (data) => api.put('/admin/contest/settings', data),
+};
+
+// Competition Management API
+export const competitionAPI = {
+  setup: () => api.post('/admin/competition/setup'),
+  advanceRound: () => api.post('/admin/competition/advance-round'),
+  complete: () => api.post('/admin/competition/complete'),
+  getStatus: () => api.get('/admin/competition/status'),
+  getWinners: () => api.get('/competition/winners'),
+};
+
 // Analytics Tracking
 export const analyticsAPI = {
   trackPageView: (page) => api.post(`/analytics/pageview?page=${page}`),
