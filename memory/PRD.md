@@ -280,15 +280,6 @@ Password: contestant123
 
 ## 📋 Upcoming Tasks
 
-### P1: UI for Core Admin Systems
-- [ ] Contest Management UI - Form to create/edit contests
-- [ ] Payment Management UI - Table to view transactions
-- [ ] User Management UI - Table to manage contestants (approve/reject/suspend)
-- [ ] Category Management UI - CRUD interface
-
-### P1: Contest Entry Fee Payment Flow
-- [ ] Update registration to include Stripe payment step
-
 ### P2: Real Email Integration
 - [ ] Replace mocked OTP with SendGrid
 
