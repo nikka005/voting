@@ -105,6 +105,9 @@ function App() {
               Separate domain for Admin & Contestants
               ============================================ */}
           
+          {/* User Site Landing - Join Contest Page */}
+          <Route path="/join" element={<UserSiteLanding />} />
+          
           {/* Portal Home - Entry point for management */}
           <Route 
             path="/portal" 
