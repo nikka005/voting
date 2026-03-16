@@ -79,9 +79,9 @@ export default function PortalLogin() {
 
           <div className="space-y-4">
             {[
-              { icon: Shield, text: 'Admin Panel - Full platform control' },
-              { icon: Users, text: 'Contestant Dashboard - Manage your profile' },
-              { icon: Globe, text: 'glowingstar.net - Management domain' },
+              { icon: Award, text: 'Contestant Dashboard - Manage your profile' },
+              { icon: Users, text: 'Track your votes and rankings' },
+              { icon: Globe, text: 'glowingstar.net - Contestant portal' },
             ].map((item, idx) => (
               <div key={idx} className="flex items-center gap-3 text-slate-300">
                 <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
