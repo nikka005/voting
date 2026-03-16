@@ -6,6 +6,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { contestantsAPI, votingAPI } from '../lib/api';
 import { formatNumber, getPlaceholderImage } from '../lib/utils';
+import { useVoteUpdates } from '../hooks/useWebSocket';
 import { 
   Heart, 
   Share2, 
@@ -25,8 +26,7 @@ import {
   ExternalLink,
   Mail,
   Check,
-  CreditCard,
-  Sparkles
+  CreditCard
 } from 'lucide-react';
 import { toast } from 'sonner';
 
