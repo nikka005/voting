@@ -1,186 +1,225 @@
-# Glamour - Premium Online Voting Contest Platform
+# Glowing Star - Premium Beauty Contest Platform
 
 ## Original Problem Statement
-Build a premium, high-class online voting contest platform inspired by mshealthandfit.com with three distinct panels:
-1. **Admin Panel** (Backbone) - Master dashboard for contest management
-2. **User Panel** (Contestant Dashboard) - Participants manage profiles
-3. **Public Voting Panel** - Public-facing voting website optimized for viral traffic
+Build a premium, high-class online voting contest platform inspired by mshealthandfit.com with:
+1. **Admin Panel**: Master dashboard for website owner to manage contestants, approve profiles, manage contest rounds, monitor votes in real-time, block fake voters, manage leaderboard, and control contest settings
+2. **User Panel (Contestant Dashboard)**: Portal for participants to register, login, upload photos, add personal information, submit application, view vote statistics, and get unique public voting link
+3. **Public Voting Panel**: Public-facing website where visitors can view contestant profiles, see leaderboard, and vote
+
+### Core Voting Rules
+- 1 email address = 1 vote every 24 hours (free votes)
+- Votes verified via email OTP system
+- Paid votes available via Stripe
+
+### Domain Architecture
+- **glowingstar.vote** - Public voting domain (NO "Join Contest" button)
+- **glowingstar.net** - Management portal domain (Admin + Contestant Dashboard)
 
 ---
 
-## What's Been Implemented
+## Completed Features
 
-### ✅ All Core Systems Complete
+### ✅ Rebranding (Dec 16, 2025)
+- Changed project name from "Glamour" to "Glowing Star"
+- Applied gold/amber theme throughout the application
+- Updated favicon with gold star icon
+- Updated all text references and color schemes
 
-#### 1. Public Voting Panel (15-Point Spec)
-- [x] **Contest Homepage** - Hero section, stats, featured contestants, floating cards
-- [x] **Countdown Timer** - Dark purple bar with days/hours/mins/secs
-- [x] **Trending Section** - Fastest rising stars with growth percentages
-- [x] **Leaderboard Preview** - Top 3 podium + full rankings
-- [x] **How Voting Works** - 4-step process explanation
-- [x] **Grand Prize Banner** - $10K prize promotion
-- [x] **Categories Section** - Browse by category
-- [x] **Featured Contestants** - Grid of top contestants
-- [x] **Contest Timeline** - Round progress tracker
-- [x] **CTA Section** - Vote Now / Join Contest buttons
+### ✅ Two-Domain Architecture (Dec 16, 2025)
+- Public Site: Homepage, Contestants, Leaderboard, Voting pages
+- Management Portal: Admin Panel, Contestant Dashboard, Login/Register
+- Public site has "Contestant Login" external link (no "Join Contest")
+- Management portal accessible at /portal/* routes
 
-#### 2. Contestants Listing Page
-- [x] **Search** - By name or location
-- [x] **Category Filter** - Dropdown with all categories
-- [x] **Sort Options** - Most Votes, Trending, Newest, A-Z
-- [x] **Grid/List View** - Toggle between views
-- [x] **Contestant Cards** - Rank badges, vote counts, hover effects
-- [x] **Quick Vote Badges** - Hover to reveal vote button
+### ✅ Mobile Responsive Design (Dec 16, 2025)
+- All pages fully responsive for mobile, tablet, desktop
+- Hamburger menu for mobile navigation
+- Optimized grid layouts for smaller screens
+- Touch-friendly buttons and inputs
 
-#### 3. Enhanced Leaderboard Page
-- [x] **Live Rankings Badge** - With real-time indicator
-- [x] **Top 3 Podium** - Olympic-style with medals
-- [x] **Leaderboard Types** - Global, Category, Daily tabs
-- [x] **Rank Movement** - Up/down arrows
-- [x] **Full Rankings Table** - With vote differences
-- [x] **Stats Section** - Total contestants, votes, categories, prize
+### ✅ Full WebSocket Integration (Dec 16, 2025)
+- Real-time vote updates on HomePage, LeaderboardPage, VotingPage
+- Admin Panel receives live vote notifications
+- Contestant Dashboard shows live vote count updates
+- WebSocket hooks: useWebSocket, useVoteUpdates, useLeaderboardUpdates
 
-#### 4. Paid Voting System (Stripe)
-- [x] 4 vote packages: 10/$5, 50/$20, 100/$35, 250/$75
-- [x] Stripe Checkout integration
-- [x] Payment success/cancel pages
-- [x] Automatic vote addition
+### ✅ Email Notification Templates (Dec 16, 2025)
+- OTP verification template
+- Vote confirmation template
+- Round qualification template
+- Payment confirmation template
+- Welcome contestant template
+- Profile approved template
 
-#### 5. Real-time WebSocket Updates
-- [x] `/ws/votes` - Global vote updates
-- [x] `/ws/leaderboard` - Leaderboard updates
-- [x] `/ws/contestant/:id` - Contestant-specific updates
+### ✅ Advanced Admin Panel
+- Dashboard with real-time stats and charts
+- Contestant management (approve/reject/edit)
+- Category management (CRUD)
+- Round management (create, activate, end)
+- Vote monitoring with fraud detection
+- Dark luxury Web3 design
 
-#### 6. Advanced Fraud Detection
-- [x] IP pattern monitoring & blocking
-- [x] Suspicious email domain detection
-- [x] Vote velocity analysis
-- [x] Admin blocking tools
+### ✅ Advanced Contestant Dashboard
+- Profile management with photo uploads
+- Vote statistics and analytics
+- Unique voting link with copy button
+- Social media integration
+- Q&A section management
+- Light premium Web3 design
 
-#### 7. Email Templates (HTML)
-- [x] OTP verification
-- [x] Vote confirmation
-- [x] Round qualification
-- [x] Payment confirmation
+### ✅ Public Voting Interface
+- Professional homepage with hero section
+- Contestant gallery with filters and search
+- Individual voting pages with paid vote options
+- Live leaderboard with podium display
+- Countdown timer for round endings
 
-#### 8. Admin Panel (12-Point Spec)
-- [x] Dashboard, Contests, Contestants, Voting
-- [x] Leaderboard, Media, Security, Reports, Settings
+### ✅ Stripe Integration
+- Vote packages (10, 50, 100 votes)
+- Secure checkout flow
+- Payment success handling
+- Transaction recording
 
-#### 9. Contestant Dashboard (13-Point Spec)
-- [x] Dashboard, Profile, Gallery, Voting Link
-- [x] Analytics, Leaderboard, Notifications, Support, Settings
-
----
-
-## Branding & Customization
-- [x] Custom favicon (gradient star)
-- [x] Tab title: "Glamour | Premium Beauty Contest"
-- [x] Removed "Made with Emergent"
-
----
-
-## Design Features
-- **Light Web3 Theme** - Glassmorphism, gradients, soft neons
-- **Dark Admin Theme** - Luxury glassmorphism for admin
-- **Mobile Optimized** - Responsive design throughout
-- **Smooth Animations** - Hover effects, transitions
+### ✅ Fraud Detection
+- Duplicate vote detection
+- IP-based rate limiting
+- Email pattern analysis
+- Admin vote review interface
 
 ---
 
-## API Endpoints (Complete List)
+## Architecture
+
+```
+/app
+├── backend/
+│   ├── server.py          # FastAPI with all endpoints
+│   ├── requirements.txt   # Python dependencies
+│   └── .env              # MongoDB, JWT, Stripe config
+└── frontend/
+    ├── src/
+    │   ├── App.js         # Router (public vs portal)
+    │   ├── components/
+    │   │   ├── Layout.jsx # Header/Footer
+    │   │   └── ui/        # Shadcn components
+    │   ├── pages/
+    │   │   ├── HomePage.jsx
+    │   │   ├── ContestantsPage.jsx
+    │   │   ├── LeaderboardPage.jsx
+    │   │   ├── VotingPage.jsx
+    │   │   └── portal/
+    │   │       ├── AdminPanel.jsx
+    │   │       ├── ContestantDashboard.jsx
+    │   │       ├── PortalLogin.jsx
+    │   │       └── PortalRegister.jsx
+    │   ├── hooks/
+    │   │   └── useWebSocket.js
+    │   └── context/
+    │       └── AuthContext.js
+    └── public/
+        └── index.html
+```
+
+---
+
+## Database Schema
+
+### users
+```json
+{
+  "id": "uuid",
+  "email": "string",
+  "password": "hashed",
+  "full_name": "string",
+  "role": "admin | contestant",
+  "created_at": "datetime"
+}
+```
+
+### contestants
+```json
+{
+  "id": "uuid",
+  "user_id": "uuid",
+  "full_name": "string",
+  "bio": "string",
+  "photos": ["url"],
+  "status": "pending | approved | rejected",
+  "vote_count": "int",
+  "slug": "string",
+  "category_id": "uuid",
+  "location": "string",
+  "social_media": {},
+  "q_and_a": []
+}
+```
+
+### votes
+```json
+{
+  "id": "uuid",
+  "contestant_id": "uuid",
+  "email": "string",
+  "type": "free | paid",
+  "timestamp": "datetime",
+  "otp_verified": "boolean"
+}
+```
+
+---
+
+## API Endpoints
 
 ### Auth
 - POST /api/auth/register
 - POST /api/auth/login
 - GET /api/auth/me
 
-### Categories & Rounds
-- CRUD /api/categories
-- CRUD /api/rounds
-- POST /api/rounds/:id/activate
-
 ### Contestants
-- GET/POST /api/contestants
-- GET /api/contestants/:id
-- GET /api/contestants/slug/:year/:slug
-- GET/PUT /api/contestants/me/profile
-- POST/DELETE /api/contestants/me/photos
+- GET /api/contestants
+- GET /api/contestants/:slug
+- POST /api/contestants (create profile)
+- PUT /api/contestants/:id
 
 ### Voting
-- POST /api/vote/request-otp
-- POST /api/vote/verify
-- GET /api/vote-packages
-- POST /api/checkout/create
-- GET /api/checkout/status/:session_id
-- POST /api/webhook/stripe
+- POST /api/votes/initiate
+- POST /api/votes/verify
+- GET /api/votes/packages
+- POST /api/votes/checkout
 
 ### Admin
 - GET /api/admin/stats
 - GET /api/admin/votes
 - PUT /api/admin/contestants/:id/status
-- PUT /api/admin/contestants/:id/round
-- DELETE /api/admin/contestants/:id
-- GET /api/admin/fraud-logs
-- POST /api/admin/block-ip
-- POST /api/admin/block-email
-- GET /api/admin/payment-transactions
+- POST /api/admin/contestants/:id/block
 
 ### WebSocket
-- WS /ws/votes
-- WS /ws/leaderboard
-- WS /ws/contestant/:id
-
-### Leaderboard
-- GET /api/leaderboard
+- /ws/votes - Global vote updates
+- /ws/leaderboard - Leaderboard updates
+- /ws/contestant/:id - Specific contestant updates
 
 ---
 
-## Pending Items
+## Pending/Backlog
 
-### P1 - Medium Priority
-- [ ] SendGrid integration (currently mocked)
-- [ ] Cloud storage for photos (currently base64)
+### P1 - High Priority
+- [ ] Cloud Storage Integration (AWS S3) for contestant photos
+- [ ] Real SendGrid email integration (currently MOCKED)
 
-### P2 - Future Features
-- [ ] Two-domain architecture
-- [ ] Comments/support section
-- [ ] Video introduction upload
-- [ ] CAPTCHA protection
-- [ ] Device fingerprinting
+### P2 - Medium Priority
+- [ ] Social sharing buttons with OG meta tags
+- [ ] Photo gallery lightbox
+- [ ] Advanced analytics dashboard
 
----
-
-## Admin Credentials
-- Email: `admin@lumina.com`
-- Password: `admin123`
+### P3 - Low Priority
+- [ ] Multi-language support
+- [ ] Contest winner announcement page
+- [ ] Certificate generation
 
 ---
 
-## Tech Stack
-- **Backend**: FastAPI, PyMongo, JWT, emergentintegrations
-- **Frontend**: React, Tailwind CSS, Shadcn/UI
-- **Database**: MongoDB
-- **Payments**: Stripe Checkout
-- **Real-time**: WebSocket
+## Test Credentials
+- **Admin**: admin@glowingstar.net / admin123
 
----
-
-## Session Progress - March 15, 2026
-
-### Completed Today:
-1. ✅ Branding (favicon, title, removed Emergent badge)
-2. ✅ Complete Admin Panel (12-point spec)
-3. ✅ Complete Contestant Dashboard (13-point spec)
-4. ✅ Stripe Paid Voting System
-5. ✅ WebSocket Real-time Updates
-6. ✅ Advanced Fraud Detection
-7. ✅ Email Notification Templates
-8. ✅ **Complete Public Voting Panel (15-point spec)**:
-   - Redesigned Homepage with hero, countdown, trending
-   - Enhanced Contestants page with search/filter/sort
-   - Professional Leaderboard with podium display
-   - How voting works section
-   - Contest timeline/round tracker
-   - Grand prize banner
-   - All Web3-style glassmorphism design
+## Mocked Services
+- ⚠️ Email OTP: `send_otp_email` function is mocked (logs to console)
