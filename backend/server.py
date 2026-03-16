@@ -1549,7 +1549,7 @@ async def seed_admin():
 
 @api_router.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "glamour-contest-api", "features": ["stripe", "websocket", "fraud-detection"]}
+    return {"status": "healthy", "service": "glowing-star-contest-api", "features": ["stripe", "websocket", "fraud-detection", "email-templates"]}
 
 # Include the router
 app.include_router(api_router)
