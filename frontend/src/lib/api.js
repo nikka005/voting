@@ -95,6 +95,15 @@ export const adminAPI = {
   blockEmail: (email, reason) => api.post(`/admin/block-email?email=${email}&reason=${reason}`),
   // Payment transactions
   getPaymentTransactions: () => api.get('/admin/payment-transactions'),
+  // Contestant badges
+  updateContestantBadges: (id, badges) => {
+    const params = new URLSearchParams(badges).toString();
+    return api.put(`/admin/contestants/${id}/badges?${params}`);
+  },
+  // Analytics
+  getAnalytics: (days = 30) => api.get(`/admin/analytics?days=${days}`),
+  // Fraud analysis
+  getFraudAnalysis: (contestantId) => api.get(`/admin/fraud-analysis/${contestantId}`),
 };
 
 // Voting API
@@ -113,6 +122,32 @@ export const leaderboardAPI = {
     const queryString = new URLSearchParams(params).toString();
     return api.get(`/leaderboard?${queryString}`);
   },
+  getFiltered: (filterType, params = {}) => {
+    const queryParams = { filter_type: filterType, ...params };
+    const queryString = new URLSearchParams(queryParams).toString();
+    return api.get(`/leaderboard/filtered?${queryString}`);
+  },
+};
+
+// Highlights API
+export const highlightsAPI = {
+  get: () => api.get('/contestants/highlights'),
+};
+
+// Search API
+export const searchAPI = {
+  search: (query, searchType = 'all', limit = 20) => 
+    api.get(`/search?q=${query}&search_type=${searchType}&limit=${limit}`),
+};
+
+// Contest Timeline API
+export const timelineAPI = {
+  get: () => api.get('/contest/timeline'),
+};
+
+// Analytics Tracking
+export const analyticsAPI = {
+  trackPageView: (page) => api.post(`/analytics/pageview?page=${page}`),
 };
 
 export default api;
