@@ -147,7 +147,7 @@ export default function PortalRegister() {
                     placeholder="Min 6 characters"
                     required
                     data-testid="register-password"
-                    className="pl-12 pr-12 h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-pink-500 focus:ring-pink-500/20"
+                    className="pl-12 pr-12 h-12 rounded-xl bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-amber-500 focus:ring-amber-500/20"
                   />
                   <button
                     type="button"
