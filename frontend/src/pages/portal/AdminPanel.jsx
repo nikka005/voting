@@ -331,6 +331,7 @@ export default function AdminPanel() {
     { id: 'guide', label: 'How It Works', icon: HelpCircle },
     { id: 'contests', label: 'Contests', icon: Trophy },
     { id: 'contestants', label: 'Contestants', icon: Users },
+    { id: 'payments', label: 'Payments', icon: CreditCard },
     { id: 'banners', label: 'Promotions', icon: Megaphone },
     { id: 'voting', label: 'Voting', icon: Heart },
     { id: 'leaderboard', label: 'Leaderboard', icon: Award },
