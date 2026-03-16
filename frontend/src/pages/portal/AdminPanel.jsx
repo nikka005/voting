@@ -263,12 +263,12 @@ export default function AdminPanel() {
         {/* Logo */}
         <div className="p-6 border-b border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center shadow-lg shadow-pink-500/25">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/25">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="font-syne font-bold text-lg">Glamour</h1>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-pink-500/20 to-violet-500/20 text-pink-400 border border-pink-500/20">
+              <h1 className="font-syne font-bold text-lg">Glowing Star</h1>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border border-amber-500/20">
                 ADMIN
               </span>
             </div>
