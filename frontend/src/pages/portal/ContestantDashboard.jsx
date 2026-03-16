@@ -115,6 +115,21 @@ export default function ContestantDashboard() {
     fetchProfile();
   }, [isContestant, navigate, fetchProfile]);
 
+  // Handle real-time vote updates for this contestant
+  useEffect(() => {
+    if (lastVoteUpdate && profile && lastVoteUpdate.contestant_id === profile.id) {
+      setProfile(prev => ({
+        ...prev,
+        vote_count: lastVoteUpdate.vote_count
+      }));
+      
+      // Show toast notification for new vote
+      toast.success(`You received a new vote! Total: ${lastVoteUpdate.vote_count}`, {
+        icon: '🌟'
+      });
+    }
+  }, [lastVoteUpdate, profile?.id]);
+
   // Handlers
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
