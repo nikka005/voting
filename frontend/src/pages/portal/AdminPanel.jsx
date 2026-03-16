@@ -1228,6 +1228,129 @@ function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, p
           </div>
         </GlassCard>
       </div>
+
+      {/* Analytics Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Vote Growth Chart */}
+        <GlassCard title="Vote Growth (Last 7 Days)" icon={TrendingUp}>
+          <div className="h-48">
+            <div className="flex items-end justify-between h-full gap-2 pb-4">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, idx) => {
+                const height = [45, 62, 38, 78, 55, 85, 70][idx];
+                return (
+                  <div key={day} className="flex-1 flex flex-col items-center gap-2">
+                    <div 
+                      className="w-full bg-gradient-to-t from-pink-500 to-violet-500 rounded-t-lg transition-all hover:from-pink-400 hover:to-violet-400"
+                      style={{ height: `${height}%` }}
+                    />
+                    <span className="text-xs text-slate-500">{day}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </GlassCard>
+
+        {/* Device Analytics */}
+        <GlassCard title="Device Analytics" icon={Monitor}>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                  <Monitor className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <p className="font-medium">Desktop</p>
+                  <p className="text-xs text-slate-500">Windows, Mac, Linux</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-blue-400">62%</p>
+                <p className="text-xs text-slate-500">1,550 votes</p>
+              </div>
+            </div>
+            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full" style={{ width: '62%' }} />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center">
+                  <Smartphone className="w-5 h-5 text-pink-400" />
+                </div>
+                <div>
+                  <p className="font-medium">Mobile</p>
+                  <p className="text-xs text-slate-500">iOS, Android</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-bold text-pink-400">38%</p>
+                <p className="text-xs text-slate-500">950 votes</p>
+              </div>
+            </div>
+            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full" style={{ width: '38%' }} />
+            </div>
+          </div>
+        </GlassCard>
+      </div>
+
+      {/* Country-wise Voters & Recent Registrations */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top Countries */}
+        <GlassCard title="Top Voting Countries" icon={Globe}>
+          <div className="space-y-3">
+            {[
+              { country: 'United States', flag: '🇺🇸', votes: 856, pct: 34 },
+              { country: 'United Kingdom', flag: '🇬🇧', votes: 423, pct: 17 },
+              { country: 'Canada', flag: '🇨🇦', votes: 312, pct: 12 },
+              { country: 'Australia', flag: '🇦🇺', votes: 245, pct: 10 },
+              { country: 'Germany', flag: '🇩🇪', votes: 189, pct: 8 },
+            ].map((item, idx) => (
+              <div key={idx} className="flex items-center gap-3">
+                <span className="text-2xl">{item.flag}</span>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium">{item.country}</span>
+                    <span className="text-xs text-slate-500">{item.votes} votes</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-violet-500 to-pink-500 rounded-full" 
+                      style={{ width: `${item.pct}%` }} 
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+
+        {/* Recent Registrations */}
+        <GlassCard title="Recent Registrations" icon={UserCheck}>
+          <div className="space-y-3 max-h-64 overflow-y-auto">
+            {contestants?.filter(c => c.status === 'pending').slice(0, 5).map((c, idx) => (
+              <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-white/5">
+                <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/10 flex-shrink-0">
+                  {c.photos?.[0] ? (
+                    <img src={c.photos[0]} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <Users className="w-full h-full p-2 text-slate-500" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{c.full_name}</p>
+                  <p className="text-xs text-slate-500">{c.location || 'Unknown location'}</p>
+                </div>
+                <span className="px-2 py-1 text-xs bg-amber-500/20 text-amber-400 rounded-full">Pending</span>
+              </div>
+            ))}
+            {contestants?.filter(c => c.status === 'pending').length === 0 && (
+              <p className="text-center text-slate-500 py-4">No pending registrations</p>
+            )}
+          </div>
+        </GlassCard>
+      </div>
     </div>
   );
 }
