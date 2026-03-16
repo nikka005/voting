@@ -2,15 +2,58 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#f59e0b" />
-        <meta name="description" content="Glowing Star - Premium Beauty Contest Voting Platform" />
+        <meta name="description" content="Glowing Star - Premium Beauty Contest Voting Platform. Vote for your favorite contestants!" />
+        
+        <!-- PWA Meta Tags -->
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Glowing Star" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="Glowing Star" />
+        <meta name="msapplication-TileColor" content="#f59e0b" />
+        
+        <!-- Open Graph / Social Sharing Meta Tags -->
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Glowing Star Beauty Contest" />
+        <meta property="og:title" content="Glowing Star - Premium Beauty Contest" />
+        <meta property="og:description" content="Vote for your favorite contestants in the world's most prestigious beauty contest. Every vote counts!" />
+        <meta property="og:image" content="https://glowingstar.vote/og-image.jpg" />
+        <meta property="og:url" content="https://glowingstar.vote" />
+        
+        <!-- Twitter Card Meta Tags -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Glowing Star - Premium Beauty Contest" />
+        <meta name="twitter:description" content="Vote for your favorite contestants in the world's most prestigious beauty contest!" />
+        <meta name="twitter:image" content="https://glowingstar.vote/og-image.jpg" />
+        
+        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+        
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json" />
+        
         <!-- Favicon - Gold Star -->
         <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23f59e0b'/%3E%3Cstop offset='100%25' style='stop-color:%23f97316'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23grad)'/%3E%3Cpath d='M50 20 L58 40 L80 40 L62 54 L70 76 L50 62 L30 76 L38 54 L20 40 L42 40 Z' fill='white'/%3E%3C/svg%3E" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        
         <title>Glowing Star | Premium Beauty Contest</title>
+        
+        <!-- Service Worker Registration -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    }, function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+                });
+            }
+        </script>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
