@@ -5,8 +5,8 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { 
-  Sparkles, Mail, Lock, Eye, EyeOff, ArrowRight, User,
-  Globe, Star, Trophy, Heart, Loader2, AlertCircle, CheckCircle
+  Star, Mail, Lock, Eye, EyeOff, ArrowRight, User,
+  Globe, Trophy, Heart, Loader2, AlertCircle, CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 
