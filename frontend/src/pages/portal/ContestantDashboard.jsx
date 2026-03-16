@@ -12,6 +12,7 @@ import { Progress } from '../../components/ui/progress';
 import { Switch } from '../../components/ui/switch';
 import { contestantsAPI, categoriesAPI, leaderboardAPI } from '../../lib/api';
 import { formatNumber, formatDate } from '../../lib/utils';
+import { useVoteUpdates } from '../../hooks/useWebSocket';
 import { toast } from 'sonner';
 import {
   User, Heart, Link as LinkIcon, Camera, Instagram, Facebook, Twitter,
