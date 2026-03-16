@@ -83,13 +83,14 @@ export default function AdminPanel() {
   // Fetch all data
   const fetchData = useCallback(async () => {
     try {
-      const [statsRes, dashboardRes, categoriesRes, roundsRes, votesRes, paymentsRes] = await Promise.all([
+      const [statsRes, dashboardRes, categoriesRes, roundsRes, votesRes, paymentsRes, contestsRes] = await Promise.all([
         adminAPI.getStats(),
         adminAPI.getDashboardStats(),
         categoriesAPI.getAll(),
         roundsAPI.getAll(),
         adminAPI.getVotes({ limit: 50 }),
         adminAPI.getPayments({ limit: 50 }),
+        contestsAPI.getAll().catch(() => ({ data: [] })),
       ]);
       setStats(statsRes.data);
       setDashboardStats(dashboardRes.data);
@@ -97,6 +98,7 @@ export default function AdminPanel() {
       setRounds(roundsRes.data);
       setVotes(votesRes.data?.votes || votesRes.data || []);
       setPayments(paymentsRes.data?.payments || paymentsRes.data || []);
+      setContests(contestsRes.data || []);
     } catch (error) {
       console.error('Failed to fetch admin data:', error);
       toast.error('Failed to load dashboard data');
