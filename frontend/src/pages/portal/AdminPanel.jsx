@@ -1234,13 +1234,286 @@ function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, p
 
 // ============ CONTESTS SECTION ============
 function ContestsSection({
-  categories, rounds, categoryForm, setCategoryForm, roundForm, setRoundForm,
-  categoryModalOpen, setCategoryModalOpen, roundModalOpen, setRoundModalOpen,
-  editingCategory, setEditingCategory, editingRound, setEditingRound,
-  handleCategorySubmit, handleDeleteCategory, handleRoundSubmit, handleActivateRound
+  categories, rounds, contests, categoryForm, setCategoryForm, roundForm, setRoundForm,
+  contestForm, setContestForm, categoryModalOpen, setCategoryModalOpen, roundModalOpen, setRoundModalOpen,
+  contestModalOpen, setContestModalOpen, editingCategory, setEditingCategory, editingRound, setEditingRound,
+  editingContest, setEditingContest, handleCategorySubmit, handleDeleteCategory, handleRoundSubmit,
+  handleActivateRound, handleContestSubmit, handleContestAction
 }) {
+  const resetContestForm = () => ({
+    name: '', description: '', entry_fee: 50, max_participants: 100,
+    start_date: '', end_date: '', registration_deadline: '',
+    voting_start_date: '', voting_end_date: '', prize_pool: 35000,
+    rules: '', status: 'draft'
+  });
+
   return (
     <div className="space-y-6" data-testid="contests-section">
+      {/* Contest Management */}
+      <GlassCard 
+        title="Contest Management" 
+        icon={Trophy}
+        action={
+          <Dialog open={contestModalOpen} onOpenChange={setContestModalOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                size="sm" 
+                className="bg-gradient-to-r from-amber-500 to-orange-600"
+                onClick={() => { setEditingContest(null); setContestForm(resetContestForm()); }}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Contest
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-[#15151f] border-white/10 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="font-syne">{editingContest ? 'Edit' : 'Create'} Contest</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleContestSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <Label className="text-slate-300">Contest Name</Label>
+                    <Input 
+                      value={contestForm.name} 
+                      onChange={(e) => setContestForm({ ...contestForm, name: e.target.value })} 
+                      className="bg-white/5 border-white/10 text-white mt-1"
+                      placeholder="e.g., Glowing Star 2026"
+                      required 
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <Label className="text-slate-300">Description</Label>
+                    <Textarea 
+                      value={contestForm.description} 
+                      onChange={(e) => setContestForm({ ...contestForm, description: e.target.value })} 
+                      className="bg-white/5 border-white/10 text-white mt-1"
+                      placeholder="Contest description..."
+                      rows={2}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate-300">Entry Fee ($)</Label>
+                    <Input 
+                      type="number"
+                      value={contestForm.entry_fee} 
+                      onChange={(e) => setContestForm({ ...contestForm, entry_fee: e.target.value })} 
+                      className="bg-white/5 border-white/10 text-white mt-1"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate-300">Max Participants</Label>
+                    <Input 
+                      type="number"
+                      value={contestForm.max_participants} 
+                      onChange={(e) => setContestForm({ ...contestForm, max_participants: e.target.value })} 
+                      className="bg-white/5 border-white/10 text-white mt-1"
+                      min="1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate-300">Prize Pool ($)</Label>
+                    <Input 
+                      type="number"
+                      value={contestForm.prize_pool} 
+                      onChange={(e) => setContestForm({ ...contestForm, prize_pool: e.target.value })} 
+                      className="bg-white/5 border-white/10 text-white mt-1"
+                      min="0"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate-300">Status</Label>
+                    <Select value={contestForm.status} onValueChange={(v) => setContestForm({ ...contestForm, status: v })}>
+                      <SelectTrigger className="bg-white/5 border-white/10 text-white mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#15151f] border-white/10 text-white">
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="registration">Registration Open</SelectItem>
+                        <SelectItem value="voting">Voting Active</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-slate-300">Start Date</Label>
+                    <Input 
+                      type="date"
+                      value={contestForm.start_date} 
+                      onChange={(e) => setContestForm({ ...contestForm, start_date: e.target.value })} 
+                      className="bg-white/5 border-white/10 text-white mt-1"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate-300">End Date</Label>
+                    <Input 
+                      type="date"
+                      value={contestForm.end_date} 
+                      onChange={(e) => setContestForm({ ...contestForm, end_date: e.target.value })} 
+                      className="bg-white/5 border-white/10 text-white mt-1"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate-300">Registration Deadline</Label>
+                    <Input 
+                      type="date"
+                      value={contestForm.registration_deadline} 
+                      onChange={(e) => setContestForm({ ...contestForm, registration_deadline: e.target.value })} 
+                      className="bg-white/5 border-white/10 text-white mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate-300">Voting Start</Label>
+                    <Input 
+                      type="date"
+                      value={contestForm.voting_start_date} 
+                      onChange={(e) => setContestForm({ ...contestForm, voting_start_date: e.target.value })} 
+                      className="bg-white/5 border-white/10 text-white mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate-300">Voting End</Label>
+                    <Input 
+                      type="date"
+                      value={contestForm.voting_end_date} 
+                      onChange={(e) => setContestForm({ ...contestForm, voting_end_date: e.target.value })} 
+                      className="bg-white/5 border-white/10 text-white mt-1"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <Label className="text-slate-300">Rules</Label>
+                    <Textarea 
+                      value={contestForm.rules} 
+                      onChange={(e) => setContestForm({ ...contestForm, rules: e.target.value })} 
+                      className="bg-white/5 border-white/10 text-white mt-1"
+                      placeholder="Contest rules and guidelines..."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+                <Button type="submit" className="w-full bg-gradient-to-r from-amber-500 to-orange-600">
+                  {editingContest ? 'Update' : 'Create'} Contest
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        }
+      >
+        <div className="space-y-4">
+          {contests?.map((contest) => (
+            <div key={contest.id} className={`p-4 rounded-xl border transition-all ${
+              contest.status === 'voting' 
+                ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500/30' 
+                : contest.status === 'registration'
+                ? 'bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/30'
+                : 'bg-white/5 border-white/10 hover:border-white/20'
+            }`}>
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    contest.status === 'voting' 
+                      ? 'bg-gradient-to-br from-green-500 to-emerald-600' 
+                      : contest.status === 'registration'
+                      ? 'bg-gradient-to-br from-blue-500 to-cyan-600'
+                      : 'bg-gradient-to-br from-amber-500 to-orange-600'
+                  }`}>
+                    <Trophy className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-semibold text-lg">{contest.name}</h4>
+                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded ${
+                        contest.status === 'voting' ? 'bg-green-500 text-white animate-pulse' :
+                        contest.status === 'registration' ? 'bg-blue-500 text-white' :
+                        contest.status === 'completed' ? 'bg-slate-500 text-white' :
+                        'bg-amber-500/20 text-amber-400'
+                      }`}>
+                        {contest.status?.toUpperCase()}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-400">
+                      ${contest.entry_fee} entry • {contest.current_participants || 0}/{contest.max_participants} slots • ${contest.prize_pool?.toLocaleString()} prize
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {contest.start_date} to {contest.end_date}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {contest.status === 'draft' && (
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="bg-blue-500/10 border-blue-500/30 text-blue-400 hover:bg-blue-500/20"
+                      onClick={() => handleContestAction(contest.id, 'start-voting')}
+                    >
+                      <Play className="w-4 h-4 mr-1" />
+                      Open Registration
+                    </Button>
+                  )}
+                  {contest.status === 'registration' && (
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20"
+                      onClick={() => handleContestAction(contest.id, 'start-voting')}
+                    >
+                      <Play className="w-4 h-4 mr-1" />
+                      Start Voting
+                    </Button>
+                  )}
+                  {contest.status === 'voting' && (
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20"
+                      onClick={() => handleContestAction(contest.id, 'stop-voting')}
+                    >
+                      <Pause className="w-4 h-4 mr-1" />
+                      Stop Voting
+                    </Button>
+                  )}
+                  <Button 
+                    size="icon" 
+                    variant="ghost" 
+                    className="h-8 w-8 text-slate-400 hover:text-white"
+                    onClick={() => { 
+                      setEditingContest(contest);
+                      setContestForm({
+                        name: contest.name,
+                        description: contest.description || '',
+                        entry_fee: contest.entry_fee,
+                        max_participants: contest.max_participants,
+                        start_date: contest.start_date || '',
+                        end_date: contest.end_date || '',
+                        registration_deadline: contest.registration_deadline || '',
+                        voting_start_date: contest.voting_start_date || '',
+                        voting_end_date: contest.voting_end_date || '',
+                        prize_pool: contest.prize_pool,
+                        rules: contest.rules || '',
+                        status: contest.status
+                      });
+                      setContestModalOpen(true);
+                    }}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+          {(!contests || contests.length === 0) && (
+            <div className="text-center py-12 text-slate-500">
+              <Trophy className="w-12 h-12 mx-auto mb-4 opacity-20" />
+              <p>No contests created yet. Click "Create Contest" to get started.</p>
+            </div>
+          )}
+        </div>
+      </GlassCard>
+
       {/* Categories */}
       <GlassCard 
         title="Contest Categories" 
