@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Switch } from '../../components/ui/switch';
 import { adminAPI, contestantsAPI, categoriesAPI, roundsAPI } from '../../lib/api';
 import { formatNumber, formatDate } from '../../lib/utils';
+import { useVoteUpdates } from '../../hooks/useWebSocket';
 import { toast } from 'sonner';
 import {
   Users, Heart, Crown, Clock, Plus, Trash2, Check, X, Edit, Loader2, Search,
