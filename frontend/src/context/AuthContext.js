@@ -34,12 +34,16 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
-  const register = async (data) => {
-    const response = await authAPI.register(data);
-    const { token, user: userData } = response.data;
-    setAuth(token, userData);
-    setUser(userData);
-    return userData;
+  const register = async (full_name, email, password) => {
+    try {
+      const response = await authAPI.register({ full_name, email, password });
+      const { token, user: userData } = response.data;
+      setAuth(token, userData);
+      setUser(userData);
+      return { success: true, user: userData };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.detail || 'Registration failed' };
+    }
   };
 
   const logout = () => {
