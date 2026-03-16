@@ -2814,6 +2814,8 @@ async def create_entry_fee_checkout(request: EntryFeePayment, current_user: dict
     if not STRIPE_API_KEY:
         raise HTTPException(status_code=500, detail="Payment system not configured")
     
+    user_id = current_user.get("user_id") or current_user.get("id")
+    
     # Get contest details
     contest = await db.contests.find_one({"id": request.contest_id}, {"_id": 0})
     if not contest:
@@ -2826,16 +2828,21 @@ async def create_entry_fee_checkout(request: EntryFeePayment, current_user: dict
     
     # Check if user already paid
     existing_payment = await db.entry_fee_payments.find_one({
-        "user_id": current_user["id"],
+        "user_id": user_id,
         "status": "completed"
     })
     if existing_payment:
         raise HTTPException(status_code=400, detail="Entry fee already paid")
     
     # Get contestant profile
-    contestant = await db.contestants.find_one({"user_id": current_user["id"]}, {"_id": 0})
+    contestant = await db.contestants.find_one({"user_id": user_id}, {"_id": 0})
     if not contestant:
         raise HTTPException(status_code=400, detail="Please create your contestant profile first")
+    
+    # Get user info for email
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    user_email = user.get("email") if user else None
+    user_name = user.get("full_name") if user else "Contestant"
     
     success_url = f"{request.origin_url}/portal?payment=success&session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{request.origin_url}/portal?payment=cancelled"
@@ -2848,7 +2855,7 @@ async def create_entry_fee_checkout(request: EntryFeePayment, current_user: dict
                     'currency': 'usd',
                     'product_data': {
                         'name': f'Entry Fee - {contest_name}',
-                        'description': f'Contest registration fee for {current_user.get("full_name", "Contestant")}',
+                        'description': f'Contest registration fee for {user_name}',
                     },
                     'unit_amount': int(entry_fee * 100),
                 },
@@ -2857,9 +2864,9 @@ async def create_entry_fee_checkout(request: EntryFeePayment, current_user: dict
             mode='payment',
             success_url=success_url,
             cancel_url=cancel_url,
-            customer_email=current_user.get("email"),
+            customer_email=user_email,
             metadata={
-                'user_id': current_user["id"],
+                'user_id': user_id,
                 'contestant_id': contestant["id"],
                 'payment_type': 'entry_fee',
                 'contest_id': request.contest_id
@@ -2869,7 +2876,8 @@ async def create_entry_fee_checkout(request: EntryFeePayment, current_user: dict
         # Create payment record
         payment_doc = {
             "id": str(uuid.uuid4()),
-            "user_id": current_user["id"],
+            "user_id": user_id,
+            "user_email": user_email,
             "contestant_id": contestant["id"],
             "contestant_name": contestant.get("full_name", ""),
             "contest_id": request.contest_id,
