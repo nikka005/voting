@@ -1618,21 +1618,21 @@ async def websocket_contestant(websocket: WebSocket, contestant_id: str):
 @api_router.post("/seed/admin")
 async def seed_admin():
     """Create default admin user (for initial setup)"""
-    existing = await db.users.find_one({"email": "admin@lumina.com"})
+    existing = await db.users.find_one({"email": "admin@glowingstar.net"})
     if existing:
-        return {"message": "Admin already exists", "email": "admin@lumina.com", "password": "admin123"}
+        return {"message": "Admin already exists", "email": "admin@glowingstar.net", "password": "admin123"}
     
     admin_id = str(uuid.uuid4())
     admin_doc = {
         "id": admin_id,
-        "email": "admin@lumina.com",
-        "full_name": "Glamour Admin",
+        "email": "admin@glowingstar.net",
+        "full_name": "Glowing Star Admin",
         "password": hash_password("admin123"),
         "role": "admin",
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.users.insert_one(admin_doc)
-    return {"message": "Admin created", "email": "admin@lumina.com", "password": "admin123"}
+    return {"message": "Admin created", "email": "admin@glowingstar.net", "password": "admin123"}
 
 # ============ HEALTH CHECK ============
 
