@@ -1001,6 +1001,68 @@ async def get_contestant_by_slug(year: str, slug: str):
         achievements=contestant.get("achievements")
     )
 
+# ============ CONTESTANT HIGHLIGHTS SYSTEM ============
+# NOTE: This route MUST be defined BEFORE /contestants/{contestant_id} to avoid route conflicts
+
+@api_router.get("/contestants/highlights")
+async def get_contestant_highlights():
+    """Get highlighted contestants for homepage"""
+    
+    # Get trending contestants (most votes in last 7 days)
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    pipeline = [
+        {"$match": {"created_at": {"$gte": week_ago}}},
+        {"$group": {"_id": "$contestant_id", "recent_votes": {"$sum": 1}}},
+        {"$sort": {"recent_votes": -1}},
+        {"$limit": 6}
+    ]
+    trending_ids = [doc["_id"] async for doc in db.votes.aggregate(pipeline)]
+    trending = await db.contestants.find(
+        {"id": {"$in": trending_ids}, "status": "approved"},
+        {"_id": 0}
+    ).to_list(6)
+    
+    # Get new contestants (joined in last 14 days)
+    two_weeks_ago = (datetime.now(timezone.utc) - timedelta(days=14)).isoformat()
+    new_contestants = await db.contestants.find(
+        {"status": "approved", "created_at": {"$gte": two_weeks_ago}},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(6).to_list(6)
+    
+    # Get featured contestants
+    featured = await db.contestants.find(
+        {"status": "approved", "is_featured": True},
+        {"_id": 0}
+    ).limit(6).to_list(6)
+    
+    # Get verified contestants
+    verified = await db.contestants.find(
+        {"status": "approved", "is_verified": True},
+        {"_id": 0}
+    ).limit(6).to_list(6)
+    
+    # Get rising stars (biggest vote increase in last 24 hours)
+    yesterday = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+    pipeline = [
+        {"$match": {"created_at": {"$gte": yesterday}}},
+        {"$group": {"_id": "$contestant_id", "daily_votes": {"$sum": 1}}},
+        {"$sort": {"daily_votes": -1}},
+        {"$limit": 6}
+    ]
+    rising_ids = [doc["_id"] async for doc in db.votes.aggregate(pipeline)]
+    rising = await db.contestants.find(
+        {"id": {"$in": rising_ids}, "status": "approved"},
+        {"_id": 0}
+    ).to_list(6)
+    
+    return {
+        "trending": trending,
+        "new": new_contestants,
+        "featured": featured,
+        "verified": verified,
+        "rising": rising
+    }
+
 @api_router.get("/contestants/{contestant_id}", response_model=ContestantResponse)
 async def get_contestant(contestant_id: str):
     """Get contestant by ID"""
