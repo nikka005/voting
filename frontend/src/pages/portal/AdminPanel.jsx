@@ -1334,60 +1334,271 @@ function ReportsSection({ stats, contestants, votes }) {
 
 // ============ SETTINGS SECTION ============
 function SettingsSection() {
+  const [contestSettings, setContestSettings] = useState({
+    contest_name: '',
+    contest_tagline: '',
+    contest_description: '',
+    contest_rules: '',
+    prize_pool: 35000,
+    prize_distribution: [],
+    max_participants: 100,
+    status: 'active'
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/contest/settings`);
+      const data = await response.json();
+      setContestSettings(data);
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('lumina_token');
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/admin/contest/settings`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(contestSettings)
+      });
+      const data = await response.json();
+      if (data.success) {
+        toast.success('Contest settings saved successfully!');
+      } else {
+        toast.error('Failed to save settings');
+      }
+    } catch (error) {
+      toast.error('Failed to save settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const updatePrize = (index, field, value) => {
+    const newDistribution = [...contestSettings.prize_distribution];
+    newDistribution[index] = { ...newDistribution[index], [field]: value };
+    setContestSettings({ ...contestSettings, prize_distribution: newDistribution });
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-pink-400" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6" data-testid="settings-section">
-      <GlassCard title="Platform Settings" icon={Settings}>
+      {/* Contest Info Section */}
+      <GlassCard title="Contest Information" icon={Trophy}>
         <div className="space-y-6">
-          {/* Contest Settings */}
-          <div>
-            <h4 className="font-semibold mb-4 flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-pink-400" />
-              Contest Settings
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-slate-300">Contest Name</Label>
-                <Input defaultValue="Glowing Star Contest 2026" className="bg-white/5 border-white/10 text-white mt-1" />
-              </div>
-              <div>
-                <Label className="text-slate-300">Contest Year</Label>
-                <Input defaultValue="2026" className="bg-white/5 border-white/10 text-white mt-1" />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-slate-300">Contest Name</Label>
+              <Input 
+                value={contestSettings.contest_name || ''} 
+                onChange={(e) => setContestSettings({ ...contestSettings, contest_name: e.target.value })}
+                className="bg-white/5 border-white/10 text-white mt-1" 
+                placeholder="e.g., Glomer Beauty Contest 2026"
+              />
+            </div>
+            <div>
+              <Label className="text-slate-300">Tagline</Label>
+              <Input 
+                value={contestSettings.contest_tagline || ''} 
+                onChange={(e) => setContestSettings({ ...contestSettings, contest_tagline: e.target.value })}
+                className="bg-white/5 border-white/10 text-white mt-1" 
+                placeholder="e.g., Vote for Your Favorite Star"
+              />
             </div>
           </div>
 
-          {/* Voting Rules */}
           <div>
-            <h4 className="font-semibold mb-4 flex items-center gap-2">
-              <Heart className="w-5 h-5 text-pink-400" />
-              Voting Rules
-            </h4>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
-                <div>
-                  <p className="font-medium">Email Verification Required</p>
-                  <p className="text-sm text-slate-500">Votes must be verified via email OTP</p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
-                <div>
-                  <p className="font-medium">24-Hour Voting Limit</p>
-                  <p className="text-sm text-slate-500">One vote per email every 24 hours</p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
-                <div>
-                  <p className="font-medium">Paid Voting</p>
-                  <p className="text-sm text-slate-500">Enable paid vote packages (Coming Soon)</p>
-                </div>
-                <Switch disabled />
-              </div>
+            <Label className="text-slate-300">Contest Description</Label>
+            <Textarea 
+              value={contestSettings.contest_description || ''} 
+              onChange={(e) => setContestSettings({ ...contestSettings, contest_description: e.target.value })}
+              className="bg-white/5 border-white/10 text-white mt-1 min-h-[120px]" 
+              placeholder="Describe your contest in detail - what makes it special, what participants can expect..."
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-slate-300">Total Prize Pool (USD)</Label>
+              <Input 
+                type="number"
+                value={contestSettings.prize_pool || 0} 
+                onChange={(e) => setContestSettings({ ...contestSettings, prize_pool: parseFloat(e.target.value) })}
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+            <div>
+              <Label className="text-slate-300">Max Participants</Label>
+              <Input 
+                type="number"
+                value={contestSettings.max_participants || 100} 
+                onChange={(e) => setContestSettings({ ...contestSettings, max_participants: parseInt(e.target.value) })}
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
             </div>
           </div>
         </div>
       </GlassCard>
+
+      {/* Prize Distribution Section */}
+      <GlassCard title="Prize Distribution" icon={Award}>
+        <div className="space-y-4">
+          <div className="p-4 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                <Trophy className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-white">${formatNumber(contestSettings.prize_pool || 0)}</p>
+                <p className="text-sm text-amber-400">Total Prize Pool</p>
+              </div>
+            </div>
+          </div>
+
+          {contestSettings.prize_distribution?.map((prize, index) => (
+            <div key={index} className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-4 mb-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                  index === 0 ? 'bg-gradient-to-br from-amber-400 to-yellow-500 text-white' :
+                  index === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-800' :
+                  index === 2 ? 'bg-gradient-to-br from-amber-600 to-amber-700 text-white' :
+                  'bg-white/10 text-slate-400'
+                }`}>
+                  {prize.position}
+                </div>
+                <Input 
+                  value={prize.title || ''} 
+                  onChange={(e) => updatePrize(index, 'title', e.target.value)}
+                  className="bg-white/5 border-white/10 text-white flex-1" 
+                  placeholder="Position Title"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-slate-400 text-xs">Prize Amount (USD)</Label>
+                  <Input 
+                    type="number"
+                    value={prize.amount || 0} 
+                    onChange={(e) => updatePrize(index, 'amount', parseFloat(e.target.value))}
+                    className="bg-white/5 border-white/10 text-white mt-1" 
+                  />
+                </div>
+                <div>
+                  <Label className="text-slate-400 text-xs">Description</Label>
+                  <Input 
+                    value={prize.description || ''} 
+                    onChange={(e) => updatePrize(index, 'description', e.target.value)}
+                    className="bg-white/5 border-white/10 text-white mt-1" 
+                    placeholder="e.g., Cash + Magazine Feature"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
+
+      {/* Contest Rules Section */}
+      <GlassCard title="Contest Rules & Guidelines" icon={FileText}>
+        <div>
+          <Label className="text-slate-300">Rules & Eligibility</Label>
+          <Textarea 
+            value={contestSettings.contest_rules || ''} 
+            onChange={(e) => setContestSettings({ ...contestSettings, contest_rules: e.target.value })}
+            className="bg-white/5 border-white/10 text-white mt-1 min-h-[200px]" 
+            placeholder={`Enter contest rules here. Example:
+
+ELIGIBILITY:
+• Must be 18 years or older
+• Open to all nationalities
+• Professional and amateur models welcome
+
+PARTICIPATION RULES:
+• Submit clear, high-quality photos
+• No heavy filters or editing
+• Professional headshots recommended
+
+VOTING RULES:
+• One free vote per email per 24 hours
+• Paid votes available through our secure platform
+• Vote buying or manipulation will result in disqualification
+
+PRIZES:
+• All prizes distributed within 30 days of contest end
+• Winners must provide valid ID for verification
+• Tax obligations are winner's responsibility`}
+          />
+        </div>
+      </GlassCard>
+
+      {/* Voting Rules */}
+      <GlassCard title="Voting Configuration" icon={Heart}>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+            <div>
+              <p className="font-medium">Email Verification Required</p>
+              <p className="text-sm text-slate-500">Votes must be verified via email OTP</p>
+            </div>
+            <Switch defaultChecked />
+          </div>
+          <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+            <div>
+              <p className="font-medium">24-Hour Voting Limit</p>
+              <p className="text-sm text-slate-500">One vote per email every 24 hours</p>
+            </div>
+            <Switch defaultChecked />
+          </div>
+          <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+            <div>
+              <p className="font-medium">Paid Voting Enabled</p>
+              <p className="text-sm text-slate-500">Allow purchase of vote packages via Stripe</p>
+            </div>
+            <Switch defaultChecked />
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* Save Button */}
+      <div className="flex justify-end">
+        <Button 
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-gradient-to-r from-pink-500 to-violet-600 px-8"
+        >
+          {saving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Check className="w-4 h-4 mr-2" />
+              Save Contest Settings
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 }
