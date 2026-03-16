@@ -30,6 +30,9 @@ export default function AdminPanel() {
   const { isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   
+  // Real-time WebSocket updates
+  const { lastVoteUpdate, isConnected } = useVoteUpdates();
+  
   // Core Data States
   const [stats, setStats] = useState(null);
   const [contestants, setContestants] = useState([]);
