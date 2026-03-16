@@ -1447,7 +1447,8 @@ async def create_checkout_session(request: CheckoutRequest, http_request: Reques
 @api_router.get("/checkout/status/{session_id}")
 async def get_checkout_status(session_id: str):
     """Get checkout session status and process payment if successful"""
-    from emergentintegrations.payments.stripe.checkout import StripeCheckout
+    import stripe
+    stripe.api_key = STRIPE_API_KEY
     
     # Check if already processed
     transaction = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
@@ -1462,58 +1463,60 @@ async def get_checkout_status(session_id: str):
             "votes_added": transaction["votes"]
         }
     
-    # Get status from Stripe
-    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url="")
-    status = await stripe_checkout.get_checkout_status(session_id)
-    
-    # If payment successful, add votes
-    if status.payment_status == "paid" and transaction["payment_status"] != "completed":
-        # Add votes to contestant
-        await db.contestants.update_one(
-            {"id": transaction["contestant_id"]},
-            {"$inc": {"vote_count": transaction["votes"], "paid_vote_count": transaction["votes"]}}
-        )
+    try:
+        # Get session status from Stripe
+        session = stripe.checkout.Session.retrieve(session_id)
         
-        # Update transaction status
-        await db.payment_transactions.update_one(
-            {"session_id": session_id},
-            {"$set": {"payment_status": "completed", "completed_at": datetime.now(timezone.utc).isoformat()}}
-        )
-        
-        # Record paid votes
-        for i in range(transaction["votes"]):
-            vote_doc = {
-                "id": str(uuid.uuid4()),
-                "email": f"paid-{session_id}",
-                "contestant_id": transaction["contestant_id"],
-                "vote_type": "paid",
-                "package_id": transaction["package_id"],
-                "session_id": session_id,
-                "created_at": datetime.now(timezone.utc).isoformat()
+        # If payment successful, add votes
+        if session.payment_status == "paid" and transaction["payment_status"] != "completed":
+            # Add votes to contestant
+            await db.contestants.update_one(
+                {"id": transaction["contestant_id"]},
+                {"$inc": {"vote_count": transaction["votes"], "paid_vote_count": transaction["votes"]}}
+            )
+            
+            # Update transaction status
+            await db.payment_transactions.update_one(
+                {"session_id": session_id},
+                {"$set": {"payment_status": "completed", "completed_at": datetime.now(timezone.utc).isoformat()}}
+            )
+            
+            # Record paid votes
+            for i in range(transaction["votes"]):
+                vote_doc = {
+                    "id": str(uuid.uuid4()),
+                    "email": f"paid-{session_id}",
+                    "contestant_id": transaction["contestant_id"],
+                    "vote_type": "paid",
+                    "package_id": transaction["package_id"],
+                    "session_id": session_id,
+                    "created_at": datetime.now(timezone.utc).isoformat()
+                }
+                await db.votes.insert_one(vote_doc)
+            
+            # Get updated vote count
+            contestant = await db.contestants.find_one({"id": transaction["contestant_id"]}, {"_id": 0})
+            
+            # Broadcast vote update
+            if contestant:
+                await manager.broadcast_vote(transaction["contestant_id"], contestant["vote_count"])
+            
+            return {
+                "status": "complete",
+                "payment_status": "paid",
+                "message": f"{transaction['votes']} votes added successfully!",
+                "votes_added": transaction["votes"],
+                "new_vote_count": contestant["vote_count"] if contestant else None
             }
-            await db.votes.insert_one(vote_doc)
-        
-        # Get updated vote count
-        contestant = await db.contestants.find_one({"id": transaction["contestant_id"]}, {"_id": 0})
-        
-        # Broadcast vote update
-        if contestant:
-            await manager.broadcast_vote(transaction["contestant_id"], contestant["vote_count"])
         
         return {
-            "status": "complete",
-            "payment_status": "paid",
-            "message": f"{transaction['votes']} votes added successfully!",
-            "votes_added": transaction["votes"],
-            "new_vote_count": contestant["vote_count"] if contestant else None
+            "status": session.status,
+            "payment_status": session.payment_status,
+            "amount": session.amount_total / 100 if session.amount_total else 0,
+            "currency": session.currency or "usd"
         }
-    
-    return {
-        "status": status.status,
-        "payment_status": status.payment_status,
-        "amount": status.amount_total / 100,
-        "currency": status.currency
-    }
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @api_router.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
