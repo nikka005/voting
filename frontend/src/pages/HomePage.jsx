@@ -139,7 +139,7 @@ export default function HomePage() {
               <div className="relative">
                 {/* Main Card */}
                 {contestants[0] && (
-                  <Link to={`/${contestants[0].slug}`} className="block">
+                  <Link to={`/2026/${contestants[0].slug}`} className="block">
                     <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/20 transform hover:scale-[1.02] transition-transform">
                       <img 
                         src={contestants[0].photos?.[0] || getPlaceholderImage(0)} 
@@ -163,7 +163,7 @@ export default function HomePage() {
 
                 {/* Floating Cards */}
                 {contestants[1] && (
-                  <Link to={`/${contestants[1].slug}`} className="absolute -right-8 top-20 w-48 rounded-2xl overflow-hidden shadow-xl transform hover:scale-105 transition-transform">
+                  <Link to={`/2026/${contestants[1].slug}`} className="absolute -right-8 top-20 w-48 rounded-2xl overflow-hidden shadow-xl transform hover:scale-105 transition-transform">
                     <img src={contestants[1].photos?.[0] || getPlaceholderImage(1)} alt="" className="w-full aspect-square object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -174,7 +174,7 @@ export default function HomePage() {
                 )}
 
                 {contestants[2] && (
-                  <Link to={`/${contestants[2].slug}`} className="absolute -left-8 bottom-20 w-40 rounded-2xl overflow-hidden shadow-xl transform hover:scale-105 transition-transform">
+                  <Link to={`/2026/${contestants[2].slug}`} className="absolute -left-8 bottom-20 w-40 rounded-2xl overflow-hidden shadow-xl transform hover:scale-105 transition-transform">
                     <img src={contestants[2].photos?.[0] || getPlaceholderImage(2)} alt="" className="w-full aspect-square object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3">
