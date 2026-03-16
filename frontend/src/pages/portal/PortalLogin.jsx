@@ -6,7 +6,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { 
   Star, Mail, Lock, Eye, EyeOff, ArrowRight, 
-  Globe, Shield, Users, Loader2, AlertCircle
+  Globe, Users, Award, Loader2, AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 
