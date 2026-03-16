@@ -455,22 +455,31 @@ export default function AdminPanel() {
             <ContestsSection
               categories={categories}
               rounds={rounds}
+              contests={contests}
               categoryForm={categoryForm}
               setCategoryForm={setCategoryForm}
               roundForm={roundForm}
               setRoundForm={setRoundForm}
+              contestForm={contestForm}
+              setContestForm={setContestForm}
               categoryModalOpen={categoryModalOpen}
               setCategoryModalOpen={setCategoryModalOpen}
               roundModalOpen={roundModalOpen}
               setRoundModalOpen={setRoundModalOpen}
+              contestModalOpen={contestModalOpen}
+              setContestModalOpen={setContestModalOpen}
               editingCategory={editingCategory}
               setEditingCategory={setEditingCategory}
               editingRound={editingRound}
               setEditingRound={setEditingRound}
+              editingContest={editingContest}
+              setEditingContest={setEditingContest}
               handleCategorySubmit={handleCategorySubmit}
               handleDeleteCategory={handleDeleteCategory}
               handleRoundSubmit={handleRoundSubmit}
               handleActivateRound={handleActivateRound}
+              handleContestSubmit={handleContestSubmit}
+              handleContestAction={handleContestAction}
             />
           )}
 
