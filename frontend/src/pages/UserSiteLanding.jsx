@@ -12,6 +12,7 @@ import {
   Play, Target, Zap, Shield, HelpCircle, ArrowRight
 } from 'lucide-react';
 import { toast } from 'sonner';
+import PromoBannerPopup from '../components/PromoBannerPopup';
 
 // Contest Configuration
 const CONTEST_CONFIG = {
