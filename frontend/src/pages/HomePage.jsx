@@ -139,7 +139,7 @@ export default function HomePage() {
               <div className="relative">
                 {/* Main Card */}
                 {contestants[0] && (
-                  <Link to={`/2026/${contestants[0].slug}`} className="block">
+                  <Link to={`/${contestants[0].slug}`} className="block">
                     <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/20 transform hover:scale-[1.02] transition-transform">
                       <img 
                         src={contestants[0].photos?.[0] || getPlaceholderImage(0)} 
@@ -163,7 +163,7 @@ export default function HomePage() {
 
                 {/* Floating Cards */}
                 {contestants[1] && (
-                  <Link to={`/2026/${contestants[1].slug}`} className="absolute -right-8 top-20 w-48 rounded-2xl overflow-hidden shadow-xl transform hover:scale-105 transition-transform">
+                  <Link to={`/${contestants[1].slug}`} className="absolute -right-8 top-20 w-48 rounded-2xl overflow-hidden shadow-xl transform hover:scale-105 transition-transform">
                     <img src={contestants[1].photos?.[0] || getPlaceholderImage(1)} alt="" className="w-full aspect-square object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -174,7 +174,7 @@ export default function HomePage() {
                 )}
 
                 {contestants[2] && (
-                  <Link to={`/2026/${contestants[2].slug}`} className="absolute -left-8 bottom-20 w-40 rounded-2xl overflow-hidden shadow-xl transform hover:scale-105 transition-transform">
+                  <Link to={`/${contestants[2].slug}`} className="absolute -left-8 bottom-20 w-40 rounded-2xl overflow-hidden shadow-xl transform hover:scale-105 transition-transform">
                     <img src={contestants[2].photos?.[0] || getPlaceholderImage(2)} alt="" className="w-full aspect-square object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -255,7 +255,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {trending.map((c, idx) => (
-              <Link key={c.id} to={`/2026/${c.slug}`} className="group">
+              <Link key={c.id} to={`/${c.slug}`} className="group">
                 <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-xl transition-all">
                   <div className="aspect-[3/4] overflow-hidden">
                     <img 
@@ -308,7 +308,7 @@ export default function HomePage() {
                 {/* Top 3 */}
                 <div className="grid grid-cols-3 gap-2 sm:gap-4 p-4 sm:p-6 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100">
                   {leaderboard.slice(0, 3).map((entry, idx) => (
-                    <Link key={entry.contestant_id} to={`/2026/${entry.slug}`} className="text-center group">
+                    <Link key={entry.contestant_id} to={`/${entry.slug}`} className="text-center group">
                       <div className={`relative w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-1 sm:mb-2 rounded-full overflow-hidden ring-2 sm:ring-4 ${
                         idx === 0 ? 'ring-amber-400' : idx === 1 ? 'ring-slate-300' : 'ring-amber-600'
                       }`}>
@@ -328,7 +328,7 @@ export default function HomePage() {
                 {/* Rest of leaderboard */}
                 <div className="divide-y divide-slate-100">
                   {leaderboard.slice(3, 10).map((entry, idx) => (
-                    <Link key={entry.contestant_id} to={`/2026/${entry.slug}`} className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4 hover:bg-slate-50 transition-colors">
+                    <Link key={entry.contestant_id} to={`/${entry.slug}`} className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4 hover:bg-slate-50 transition-colors">
                       <span className="w-6 sm:w-8 text-center font-bold text-slate-400 text-sm">{idx + 4}</span>
                       <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-slate-100 flex-shrink-0">
                         <img src={entry.photo || getPlaceholderImage(idx + 3)} alt="" className="w-full h-full object-cover" />
@@ -452,7 +452,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {contestants.slice(0, 8).map((c, idx) => (
-              <Link key={c.id} to={`/2026/${c.slug}`}>
+              <Link key={c.id} to={`/${c.slug}`}>
                 <ContestantCard contestant={c} rank={idx + 1} />
               </Link>
             ))}

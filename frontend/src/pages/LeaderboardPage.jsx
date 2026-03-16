@@ -141,7 +141,7 @@ export default function LeaderboardPage() {
           <div className="flex items-end justify-center gap-4 md:gap-8">
             {/* 2nd Place */}
             {top3[1] && (
-              <Link to={`/2026/${top3[1].slug}`} className="flex-1 max-w-[200px] group">
+              <Link to={`/${top3[1].slug}`} className="flex-1 max-w-[200px] group">
                 <div className="text-center">
                   <div className="relative mx-auto mb-4">
                     <div className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full overflow-hidden ring-4 ring-slate-300 shadow-xl group-hover:ring-slate-400 transition-all">
@@ -161,7 +161,7 @@ export default function LeaderboardPage() {
 
             {/* 1st Place */}
             {top3[0] && (
-              <Link to={`/2026/${top3[0].slug}`} className="flex-1 max-w-[240px] group -mt-8">
+              <Link to={`/${top3[0].slug}`} className="flex-1 max-w-[240px] group -mt-8">
                 <div className="text-center">
                   <div className="relative mx-auto mb-4">
                     <Crown className="absolute -top-6 left-1/2 -translate-x-1/2 w-8 h-8 text-amber-400 animate-bounce" />
@@ -183,7 +183,7 @@ export default function LeaderboardPage() {
 
             {/* 3rd Place */}
             {top3[2] && (
-              <Link to={`/2026/${top3[2].slug}`} className="flex-1 max-w-[200px] group">
+              <Link to={`/${top3[2].slug}`} className="flex-1 max-w-[200px] group">
                 <div className="text-center">
                   <div className="relative mx-auto mb-4">
                     <div className="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full overflow-hidden ring-4 ring-amber-600 shadow-xl group-hover:ring-amber-700 transition-all">
@@ -226,7 +226,7 @@ export default function LeaderboardPage() {
                 return (
                   <Link 
                     key={entry.contestant_id} 
-                    to={`/2026/${entry.slug}`}
+                    to={`/${entry.slug}`}
                     className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors group"
                   >
                     {/* Rank */}
