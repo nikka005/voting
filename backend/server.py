@@ -2412,19 +2412,90 @@ async def get_contest_settings():
     """Get current contest settings"""
     settings = await db.contest_settings.find_one({"active": True}, {"_id": 0})
     if not settings:
-        # Return default settings
+        # Return default settings - Glomer Beauty Contest
         return {
-            "contest_name": "Glowing Star Beauty Contest 2026",
-            "contest_tagline": "Vote for Your Favorite Star",
-            "contest_description": "Join the world's most prestigious online beauty contest. Showcase your beauty, gain followers, and compete for amazing prizes!",
-            "contest_rules": "",
+            "contest_name": "Glomer Beauty Contest 2026",
+            "contest_tagline": "Where Beauty Meets Excellence",
+            "contest_description": """Welcome to Glomer Beauty Contest 2026 - the world's most prestigious online beauty competition!
+
+Join thousands of stunning contestants from around the globe as they compete for the ultimate crown and a share of our $35,000 USD prize pool.
+
+Whether you're a professional model or an aspiring star, this is your chance to shine on the international stage. Showcase your unique beauty, gain followers, connect with industry professionals, and compete for life-changing prizes!
+
+🌟 100 Elite Participants
+🏆 $35,000 Total Prize Pool
+📸 Professional Exposure
+🌍 Global Recognition
+💫 Brand Partnership Opportunities""",
+            "contest_rules": """━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ELIGIBILITY REQUIREMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Must be 18 years of age or older
+• Open to all nationalities and genders
+• Both professional and amateur models welcome
+• Must have legal right to participate in online contests
+• Valid email address required for registration
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PARTICIPATION GUIDELINES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Submit clear, high-quality photographs
+• Minimum 1 photo, maximum 5 photos allowed
+• No heavy filters or excessive photo manipulation
+• Professional headshots and full-body shots recommended
+• Photos must be recent (within last 12 months)
+• Inappropriate content will result in disqualification
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VOTING RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• One FREE vote per email address every 24 hours
+• Email verification (OTP) required for all votes
+• Paid vote packages available for supporters
+• Vote manipulation or fraud = immediate disqualification
+• All votes monitored by advanced anti-fraud system
+• Suspicious voting patterns will be investigated
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMPETITION ROUNDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Round 1: Qualification - All contestants compete
+Round 2: Top 100 - Best performers advance
+Round 3: Top 50 - Competition intensifies
+Round 4: Top 20 - Elite contestants only
+Round 5: Semi-Finals - Top 10 compete
+Round 6: Grand Finals - Top 5 battle for the crown
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRIZE DISTRIBUTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🥇 Grand Winner: $15,000 + Magazine Feature + Brand Deals
+🥈 1st Runner Up: $8,000 + Photo Package + Agency Intro
+🥉 2nd Runner Up: $5,000 + Photo Shoot + Sponsorship
+🏅 3rd Runner Up: $4,000 + Feature + Beauty Package
+🎖️ 4th Runner Up: $3,000 + Feature + Gift Package
+
+• All prizes paid within 30 days of contest completion
+• Winners must provide valid government-issued ID
+• Prize money sent via bank transfer or PayPal
+• Tax obligations are the responsibility of winners
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GENERAL RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Contestants must maintain professional conduct
+• No defamatory content about other participants
+• Platform reserves right to disqualify rule violators
+• All decisions by the judging panel are final
+• By participating, you agree to our Terms of Service
+• Contest organizers may use photos for promotional purposes""",
             "prize_pool": 35000,
             "prize_distribution": [
-                {"position": 1, "title": "Grand Winner", "amount": 15000, "description": "$15,000 Cash Prize + Magazine Feature + Brand Partnerships"},
-                {"position": 2, "title": "1st Runner Up", "amount": 8000, "description": "$8,000 Cash Prize + Professional Photo Shoot"},
-                {"position": 3, "title": "2nd Runner Up", "amount": 5000, "description": "$5,000 Cash Prize + Modeling Contract Opportunity"},
-                {"position": 4, "title": "3rd Runner Up", "amount": 4000, "description": "$4,000 Cash Prize + Beauty Product Package"},
-                {"position": 5, "title": "4th Runner Up", "amount": 3000, "description": "$3,000 Cash Prize + Gift Package"}
+                {"position": 1, "title": "Grand Winner", "amount": 15000, "description": "$15,000 Cash + International Magazine Feature + Brand Ambassador Contract + Professional Photo Shoot Package"},
+                {"position": 2, "title": "1st Runner Up", "amount": 8000, "description": "$8,000 Cash + Magazine Feature + Professional Photo Package + Modeling Agency Introduction"},
+                {"position": 3, "title": "2nd Runner Up", "amount": 5000, "description": "$5,000 Cash + Online Feature + Professional Photo Shoot + Beauty Product Sponsorship"},
+                {"position": 4, "title": "3rd Runner Up", "amount": 4000, "description": "$4,000 Cash + Social Media Feature + Luxury Beauty Product Package"},
+                {"position": 5, "title": "4th Runner Up", "amount": 3000, "description": "$3,000 Cash + Platform Feature + Premium Gift Package"}
             ],
             "max_participants": 100,
             "status": "active",
