@@ -79,6 +79,7 @@ export const contestantsAPI = {
 // Admin API
 export const adminAPI = {
   getStats: () => api.get('/admin/stats'),
+  getDashboardStats: () => api.get('/admin/dashboard-stats'),
   getVotes: (params = {}) => {
     const queryString = new URLSearchParams(params).toString();
     return api.get(`/admin/votes?${queryString}`);
@@ -88,12 +89,28 @@ export const adminAPI = {
   assignContestantRound: (id, roundName) => 
     api.put(`/admin/contestants/${id}/round?round_name=${roundName}`),
   deleteContestant: (id) => api.delete(`/admin/contestants/${id}`),
+  editContestant: (id, data) => api.put(`/admin/contestants/${id}/edit`, data),
   seedAdmin: () => api.post('/seed/admin'),
+  // User management
+  getUsers: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return api.get(`/admin/users?${queryString}`);
+  },
+  suspendUser: (id) => api.put(`/admin/users/${id}/suspend`),
+  activateUser: (id) => api.put(`/admin/users/${id}/activate`),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
   // Fraud detection
   getFraudLogs: () => api.get('/admin/fraud-logs'),
   blockIP: (ip, reason) => api.post(`/admin/block-ip?ip=${ip}&reason=${reason}`),
   blockEmail: (email, reason) => api.post(`/admin/block-email?email=${email}&reason=${reason}`),
-  // Payment transactions
+  // Payment management
+  getPayments: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return api.get(`/admin/payments?${queryString}`);
+  },
+  approvePayment: (id) => api.post(`/admin/payments/${id}/approve`),
+  rejectPayment: (id, reason) => api.post(`/admin/payments/${id}/reject`, { reason }),
+  refundPayment: (id, reason) => api.post(`/admin/payments/${id}/refund`, { transaction_id: id, reason }),
   getPaymentTransactions: () => api.get('/admin/payment-transactions'),
   // Contestant badges
   updateContestantBadges: (id, badges) => {
@@ -104,6 +121,24 @@ export const adminAPI = {
   getAnalytics: (days = 30) => api.get(`/admin/analytics?days=${days}`),
   // Fraud analysis
   getFraudAnalysis: (contestantId) => api.get(`/admin/fraud-analysis/${contestantId}`),
+};
+
+// Contest Management API
+export const contestsAPI = {
+  getActive: () => api.get('/contests/active'),
+  getAll: () => api.get('/admin/contests'),
+  create: (data) => api.post('/admin/contests', data),
+  update: (id, data) => api.put(`/admin/contests/${id}`, data),
+  startVoting: (id) => api.post(`/admin/contests/${id}/start-voting`),
+  stopVoting: (id) => api.post(`/admin/contests/${id}/stop-voting`),
+  complete: (id) => api.post(`/admin/contests/${id}/complete`),
+};
+
+// Entry Fee Payment API
+export const entryFeeAPI = {
+  createCheckout: (contestId, originUrl) => api.post('/payments/entry-fee', { contest_id: contestId, origin_url: originUrl }),
+  verifyPayment: (sessionId) => api.get(`/payments/entry-fee/verify/${sessionId}`),
+  getMyStatus: () => api.get('/payments/my-status'),
 };
 
 // Voting API
