@@ -183,7 +183,7 @@ export default function PortalRegister() {
                 type="submit"
                 disabled={loading}
                 data-testid="register-submit"
-                className="w-full h-12 rounded-xl bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-600 hover:to-violet-700 text-white font-semibold shadow-lg shadow-pink-500/25 mt-6"
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-lg shadow-amber-500/25 mt-6"
               >
                 {loading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -196,7 +196,7 @@ export default function PortalRegister() {
             <div className="mt-6 pt-6 border-t border-white/10 text-center">
               <p className="text-slate-400 text-sm">
                 Already have an account?{' '}
-                <Link to="/portal/login" className="text-pink-400 hover:text-pink-300 font-semibold">
+                <Link to="/portal/login" className="text-amber-400 hover:text-amber-300 font-semibold">
                   Sign in
                 </Link>
               </p>
@@ -205,7 +205,7 @@ export default function PortalRegister() {
 
           {/* Back to Voting Site */}
           <div className="mt-6 text-center">
-            <a href="/" className="text-slate-500 hover:text-slate-300 text-sm flex items-center justify-center gap-2">
+            <a href="https://glowingstar.vote" className="text-slate-500 hover:text-slate-300 text-sm flex items-center justify-center gap-2">
               <Globe className="w-4 h-4" />
               Back to Voting Site
             </a>
@@ -217,18 +217,18 @@ export default function PortalRegister() {
       <div className="hidden lg:flex flex-1 items-center justify-center p-12 relative z-10">
         <div className="max-w-lg">
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center shadow-lg shadow-pink-500/30">
-              <Sparkles className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+              <Star className="w-6 h-6 text-white fill-white" />
             </div>
             <div>
-              <h1 className="font-syne text-2xl font-bold text-white">Glamour</h1>
-              <span className="text-xs font-semibold text-pink-400">2026 BEAUTY CONTEST</span>
+              <h1 className="font-syne text-2xl font-bold text-white">Glowing Star</h1>
+              <span className="text-xs font-semibold text-amber-400">2026 BEAUTY CONTEST</span>
             </div>
           </div>
 
           <h2 className="font-syne text-4xl font-bold text-white mb-4">
             Start Your Journey to
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-violet-400">
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
               Stardom
             </span>
           </h2>
@@ -239,8 +239,8 @@ export default function PortalRegister() {
           <div className="space-y-4 mb-8">
             {benefits.map((item, idx) => (
               <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/20 to-violet-500/20 flex items-center justify-center">
-                  <item.icon className="w-6 h-6 text-pink-400" />
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                  <item.icon className="w-6 h-6 text-amber-400" />
                 </div>
                 <span className="text-white font-medium">{item.text}</span>
               </div>
