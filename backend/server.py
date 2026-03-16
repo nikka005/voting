@@ -2686,6 +2686,588 @@ async def toggle_banner(banner_id: str, admin: dict = Depends(require_admin)):
     
     return {"success": True, "is_active": new_status}
 
+# ============ CONTEST MANAGEMENT SYSTEM ============
+
+@api_router.post("/admin/contests")
+async def create_contest(contest: ContestCreate, admin: dict = Depends(require_admin)):
+    """Create a new contest"""
+    contest_id = str(uuid.uuid4())
+    contest_doc = contest.dict()
+    contest_doc["id"] = contest_id
+    contest_doc["current_participants"] = 0
+    contest_doc["is_voting_active"] = False
+    contest_doc["total_votes"] = 0
+    contest_doc["total_payments"] = 0.0
+    contest_doc["created_at"] = datetime.now(timezone.utc).isoformat()
+    contest_doc["created_by"] = admin.get("email", "admin")
+    
+    await db.contests.insert_one(contest_doc)
+    contest_doc.pop("_id", None)
+    
+    return {"success": True, "message": "Contest created", "contest": contest_doc}
+
+@api_router.get("/admin/contests")
+async def get_all_contests(admin: dict = Depends(require_admin)):
+    """Get all contests for admin"""
+    contests = await db.contests.find({}, {"_id": 0}).sort("created_at", -1).to_list(50)
+    
+    # Add participant counts
+    for contest in contests:
+        count = await db.contestants.count_documents({"contest_id": contest["id"]})
+        contest["current_participants"] = count
+    
+    return contests
+
+@api_router.get("/contests/active")
+async def get_active_contest():
+    """Get the currently active contest for public"""
+    contest = await db.contests.find_one(
+        {"status": {"$in": ["registration", "voting"]}},
+        {"_id": 0}
+    )
+    if not contest:
+        # Return default contest info
+        return {
+            "id": "default",
+            "name": "Glowing Star Beauty Contest 2026",
+            "entry_fee": 50.0,
+            "max_participants": 100,
+            "current_participants": await db.contestants.count_documents({"status": "approved"}),
+            "status": "registration",
+            "is_voting_active": True
+        }
+    
+    contest["current_participants"] = await db.contestants.count_documents({
+        "contest_id": contest["id"],
+        "status": "approved"
+    })
+    return contest
+
+@api_router.put("/admin/contests/{contest_id}")
+async def update_contest(contest_id: str, contest: ContestCreate, admin: dict = Depends(require_admin)):
+    """Update contest details"""
+    update_dict = contest.dict()
+    update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_dict["updated_by"] = admin.get("email", "admin")
+    
+    result = await db.contests.update_one({"id": contest_id}, {"$set": update_dict})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Contest not found")
+    
+    updated = await db.contests.find_one({"id": contest_id}, {"_id": 0})
+    return {"success": True, "contest": updated}
+
+@api_router.post("/admin/contests/{contest_id}/start-voting")
+async def start_voting(contest_id: str, admin: dict = Depends(require_admin)):
+    """Start voting for a contest"""
+    result = await db.contests.update_one(
+        {"id": contest_id},
+        {"$set": {
+            "status": "voting",
+            "is_voting_active": True,
+            "voting_start_date": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Contest not found")
+    return {"success": True, "message": "Voting started"}
+
+@api_router.post("/admin/contests/{contest_id}/stop-voting")
+async def stop_voting(contest_id: str, admin: dict = Depends(require_admin)):
+    """Stop voting for a contest"""
+    result = await db.contests.update_one(
+        {"id": contest_id},
+        {"$set": {
+            "is_voting_active": False,
+            "voting_end_date": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Contest not found")
+    return {"success": True, "message": "Voting stopped"}
+
+@api_router.post("/admin/contests/{contest_id}/complete")
+async def complete_contest(contest_id: str, admin: dict = Depends(require_admin)):
+    """Complete a contest and finalize results"""
+    result = await db.contests.update_one(
+        {"id": contest_id},
+        {"$set": {
+            "status": "completed",
+            "is_voting_active": False,
+            "completed_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Contest not found")
+    return {"success": True, "message": "Contest completed"}
+
+# ============ ENTRY FEE PAYMENT SYSTEM ============
+
+@api_router.post("/payments/entry-fee")
+async def create_entry_fee_checkout(request: EntryFeePayment, current_user: dict = Depends(get_current_user)):
+    """Create Stripe checkout session for contest entry fee"""
+    import stripe
+    stripe.api_key = STRIPE_API_KEY
+    
+    if not STRIPE_API_KEY:
+        raise HTTPException(status_code=500, detail="Payment system not configured")
+    
+    # Get contest details
+    contest = await db.contests.find_one({"id": request.contest_id}, {"_id": 0})
+    if not contest:
+        # Use default entry fee
+        entry_fee = 50.0
+        contest_name = "Glowing Star Beauty Contest 2026"
+    else:
+        entry_fee = contest.get("entry_fee", 50.0)
+        contest_name = contest.get("name", "Glowing Star Contest")
+    
+    # Check if user already paid
+    existing_payment = await db.entry_fee_payments.find_one({
+        "user_id": current_user["id"],
+        "status": "completed"
+    })
+    if existing_payment:
+        raise HTTPException(status_code=400, detail="Entry fee already paid")
+    
+    # Get contestant profile
+    contestant = await db.contestants.find_one({"user_id": current_user["id"]}, {"_id": 0})
+    if not contestant:
+        raise HTTPException(status_code=400, detail="Please create your contestant profile first")
+    
+    success_url = f"{request.origin_url}/portal?payment=success&session_id={{CHECKOUT_SESSION_ID}}"
+    cancel_url = f"{request.origin_url}/portal?payment=cancelled"
+    
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': f'Entry Fee - {contest_name}',
+                        'description': f'Contest registration fee for {current_user.get("full_name", "Contestant")}',
+                    },
+                    'unit_amount': int(entry_fee * 100),
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url=success_url,
+            cancel_url=cancel_url,
+            customer_email=current_user.get("email"),
+            metadata={
+                'user_id': current_user["id"],
+                'contestant_id': contestant["id"],
+                'payment_type': 'entry_fee',
+                'contest_id': request.contest_id
+            }
+        )
+        
+        # Create payment record
+        payment_doc = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user["id"],
+            "contestant_id": contestant["id"],
+            "contestant_name": contestant.get("full_name", ""),
+            "contest_id": request.contest_id,
+            "payment_type": "entry_fee",
+            "amount": entry_fee,
+            "stripe_session_id": session.id,
+            "status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.entry_fee_payments.insert_one(payment_doc)
+        
+        return {"checkout_url": session.url, "session_id": session.id}
+        
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/payments/entry-fee/verify/{session_id}")
+async def verify_entry_fee_payment(session_id: str, current_user: dict = Depends(get_current_user)):
+    """Verify entry fee payment and update contestant status"""
+    import stripe
+    stripe.api_key = STRIPE_API_KEY
+    
+    payment = await db.entry_fee_payments.find_one({"stripe_session_id": session_id})
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    if payment["status"] == "completed":
+        return {"success": True, "status": "already_completed", "payment_status": "paid"}
+    
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+        
+        if session.payment_status == "paid":
+            # Update payment record
+            await db.entry_fee_payments.update_one(
+                {"stripe_session_id": session_id},
+                {"$set": {
+                    "status": "completed",
+                    "completed_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            
+            # Update contestant payment status
+            await db.contestants.update_one(
+                {"id": payment["contestant_id"]},
+                {"$set": {
+                    "payment_status": "paid",
+                    "entry_fee_paid": True,
+                    "payment_date": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            
+            # Update contest payment totals
+            if payment.get("contest_id"):
+                await db.contests.update_one(
+                    {"id": payment["contest_id"]},
+                    {"$inc": {"total_payments": payment["amount"]}}
+                )
+            
+            return {"success": True, "status": "completed", "payment_status": "paid"}
+        else:
+            return {"success": False, "status": "pending", "payment_status": session.payment_status}
+            
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/payments/my-status")
+async def get_my_payment_status(current_user: dict = Depends(get_current_user)):
+    """Get current user's payment status"""
+    payment = await db.entry_fee_payments.find_one(
+        {"user_id": current_user["id"], "status": "completed"},
+        {"_id": 0}
+    )
+    
+    contestant = await db.contestants.find_one({"user_id": current_user["id"]}, {"_id": 0})
+    
+    return {
+        "has_paid": payment is not None,
+        "payment": payment,
+        "contestant_status": contestant.get("status") if contestant else None,
+        "payment_status": contestant.get("payment_status", "unpaid") if contestant else "unpaid"
+    }
+
+# ============ ADMIN PAYMENT MANAGEMENT ============
+
+@api_router.get("/admin/payments")
+async def get_all_payments(
+    status: Optional[str] = None,
+    payment_type: Optional[str] = None,
+    limit: int = 100,
+    admin: dict = Depends(require_admin)
+):
+    """Get all payments with filters"""
+    query = {}
+    if status:
+        query["status"] = status
+    if payment_type:
+        query["payment_type"] = payment_type
+    
+    # Get entry fee payments
+    entry_payments = await db.entry_fee_payments.find(query, {"_id": 0}).sort("created_at", -1).to_list(limit)
+    
+    # Get vote package payments
+    vote_payments = await db.payment_transactions.find(query, {"_id": 0}).sort("created_at", -1).to_list(limit)
+    
+    # Combine and sort
+    all_payments = entry_payments + vote_payments
+    all_payments.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+    
+    # Calculate totals
+    total_entry_fees = sum(p.get("amount", 0) for p in entry_payments if p.get("status") == "completed")
+    total_vote_packages = sum(p.get("amount", 0) for p in vote_payments if p.get("status") == "completed" or p.get("payment_status") == "completed")
+    
+    return {
+        "payments": all_payments[:limit],
+        "totals": {
+            "entry_fees": total_entry_fees,
+            "vote_packages": total_vote_packages,
+            "total": total_entry_fees + total_vote_packages
+        },
+        "counts": {
+            "entry_fee_payments": len(entry_payments),
+            "vote_package_payments": len(vote_payments),
+            "pending": len([p for p in all_payments if p.get("status") == "pending"]),
+            "completed": len([p for p in all_payments if p.get("status") in ["completed", "paid"]])
+        }
+    }
+
+@api_router.post("/admin/payments/{payment_id}/approve")
+async def approve_payment(payment_id: str, admin: dict = Depends(require_admin)):
+    """Manually approve a payment (for manual/offline payments)"""
+    # Try entry fee payments first
+    payment = await db.entry_fee_payments.find_one({"id": payment_id})
+    if payment:
+        await db.entry_fee_payments.update_one(
+            {"id": payment_id},
+            {"$set": {
+                "status": "completed",
+                "approved_by": admin.get("email"),
+                "approved_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        # Update contestant
+        await db.contestants.update_one(
+            {"id": payment["contestant_id"]},
+            {"$set": {"payment_status": "paid", "entry_fee_paid": True}}
+        )
+        
+        return {"success": True, "message": "Payment approved"}
+    
+    # Try vote package payments
+    payment = await db.payment_transactions.find_one({"id": payment_id})
+    if payment:
+        await db.payment_transactions.update_one(
+            {"id": payment_id},
+            {"$set": {"payment_status": "completed", "approved_by": admin.get("email")}}
+        )
+        return {"success": True, "message": "Payment approved"}
+    
+    raise HTTPException(status_code=404, detail="Payment not found")
+
+@api_router.post("/admin/payments/{payment_id}/reject")
+async def reject_payment(payment_id: str, reason: Optional[str] = None, admin: dict = Depends(require_admin)):
+    """Reject a payment"""
+    result = await db.entry_fee_payments.update_one(
+        {"id": payment_id},
+        {"$set": {
+            "status": "rejected",
+            "rejected_by": admin.get("email"),
+            "rejection_reason": reason,
+            "rejected_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.modified_count == 0:
+        await db.payment_transactions.update_one(
+            {"id": payment_id},
+            {"$set": {"payment_status": "rejected", "rejection_reason": reason}}
+        )
+    
+    return {"success": True, "message": "Payment rejected"}
+
+@api_router.post("/admin/payments/{payment_id}/refund")
+async def refund_payment(payment_id: str, refund: RefundRequest, admin: dict = Depends(require_admin)):
+    """Process a refund"""
+    import stripe
+    stripe.api_key = STRIPE_API_KEY
+    
+    payment = await db.entry_fee_payments.find_one({"id": payment_id})
+    if not payment:
+        payment = await db.payment_transactions.find_one({"id": payment_id})
+    
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    if payment.get("status") != "completed" and payment.get("payment_status") != "completed":
+        raise HTTPException(status_code=400, detail="Can only refund completed payments")
+    
+    try:
+        # Get the Stripe session to find payment intent
+        session_id = payment.get("stripe_session_id") or payment.get("session_id")
+        if session_id:
+            session = stripe.checkout.Session.retrieve(session_id)
+            if session.payment_intent:
+                refund_result = stripe.Refund.create(payment_intent=session.payment_intent)
+                
+                # Update payment status
+                collection = db.entry_fee_payments if "entry_fee" in payment.get("payment_type", "") else db.payment_transactions
+                await collection.update_one(
+                    {"id": payment_id},
+                    {"$set": {
+                        "status": "refunded",
+                        "refund_id": refund_result.id,
+                        "refund_reason": refund.reason,
+                        "refunded_by": admin.get("email"),
+                        "refunded_at": datetime.now(timezone.utc).isoformat()
+                    }}
+                )
+                
+                # Update contestant payment status if entry fee
+                if payment.get("contestant_id"):
+                    await db.contestants.update_one(
+                        {"id": payment["contestant_id"]},
+                        {"$set": {"payment_status": "refunded", "entry_fee_paid": False}}
+                    )
+                
+                return {"success": True, "message": "Refund processed", "refund_id": refund_result.id}
+        
+        raise HTTPException(status_code=400, detail="Cannot process refund - no payment intent found")
+        
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============ ENHANCED USER MANAGEMENT ============
+
+@api_router.get("/admin/users")
+async def get_all_users(
+    role: Optional[str] = None,
+    status: Optional[str] = None,
+    limit: int = 100,
+    admin: dict = Depends(require_admin)
+):
+    """Get all users with their contestant info"""
+    query = {}
+    if role:
+        query["role"] = role
+    
+    users = await db.users.find(query, {"_id": 0, "password": 0}).sort("created_at", -1).to_list(limit)
+    
+    # Enrich with contestant data
+    for user in users:
+        contestant = await db.contestants.find_one({"user_id": user["id"]}, {"_id": 0})
+        if contestant:
+            user["contestant"] = {
+                "id": contestant.get("id"),
+                "status": contestant.get("status"),
+                "payment_status": contestant.get("payment_status", "unpaid"),
+                "vote_count": contestant.get("vote_count", 0),
+                "slug": contestant.get("slug"),
+                "category_id": contestant.get("category_id")
+            }
+        else:
+            user["contestant"] = None
+        
+        # Get activity stats
+        vote_count = await db.votes.count_documents({"contestant_id": user.get("id")})
+        user["stats"] = {"votes_received": vote_count}
+    
+    return users
+
+@api_router.put("/admin/users/{user_id}/suspend")
+async def suspend_user(user_id: str, admin: dict = Depends(require_admin)):
+    """Suspend a user account"""
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"status": "suspended", "suspended_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    # Also suspend their contestant profile
+    await db.contestants.update_one(
+        {"user_id": user_id},
+        {"$set": {"status": "suspended"}}
+    )
+    
+    return {"success": True, "message": "User suspended"}
+
+@api_router.put("/admin/users/{user_id}/activate")
+async def activate_user(user_id: str, admin: dict = Depends(require_admin)):
+    """Reactivate a suspended user"""
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"status": "active"}, "$unset": {"suspended_at": ""}}
+    )
+    return {"success": True, "message": "User activated"}
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(user_id: str, admin: dict = Depends(require_admin)):
+    """Delete a user and their contestant profile"""
+    # Delete contestant profile
+    await db.contestants.delete_one({"user_id": user_id})
+    
+    # Delete votes for this contestant
+    contestant = await db.contestants.find_one({"user_id": user_id})
+    if contestant:
+        await db.votes.delete_many({"contestant_id": contestant["id"]})
+    
+    # Delete user
+    await db.users.delete_one({"id": user_id})
+    
+    return {"success": True, "message": "User deleted"}
+
+@api_router.put("/admin/contestants/{contestant_id}/edit")
+async def admin_edit_contestant(contestant_id: str, update: ContestantUpdate, admin: dict = Depends(require_admin)):
+    """Admin edit contestant profile"""
+    update_dict = {k: v for k, v in update.dict().items() if v is not None}
+    update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_dict["updated_by"] = admin.get("email")
+    
+    result = await db.contestants.update_one({"id": contestant_id}, {"$set": update_dict})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Contestant not found")
+    
+    updated = await db.contestants.find_one({"id": contestant_id}, {"_id": 0})
+    return {"success": True, "contestant": updated}
+
+# ============ ENHANCED ADMIN STATS ============
+
+@api_router.get("/admin/dashboard-stats")
+async def get_dashboard_stats(admin: dict = Depends(require_admin)):
+    """Get comprehensive dashboard statistics"""
+    # Basic counts
+    total_contestants = await db.contestants.count_documents({})
+    approved_contestants = await db.contestants.count_documents({"status": "approved"})
+    pending_contestants = await db.contestants.count_documents({"status": "pending"})
+    
+    # Payment stats
+    paid_contestants = await db.contestants.count_documents({"payment_status": "paid"})
+    unpaid_contestants = await db.contestants.count_documents({"payment_status": {"$ne": "paid"}})
+    
+    # Entry fee totals
+    entry_fee_pipeline = [
+        {"$match": {"status": "completed"}},
+        {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
+    ]
+    entry_fee_result = await db.entry_fee_payments.aggregate(entry_fee_pipeline).to_list(1)
+    total_entry_fees = entry_fee_result[0]["total"] if entry_fee_result else 0
+    
+    # Vote package totals
+    vote_pkg_pipeline = [
+        {"$match": {"payment_status": "completed"}},
+        {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
+    ]
+    vote_pkg_result = await db.payment_transactions.aggregate(vote_pkg_pipeline).to_list(1)
+    total_vote_packages = vote_pkg_result[0]["total"] if vote_pkg_result else 0
+    
+    # Votes
+    total_votes = await db.votes.count_documents({})
+    free_votes = await db.votes.count_documents({"vote_type": {"$ne": "paid"}})
+    paid_votes = await db.votes.count_documents({"vote_type": "paid"})
+    
+    # Categories
+    total_categories = await db.categories.count_documents({})
+    
+    # Active contest
+    active_contest = await db.contests.find_one({"status": {"$in": ["registration", "voting"]}}, {"_id": 0})
+    
+    # Contest slots
+    max_slots = 100
+    if active_contest:
+        max_slots = active_contest.get("max_participants", 100)
+    
+    return {
+        "contestants": {
+            "total": total_contestants,
+            "approved": approved_contestants,
+            "pending": pending_contestants,
+            "paid": paid_contestants,
+            "unpaid": unpaid_contestants
+        },
+        "payments": {
+            "entry_fees_total": total_entry_fees,
+            "vote_packages_total": total_vote_packages,
+            "total_revenue": total_entry_fees + total_vote_packages
+        },
+        "votes": {
+            "total": total_votes,
+            "free": free_votes,
+            "paid": paid_votes
+        },
+        "contest": {
+            "active": active_contest is not None,
+            "name": active_contest.get("name") if active_contest else "No active contest",
+            "slots_filled": approved_contestants,
+            "max_slots": max_slots,
+            "status": active_contest.get("status") if active_contest else "none"
+        },
+        "categories": total_categories
+    }
+
 # ============ COMPETITION MANAGEMENT SYSTEM ============
 
 class CompetitionPhase(BaseModel):
