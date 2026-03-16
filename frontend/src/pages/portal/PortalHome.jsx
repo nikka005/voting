@@ -41,8 +41,8 @@ export default function PortalHome() {
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="font-syne font-bold text-white">Glamour</h1>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-pink-500/20 to-violet-500/20 text-pink-400 border border-pink-500/20">
+                <h1 className="font-syne font-bold text-white">Glowing Star</h1>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border border-amber-500/20">
                   MANAGEMENT PORTAL
                 </span>
               </div>
@@ -187,11 +187,11 @@ export default function PortalHome() {
       <footer className="relative z-10 border-t border-white/10 py-6">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-            <p>Glamour Beauty Contest © 2026</p>
+            <p>Glowing Star Contest © 2026</p>
             <div className="flex items-center gap-4">
-              <a href="/" className="hover:text-pink-400 transition-colors">Voting Site</a>
-              <a href="/leaderboard" className="hover:text-pink-400 transition-colors">Leaderboard</a>
-              <a href="/contestants" className="hover:text-pink-400 transition-colors">Contestants</a>
+              <a href="/" className="hover:text-amber-400 transition-colors">Voting Site</a>
+              <a href="/leaderboard" className="hover:text-amber-400 transition-colors">Leaderboard</a>
+              <a href="/contestants" className="hover:text-amber-400 transition-colors">Contestants</a>
             </div>
           </div>
         </div>
