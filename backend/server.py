@@ -2616,13 +2616,14 @@ async def get_competition_status(admin: dict = Depends(require_admin)):
 async def get_contestant_wallet(current_user: dict = Depends(get_current_user)):
     """Get contestant's wallet balance and transactions"""
     
-    wallet = await db.wallets.find_one({"user_id": current_user["id"]}, {"_id": 0})
+    user_id = current_user["user_id"]
+    wallet = await db.wallets.find_one({"user_id": user_id}, {"_id": 0})
     
     if not wallet:
         return {
             "balance": 0,
             "transactions": [],
-            "user_id": current_user["id"]
+            "user_id": user_id
         }
     
     return wallet
@@ -2636,7 +2637,8 @@ async def request_withdrawal(
 ):
     """Request withdrawal from wallet"""
     
-    wallet = await db.wallets.find_one({"user_id": current_user["id"]})
+    user_id = current_user["user_id"]
+    wallet = await db.wallets.find_one({"user_id": user_id})
     
     if not wallet or wallet.get("balance", 0) < amount:
         raise HTTPException(status_code=400, detail="Insufficient balance")
@@ -2645,7 +2647,7 @@ async def request_withdrawal(
     withdrawal_id = str(uuid.uuid4())
     withdrawal = {
         "id": withdrawal_id,
-        "user_id": current_user["id"],
+        "user_id": user_id,
         "amount": amount,
         "payment_method": payment_method,
         "payment_details": payment_details,
@@ -2656,7 +2658,7 @@ async def request_withdrawal(
     
     # Deduct from wallet (hold)
     await db.wallets.update_one(
-        {"user_id": current_user["id"]},
+        {"user_id": user_id},
         {
             "$inc": {"balance": -amount, "pending_withdrawal": amount},
             "$push": {"transactions": {
