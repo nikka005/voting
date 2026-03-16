@@ -107,27 +107,14 @@ const PublicHeader = () => {
               </Link>
             ))}
             <div className="border-t border-slate-100 pt-2 mt-2">
-              {user ? (
-                <Link
-                  to={isAdmin ? '/portal/admin' : '/portal/dashboard'}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2.5 text-amber-600 hover:bg-amber-50 rounded-xl"
-                >
-                  <LayoutDashboard className="w-5 h-5" />
-                  {isAdmin ? 'Admin Panel' : 'My Dashboard'}
-                </Link>
-              ) : (
-                <a
-                  href="https://glowingstar.net/portal/login"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2.5 text-slate-600 hover:bg-slate-50 rounded-xl"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Contestant Login
-                </a>
-              )}
+              <Link
+                to="/contestants"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-2.5 text-amber-600 hover:bg-amber-50 rounded-xl"
+              >
+                <Heart className="w-5 h-5" />
+                Vote Now
+              </Link>
             </div>
           </div>
         </div>
