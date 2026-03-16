@@ -27,11 +27,15 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const response = await authAPI.login({ email, password });
-    const { token, user: userData } = response.data;
-    setAuth(token, userData);
-    setUser(userData);
-    return userData;
+    try {
+      const response = await authAPI.login({ email, password });
+      const { token, user: userData } = response.data;
+      setAuth(token, userData);
+      setUser(userData);
+      return { success: true, user: userData };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.detail || 'Login failed' };
+    }
   };
 
   const register = async (full_name, email, password) => {
