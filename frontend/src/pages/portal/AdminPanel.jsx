@@ -248,6 +248,7 @@ export default function AdminPanel() {
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'contests', label: 'Contests', icon: Trophy },
     { id: 'contestants', label: 'Contestants', icon: Users },
+    { id: 'banners', label: 'Promotions', icon: Megaphone },
     { id: 'voting', label: 'Voting', icon: Heart },
     { id: 'leaderboard', label: 'Leaderboard', icon: Award },
     { id: 'media', label: 'Media', icon: Image },
