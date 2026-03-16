@@ -58,18 +58,18 @@ export default function PortalLogin() {
       <div className="hidden lg:flex flex-1 items-center justify-center p-12 relative z-10">
         <div className="max-w-lg">
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center shadow-lg shadow-pink-500/30">
-              <Sparkles className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+              <Star className="w-6 h-6 text-white fill-white" />
             </div>
             <div>
-              <h1 className="font-syne text-2xl font-bold text-white">Glamour</h1>
-              <span className="text-xs font-semibold text-pink-400">MANAGEMENT PORTAL</span>
+              <h1 className="font-syne text-2xl font-bold text-white">Glowing Star</h1>
+              <span className="text-xs font-semibold text-amber-400">MANAGEMENT PORTAL</span>
             </div>
           </div>
 
           <h2 className="font-syne text-4xl font-bold text-white mb-4">
             Welcome to the<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-violet-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
               Management Portal
             </span>
           </h2>
@@ -81,11 +81,11 @@ export default function PortalLogin() {
             {[
               { icon: Shield, text: 'Admin Panel - Full platform control' },
               { icon: Users, text: 'Contestant Dashboard - Manage your profile' },
-              { icon: Globe, text: 'Separate from public voting site' },
+              { icon: Globe, text: 'glowingstar.net - Management domain' },
             ].map((item, idx) => (
               <div key={idx} className="flex items-center gap-3 text-slate-300">
                 <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                  <item.icon className="w-4 h-4 text-pink-400" />
+                  <item.icon className="w-4 h-4 text-amber-400" />
                 </div>
                 {item.text}
               </div>
@@ -94,7 +94,7 @@ export default function PortalLogin() {
 
           <div className="mt-12 pt-8 border-t border-white/10">
             <p className="text-slate-500 text-sm mb-2">Not a contestant yet?</p>
-            <Link to="/portal/register" className="text-pink-400 hover:text-pink-300 font-semibold flex items-center gap-2">
+            <Link to="/portal/register" className="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-2">
               Join the Contest <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
