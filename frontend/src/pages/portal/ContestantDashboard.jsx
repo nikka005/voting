@@ -500,7 +500,7 @@ export default function ContestantDashboard() {
 }
 
 // ============ DASHBOARD TAB ============
-function DashboardTab({ profile, currentRank, profileCompletion, leaderboard, copyVotingLink, copied, setActiveTab }) {
+function DashboardTab({ profile, currentRank, profileCompletion, leaderboard, copyVotingLink, copied, setActiveTab, entryFeePaid, onPaymentSuccess }) {
   return (
     <div className="space-y-6" data-testid="dashboard-tab">
       {/* Welcome Header */}
@@ -516,6 +516,11 @@ function DashboardTab({ profile, currentRank, profileCompletion, leaderboard, co
           Share Voting Link
         </Button>
       </div>
+
+      {/* Entry Fee Payment Banner */}
+      {!entryFeePaid && (
+        <EntryFeePayment onPaymentSuccess={onPaymentSuccess} />
+      )}
 
       {/* Profile Completion */}
       {profileCompletion < 100 && (
