@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
 import { Switch } from '../../components/ui/switch';
-import { adminAPI, contestantsAPI, categoriesAPI, roundsAPI } from '../../lib/api';
+import { adminAPI, contestantsAPI, categoriesAPI, roundsAPI, contestsAPI } from '../../lib/api';
 import { formatNumber, formatDate } from '../../lib/utils';
 import { useVoteUpdates } from '../../hooks/useWebSocket';
 import { toast } from 'sonner';
@@ -21,7 +21,8 @@ import {
   Monitor, Smartphone, MapPin, ChevronDown, MoreHorizontal, Filter,
   ArrowUpRight, ArrowDownRight, Play, Pause, Ban, CheckCircle2, XCircle,
   Award, Star, Layers, PieChart, LineChart, Target, Flag, AlertCircle, Megaphone,
-  HelpCircle, BookOpen, Rocket, Gift, MousePointer, Share2, QrCode, BarChart
+  HelpCircle, BookOpen, Rocket, Gift, MousePointer, Share2, QrCode, BarChart,
+  DollarSign, CreditCard, Receipt, Wallet
 } from 'lucide-react';
 
 // ============ ADMIN PANEL - PREMIUM CONTEST PLATFORM ============
@@ -42,6 +43,7 @@ export default function AdminPanel() {
   const [rounds, setRounds] = useState([]);
   const [votes, setVotes] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
   
   // UI States
@@ -51,8 +53,10 @@ export default function AdminPanel() {
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [roundModalOpen, setRoundModalOpen] = useState(false);
   const [contestantModalOpen, setContestantModalOpen] = useState(false);
+  const [contestModalOpen, setContestModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingRound, setEditingRound] = useState(null);
+  const [editingContest, setEditingContest] = useState(null);
   const [selectedContestant, setSelectedContestant] = useState(null);
   
   // Form States
@@ -60,6 +64,20 @@ export default function AdminPanel() {
   const [roundForm, setRoundForm] = useState({ 
     name: '', description: '', max_contestants: '', 
     start_date: '', end_date: '', is_active: false 
+  });
+  const [contestForm, setContestForm] = useState({
+    name: '',
+    description: '',
+    entry_fee: 50,
+    max_participants: 100,
+    start_date: '',
+    end_date: '',
+    registration_deadline: '',
+    voting_start_date: '',
+    voting_end_date: '',
+    prize_pool: 35000,
+    rules: '',
+    status: 'draft'
   });
 
   // Fetch all data
