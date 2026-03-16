@@ -70,14 +70,16 @@ export default function ContestantDashboard() {
   // Fetch Profile
   const fetchProfile = useCallback(async () => {
     try {
-      const [profileRes, categoriesRes, leaderboardRes] = await Promise.all([
+      const [profileRes, categoriesRes, leaderboardRes, paymentStatusRes] = await Promise.all([
         contestantsAPI.getMyProfile(),
         categoriesAPI.getAll(true),
         leaderboardAPI.get({ limit: 10 }),
+        entryFeeAPI.getMyStatus().catch(() => ({ data: { entry_fee_paid: false } })),
       ]);
       setProfile(profileRes.data);
       setCategories(categoriesRes.data);
       setLeaderboard(leaderboardRes.data);
+      setEntryFeePaid(paymentStatusRes.data?.entry_fee_paid || profileRes.data?.entry_fee_paid || false);
       
       // Set form data
       setFormData({
