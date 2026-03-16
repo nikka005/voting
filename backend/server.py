@@ -2372,6 +2372,394 @@ async def health_check():
         ]
     }
 
+# ============ COMPETITION MANAGEMENT SYSTEM ============
+
+class CompetitionPhase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    max_contestants: int = 100
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+
+@api_router.post("/admin/competition/setup")
+async def setup_competition(admin: dict = Depends(require_admin)):
+    """Setup complete competition with all rounds"""
+    
+    # Clear existing rounds
+    await db.rounds.delete_many({})
+    
+    # Create standard competition phases
+    phases = [
+        {"name": "Qualification Round", "description": "All contestants compete. Top 100 advance.", "max_contestants": 500, "order": 1},
+        {"name": "Top 100", "description": "Top 100 contestants compete. Top 50 advance.", "max_contestants": 100, "order": 2},
+        {"name": "Top 50", "description": "Top 50 contestants compete. Top 20 advance.", "max_contestants": 50, "order": 3},
+        {"name": "Top 20", "description": "Top 20 contestants compete. Top 10 advance.", "max_contestants": 20, "order": 4},
+        {"name": "Semi Final", "description": "Top 10 contestants compete. Top 5 advance.", "max_contestants": 10, "order": 5},
+        {"name": "Grand Final", "description": "Top 5 contestants compete for the crown!", "max_contestants": 5, "order": 6},
+    ]
+    
+    created_rounds = []
+    for phase in phases:
+        round_id = str(uuid.uuid4())
+        round_doc = {
+            "id": round_id,
+            "name": phase["name"],
+            "description": phase["description"],
+            "max_contestants": phase["max_contestants"],
+            "order": phase["order"],
+            "is_active": phase["order"] == 1,  # First round is active
+            "start_date": datetime.now(timezone.utc).isoformat() if phase["order"] == 1 else None,
+            "end_date": None,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.rounds.insert_one(round_doc)
+        created_rounds.append(round_doc)
+    
+    # Set all contestants to Qualification Round
+    await db.contestants.update_many(
+        {"status": "approved"},
+        {"$set": {"current_round": "Qualification Round", "eliminated": False}}
+    )
+    
+    return {
+        "success": True,
+        "message": "Competition setup complete",
+        "rounds_created": len(created_rounds),
+        "rounds": [{"name": r["name"], "max": r["max_contestants"]} for r in created_rounds]
+    }
+
+@api_router.post("/admin/competition/advance-round")
+async def advance_to_next_round(admin: dict = Depends(require_admin)):
+    """End current round and advance top contestants to next round"""
+    
+    # Get current active round
+    current_round = await db.rounds.find_one({"is_active": True})
+    if not current_round:
+        raise HTTPException(status_code=400, detail="No active round found")
+    
+    # Get next round
+    next_round = await db.rounds.find_one({"order": current_round["order"] + 1})
+    if not next_round:
+        raise HTTPException(status_code=400, detail="This is the final round. Use /complete-competition instead.")
+    
+    # Get top contestants by vote count
+    top_contestants = await db.contestants.find(
+        {"status": "approved", "eliminated": {"$ne": True}},
+        {"_id": 0}
+    ).sort("vote_count", -1).limit(next_round["max_contestants"]).to_list(next_round["max_contestants"])
+    
+    top_contestant_ids = [c["id"] for c in top_contestants]
+    
+    # Advance top contestants
+    await db.contestants.update_many(
+        {"id": {"$in": top_contestant_ids}},
+        {"$set": {"current_round": next_round["name"]}}
+    )
+    
+    # Eliminate others
+    await db.contestants.update_many(
+        {"status": "approved", "id": {"$nin": top_contestant_ids}, "eliminated": {"$ne": True}},
+        {"$set": {"eliminated": True, "eliminated_at": current_round["name"]}}
+    )
+    
+    # Update round status
+    await db.rounds.update_one(
+        {"id": current_round["id"]},
+        {"$set": {"is_active": False, "end_date": datetime.now(timezone.utc).isoformat()}}
+    )
+    await db.rounds.update_one(
+        {"id": next_round["id"]},
+        {"$set": {"is_active": True, "start_date": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    # Get eliminated count
+    eliminated_count = await db.contestants.count_documents({"eliminated_at": current_round["name"]})
+    
+    return {
+        "success": True,
+        "previous_round": current_round["name"],
+        "current_round": next_round["name"],
+        "advanced_contestants": len(top_contestant_ids),
+        "eliminated_contestants": eliminated_count,
+        "top_contestants": [{"name": c["full_name"], "votes": c["vote_count"]} for c in top_contestants[:5]]
+    }
+
+@api_router.post("/admin/competition/complete")
+async def complete_competition(admin: dict = Depends(require_admin)):
+    """Complete the competition and award prizes to winners"""
+    
+    # Get current active round (should be Grand Final)
+    current_round = await db.rounds.find_one({"is_active": True})
+    
+    # Get top 5 contestants (winners)
+    winners = await db.contestants.find(
+        {"status": "approved", "eliminated": {"$ne": True}},
+        {"_id": 0}
+    ).sort("vote_count", -1).limit(5).to_list(5)
+    
+    # Prize distribution
+    prizes = [
+        {"position": 1, "title": "Grand Winner", "prize_amount": 10000, "prize_description": "$10,000 + Magazine Feature + Brand Partnerships"},
+        {"position": 2, "title": "1st Runner Up", "prize_amount": 5000, "prize_description": "$5,000 + Photo Shoot Package"},
+        {"position": 3, "title": "2nd Runner Up", "prize_amount": 2500, "prize_description": "$2,500 + Modeling Contract"},
+        {"position": 4, "title": "3rd Runner Up", "prize_amount": 1000, "prize_description": "$1,000 + Gift Package"},
+        {"position": 5, "title": "4th Runner Up", "prize_amount": 500, "prize_description": "$500 + Gift Package"},
+    ]
+    
+    awarded_winners = []
+    for i, winner in enumerate(winners):
+        prize = prizes[i] if i < len(prizes) else None
+        if prize:
+            # Update contestant with prize
+            await db.contestants.update_one(
+                {"id": winner["id"]},
+                {"$set": {
+                    "prize_position": prize["position"],
+                    "prize_title": prize["title"],
+                    "prize_amount": prize["prize_amount"],
+                    "prize_description": prize["prize_description"],
+                    "is_winner": True,
+                    "won_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            
+            # Add prize to wallet
+            await db.wallets.update_one(
+                {"user_id": winner["user_id"]},
+                {
+                    "$set": {"user_id": winner["user_id"], "contestant_id": winner["id"]},
+                    "$inc": {"balance": prize["prize_amount"]},
+                    "$push": {"transactions": {
+                        "id": str(uuid.uuid4()),
+                        "type": "prize",
+                        "amount": prize["prize_amount"],
+                        "description": f"{prize['title']} Prize - Glowing Star 2026",
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    }}
+                },
+                upsert=True
+            )
+            
+            awarded_winners.append({
+                "position": prize["position"],
+                "title": prize["title"],
+                "name": winner["full_name"],
+                "votes": winner["vote_count"],
+                "prize_amount": prize["prize_amount"],
+                "prize_description": prize["prize_description"]
+            })
+    
+    # End the current round
+    if current_round:
+        await db.rounds.update_one(
+            {"id": current_round["id"]},
+            {"$set": {"is_active": False, "end_date": datetime.now(timezone.utc).isoformat()}}
+        )
+    
+    # Create competition result record
+    await db.competition_results.insert_one({
+        "id": str(uuid.uuid4()),
+        "competition_name": "Glowing Star 2026",
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "winners": awarded_winners,
+        "total_contestants": await db.contestants.count_documents({"status": "approved"}),
+        "total_votes": await db.votes.count_documents({})
+    })
+    
+    return {
+        "success": True,
+        "message": "Competition completed! Prizes awarded to winners!",
+        "winners": awarded_winners
+    }
+
+@api_router.get("/admin/competition/status")
+async def get_competition_status(admin: dict = Depends(require_admin)):
+    """Get current competition status"""
+    
+    # Get all rounds
+    rounds = await db.rounds.find({}, {"_id": 0}).sort("order", 1).to_list(100)
+    
+    # Get current active round
+    active_round = next((r for r in rounds if r.get("is_active")), None)
+    
+    # Get contestant counts
+    total_contestants = await db.contestants.count_documents({"status": "approved"})
+    active_contestants = await db.contestants.count_documents({"status": "approved", "eliminated": {"$ne": True}})
+    eliminated_contestants = await db.contestants.count_documents({"eliminated": True})
+    
+    # Get top 10 current contestants
+    top_contestants = await db.contestants.find(
+        {"status": "approved", "eliminated": {"$ne": True}},
+        {"_id": 0, "id": 1, "full_name": 1, "vote_count": 1, "current_round": 1, "photos": 1}
+    ).sort("vote_count", -1).limit(10).to_list(10)
+    
+    # Get winners if competition completed
+    winners = await db.contestants.find(
+        {"is_winner": True},
+        {"_id": 0}
+    ).sort("prize_position", 1).to_list(5)
+    
+    return {
+        "rounds": rounds,
+        "active_round": active_round,
+        "total_contestants": total_contestants,
+        "active_contestants": active_contestants,
+        "eliminated_contestants": eliminated_contestants,
+        "top_contestants": top_contestants,
+        "winners": winners,
+        "competition_completed": len(winners) > 0
+    }
+
+# ============ WALLET & PRIZE SYSTEM ============
+
+@api_router.get("/contestant/wallet")
+async def get_contestant_wallet(current_user: dict = Depends(get_current_user)):
+    """Get contestant's wallet balance and transactions"""
+    
+    wallet = await db.wallets.find_one({"user_id": current_user["id"]}, {"_id": 0})
+    
+    if not wallet:
+        return {
+            "balance": 0,
+            "transactions": [],
+            "user_id": current_user["id"]
+        }
+    
+    return wallet
+
+@api_router.post("/contestant/wallet/withdraw")
+async def request_withdrawal(
+    amount: float = Query(..., gt=0),
+    payment_method: str = Query(...),
+    payment_details: str = Query(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Request withdrawal from wallet"""
+    
+    wallet = await db.wallets.find_one({"user_id": current_user["id"]})
+    
+    if not wallet or wallet.get("balance", 0) < amount:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+    
+    # Create withdrawal request
+    withdrawal_id = str(uuid.uuid4())
+    withdrawal = {
+        "id": withdrawal_id,
+        "user_id": current_user["id"],
+        "amount": amount,
+        "payment_method": payment_method,
+        "payment_details": payment_details,
+        "status": "pending",
+        "requested_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.withdrawals.insert_one(withdrawal)
+    
+    # Deduct from wallet (hold)
+    await db.wallets.update_one(
+        {"user_id": current_user["id"]},
+        {
+            "$inc": {"balance": -amount, "pending_withdrawal": amount},
+            "$push": {"transactions": {
+                "id": str(uuid.uuid4()),
+                "type": "withdrawal_pending",
+                "amount": -amount,
+                "description": f"Withdrawal request - {payment_method}",
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }}
+        }
+    )
+    
+    return {
+        "success": True,
+        "withdrawal_id": withdrawal_id,
+        "amount": amount,
+        "status": "pending",
+        "message": "Withdrawal request submitted. Processing within 3-5 business days."
+    }
+
+@api_router.get("/admin/withdrawals")
+async def get_withdrawal_requests(admin: dict = Depends(require_admin)):
+    """Get all withdrawal requests"""
+    
+    withdrawals = await db.withdrawals.find({}, {"_id": 0}).sort("requested_at", -1).to_list(100)
+    
+    # Add contestant info
+    for w in withdrawals:
+        user = await db.users.find_one({"id": w["user_id"]}, {"_id": 0, "full_name": 1, "email": 1})
+        if user:
+            w["user_name"] = user.get("full_name", "Unknown")
+            w["user_email"] = user.get("email", "Unknown")
+    
+    return withdrawals
+
+@api_router.put("/admin/withdrawals/{withdrawal_id}/process")
+async def process_withdrawal(
+    withdrawal_id: str,
+    status: str = Query(..., enum=["approved", "rejected"]),
+    admin: dict = Depends(require_admin)
+):
+    """Process a withdrawal request"""
+    
+    withdrawal = await db.withdrawals.find_one({"id": withdrawal_id})
+    if not withdrawal:
+        raise HTTPException(status_code=404, detail="Withdrawal not found")
+    
+    if withdrawal["status"] != "pending":
+        raise HTTPException(status_code=400, detail="Withdrawal already processed")
+    
+    # Update withdrawal status
+    await db.withdrawals.update_one(
+        {"id": withdrawal_id},
+        {"$set": {"status": status, "processed_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    if status == "rejected":
+        # Refund to wallet
+        await db.wallets.update_one(
+            {"user_id": withdrawal["user_id"]},
+            {
+                "$inc": {"balance": withdrawal["amount"], "pending_withdrawal": -withdrawal["amount"]},
+                "$push": {"transactions": {
+                    "id": str(uuid.uuid4()),
+                    "type": "withdrawal_refund",
+                    "amount": withdrawal["amount"],
+                    "description": "Withdrawal request rejected - funds returned",
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                }}
+            }
+        )
+    else:
+        # Complete the withdrawal
+        await db.wallets.update_one(
+            {"user_id": withdrawal["user_id"]},
+            {
+                "$inc": {"pending_withdrawal": -withdrawal["amount"]},
+                "$push": {"transactions": {
+                    "id": str(uuid.uuid4()),
+                    "type": "withdrawal_complete",
+                    "amount": 0,
+                    "description": f"Withdrawal completed - {withdrawal['payment_method']}",
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                }}
+            }
+        )
+    
+    return {"success": True, "status": status, "withdrawal_id": withdrawal_id}
+
+@api_router.get("/competition/winners")
+async def get_competition_winners():
+    """Get public list of competition winners"""
+    
+    winners = await db.contestants.find(
+        {"is_winner": True},
+        {"_id": 0, "id": 1, "full_name": 1, "photos": 1, "vote_count": 1, 
+         "prize_position": 1, "prize_title": 1, "prize_amount": 1, "prize_description": 1,
+         "location": 1, "bio": 1}
+    ).sort("prize_position", 1).to_list(10)
+    
+    return {"winners": winners, "competition": "Glowing Star 2026"}
+
+
 # Include the router
 app.include_router(api_router)
 
