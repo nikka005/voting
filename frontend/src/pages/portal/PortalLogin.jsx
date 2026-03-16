@@ -70,11 +70,11 @@ export default function PortalLogin() {
           <h2 className="font-syne text-4xl font-bold text-white mb-4">
             Welcome to the<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
-              Management Portal
+              Contestant Portal
             </span>
           </h2>
           <p className="text-lg text-slate-400 mb-8">
-            Access your dashboard to manage your contest profile or administer the platform.
+            Access your dashboard to manage your contest profile, track votes, and view your rankings.
           </p>
 
           <div className="space-y-4">
