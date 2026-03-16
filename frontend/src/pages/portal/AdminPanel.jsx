@@ -20,7 +20,7 @@ import {
   Calendar, ChevronRight, RefreshCw, Zap, Lock, FileText, Database,
   Monitor, Smartphone, MapPin, ChevronDown, MoreHorizontal, Filter,
   ArrowUpRight, ArrowDownRight, Play, Pause, Ban, CheckCircle2, XCircle,
-  Award, Star, Layers, PieChart, LineChart, Target, Flag, AlertCircle
+  Award, Star, Layers, PieChart, LineChart, Target, Flag, AlertCircle, Megaphone
 } from 'lucide-react';
 
 // ============ ADMIN PANEL - PREMIUM CONTEST PLATFORM ============
