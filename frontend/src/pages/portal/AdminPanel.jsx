@@ -22,7 +22,7 @@ import {
   ArrowUpRight, ArrowDownRight, Play, Pause, Ban, CheckCircle2, XCircle,
   Award, Star, Layers, PieChart, LineChart, Target, Flag, AlertCircle, Megaphone,
   HelpCircle, BookOpen, Rocket, Gift, MousePointer, Share2, QrCode, BarChart,
-  DollarSign, CreditCard, Receipt, Wallet
+  DollarSign, CreditCard, Receipt, Wallet, Send
 } from 'lucide-react';
 
 // ============ ADMIN PANEL - PREMIUM CONTEST PLATFORM ============
