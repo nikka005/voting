@@ -76,10 +76,16 @@ const AuthRoute = ({ children }) => {
 
 // Smart Home Router - Shows different pages based on domain
 function SmartHome() {
-  const hostname = window.location.hostname;
+  const hostname = window.location.hostname.toLowerCase();
+  
+  // Check for user site domain patterns
+  const isUserSite = 
+    hostname.includes('glowingstar.net') || 
+    hostname.includes('.net') ||
+    hostname === 'localhost' && window.location.port === '3001'; // For local testing
   
   // If on user site domain (glowingstar.net), show landing page
-  if (hostname.includes('glowingstar.net') || hostname.includes('.net')) {
+  if (isUserSite) {
     return <UserSiteLanding />;
   }
   
