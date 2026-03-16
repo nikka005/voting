@@ -2939,12 +2939,13 @@ async def verify_entry_fee_payment(session_id: str, current_user: dict = Depends
 @api_router.get("/payments/my-status")
 async def get_my_payment_status(current_user: dict = Depends(get_current_user)):
     """Get current user's payment status"""
+    user_id = current_user.get("user_id") or current_user.get("id")
     payment = await db.entry_fee_payments.find_one(
-        {"user_id": current_user["id"], "status": "completed"},
+        {"user_id": user_id, "status": "completed"},
         {"_id": 0}
     )
     
-    contestant = await db.contestants.find_one({"user_id": current_user["id"]}, {"_id": 0})
+    contestant = await db.contestants.find_one({"user_id": user_id}, {"_id": 0})
     
     return {
         "has_paid": payment is not None,
