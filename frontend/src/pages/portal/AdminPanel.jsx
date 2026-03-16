@@ -914,9 +914,9 @@ function AdminGuideSection() {
 }
 
 // ============ DASHBOARD SECTION ============
-function DashboardSection({ stats, contestants, votes, rounds }) {
+function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, payments }) {
   const activeRound = rounds?.find(r => r.is_active);
-  const todayVotes = votes?.filter(v => {
+  const todayVotes = dashboardStats?.votes_today || votes?.filter(v => {
     const voteDate = new Date(v.created_at).toDateString();
     return voteDate === new Date().toDateString();
   }).length || 0;
@@ -926,6 +926,11 @@ function DashboardSection({ stats, contestants, votes, rounds }) {
     .sort((a, b) => b.vote_count - a.vote_count)
     .slice(0, 5);
 
+  // Get contest info from dashboardStats
+  const activeContest = dashboardStats?.active_contest;
+  const contestantStats = dashboardStats?.contestants || {};
+  const paymentStats = dashboardStats?.payments || {};
+
   return (
     <div className="space-y-6" data-testid="dashboard-section">
       {/* Stats Grid */}
@@ -933,36 +938,71 @@ function DashboardSection({ stats, contestants, votes, rounds }) {
         <StatCard 
           icon={Users} 
           label="Total Contestants" 
-          value={stats?.total_contestants || 0}
-          trend="+12%"
+          value={contestantStats.total || stats?.total_contestants || 0}
+          trend={`${contestantStats.approved || 0} approved`}
           trendUp={true}
           gradient="from-pink-500 to-rose-500"
         />
         <StatCard 
           icon={Heart} 
           label="Total Votes" 
-          value={stats?.total_votes || 0}
-          trend="+23%"
+          value={dashboardStats?.total_votes || stats?.total_votes || 0}
+          trend={`${todayVotes} today`}
           trendUp={true}
           gradient="from-violet-500 to-purple-500"
         />
         <StatCard 
           icon={Zap} 
-          label="Votes Today" 
-          value={todayVotes}
-          trend="+8%"
+          label="Revenue" 
+          value={`$${((paymentStats.total_revenue || 0) / 100).toFixed(0)}`}
+          trend={`${paymentStats.successful || 0} payments`}
           trendUp={true}
           gradient="from-cyan-500 to-blue-500"
         />
         <StatCard 
           icon={Clock} 
           label="Pending Approvals" 
-          value={stats?.pending_approvals || 0}
-          trend=""
+          value={contestantStats.pending || stats?.pending_approvals || 0}
+          trend="needs review"
           gradient="from-amber-500 to-orange-500"
-          highlight={stats?.pending_approvals > 0}
+          highlight={contestantStats.pending > 0 || stats?.pending_approvals > 0}
         />
       </div>
+
+      {/* Active Contest Banner */}
+      {activeContest && (
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                <Trophy className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-amber-400 font-medium">Active Contest</p>
+                <h3 className="text-xl font-bold">{activeContest.name}</h3>
+                <p className="text-xs text-slate-400">
+                  {activeContest.current_participants || 0} / {activeContest.max_participants || '∞'} slots filled
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-2xl font-bold text-amber-400">${activeContest.entry_fee || 0}</p>
+                <p className="text-xs text-slate-500">Entry Fee</p>
+              </div>
+              <span className={`px-3 py-1 text-xs font-bold rounded-full border ${
+                activeContest.status === 'voting' 
+                  ? 'bg-green-500/20 text-green-400 border-green-500/20' 
+                  : activeContest.status === 'registration'
+                  ? 'bg-blue-500/20 text-blue-400 border-blue-500/20'
+                  : 'bg-slate-500/20 text-slate-400 border-slate-500/20'
+              }`}>
+                {activeContest.status?.toUpperCase() || 'DRAFT'}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Active Round Banner */}
       {activeRound && (
@@ -970,7 +1010,7 @@ function DashboardSection({ stats, contestants, votes, rounds }) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center">
-                <Trophy className="w-6 h-6 text-white" />
+                <Target className="w-6 h-6 text-white" />
               </div>
               <div>
                 <p className="text-sm text-pink-400 font-medium">Active Round</p>
@@ -978,7 +1018,7 @@ function DashboardSection({ stats, contestants, votes, rounds }) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 text-xs font-bold bg-green-500/20 text-green-400 rounded-full border border-green-500/20">
+              <span className="px-3 py-1 text-xs font-bold bg-green-500/20 text-green-400 rounded-full border border-green-500/20 animate-pulse">
                 LIVE
               </span>
             </div>
@@ -992,7 +1032,7 @@ function DashboardSection({ stats, contestants, votes, rounds }) {
         <div className="lg:col-span-1">
           <GlassCard title="Quick Actions" icon={Zap}>
             <div className="space-y-2">
-              <QuickActionButton icon={UserCheck} label="Approve Pending" count={stats?.pending_approvals} color="green" />
+              <QuickActionButton icon={UserCheck} label="Approve Pending" count={contestantStats.pending || stats?.pending_approvals} color="green" />
               <QuickActionButton icon={Trophy} label="Manage Rounds" color="violet" />
               <QuickActionButton icon={Shield} label="Security Check" color="cyan" />
               <QuickActionButton icon={Download} label="Export Data" color="amber" />
@@ -1038,28 +1078,70 @@ function DashboardSection({ stats, contestants, votes, rounds }) {
         </div>
       </div>
 
-      {/* Recent Activity */}
-      <GlassCard title="Recent Votes" icon={Activity}>
-        <div className="space-y-2 max-h-64 overflow-y-auto">
-          {votes?.slice(0, 10).map((vote, idx) => (
-            <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-pink-500/20 flex items-center justify-center">
-                  <Heart className="w-4 h-4 text-pink-400" />
+      {/* Recent Payments + Recent Votes */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Payments */}
+        <GlassCard title="Recent Payments" icon={BarChart}>
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {payments?.slice(0, 8).map((payment, idx) => (
+              <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                    payment.status === 'completed' ? 'bg-green-500/20' : 
+                    payment.status === 'pending' ? 'bg-yellow-500/20' : 'bg-red-500/20'
+                  }`}>
+                    {payment.status === 'completed' ? (
+                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    ) : payment.status === 'pending' ? (
+                      <Clock className="w-4 h-4 text-yellow-400" />
+                    ) : (
+                      <XCircle className="w-4 h-4 text-red-400" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{payment.user_email || 'Unknown'}</p>
+                    <p className="text-xs text-slate-500">{payment.type || 'vote_package'}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium">{vote.email}</p>
-                  <p className="text-xs text-slate-500">Cast a vote</p>
+                <div className="text-right">
+                  <p className="font-bold text-green-400">${((payment.amount || 0) / 100).toFixed(2)}</p>
+                  <p className="text-xs text-slate-500">{formatDate(payment.created_at)}</p>
                 </div>
               </div>
-              <span className="text-xs text-slate-500">{formatDate(vote.created_at)}</span>
-            </div>
-          ))}
-          {(!votes || votes.length === 0) && (
-            <p className="text-center text-slate-500 py-8">No votes recorded yet</p>
-          )}
-        </div>
-      </GlassCard>
+            ))}
+            {(!payments || payments.length === 0) && (
+              <p className="text-center text-slate-500 py-8">No payments recorded yet</p>
+            )}
+          </div>
+        </GlassCard>
+
+        {/* Recent Votes */}
+        <GlassCard title="Recent Votes" icon={Activity}>
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {votes?.slice(0, 8).map((vote, idx) => (
+              <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                    vote.type === 'paid' ? 'bg-amber-500/20' : 'bg-pink-500/20'
+                  }`}>
+                    <Heart className={`w-4 h-4 ${vote.type === 'paid' ? 'text-amber-400' : 'text-pink-400'}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{vote.email}</p>
+                    <p className="text-xs text-slate-500">
+                      {vote.type === 'paid' ? '💰 Paid vote' : 'Free vote'}
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs text-slate-500">{formatDate(vote.created_at)}</span>
+              </div>
+            ))}
+            {(!votes || votes.length === 0) && (
+              <p className="text-center text-slate-500 py-8">No votes recorded yet</p>
+            )}
+          </div>
+        </GlassCard>
+      </div>
     </div>
   );
 }
