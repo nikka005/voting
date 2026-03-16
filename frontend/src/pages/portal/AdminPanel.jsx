@@ -1338,6 +1338,398 @@ function ReportsSection({ stats, contestants, votes }) {
   );
 }
 
+// ============ BANNERS/PROMOTIONS SECTION ============
+function BannersSection() {
+  const [banners, setBanners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingBanner, setEditingBanner] = useState(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    subtitle: '',
+    description: '',
+    image_url: '',
+    button_text: 'Join Now',
+    button_link: '/portal/register',
+    background_gradient: 'from-amber-500 via-orange-500 to-pink-500',
+    is_active: true,
+    display_type: 'popup',
+    priority: 1
+  });
+
+  const gradientOptions = [
+    { value: 'from-amber-500 via-orange-500 to-pink-500', label: 'Sunset Gold' },
+    { value: 'from-purple-500 via-pink-500 to-rose-500', label: 'Purple Rose' },
+    { value: 'from-blue-500 via-cyan-500 to-teal-500', label: 'Ocean Blue' },
+    { value: 'from-green-500 via-emerald-500 to-teal-500', label: 'Emerald' },
+    { value: 'from-rose-500 via-red-500 to-orange-500', label: 'Fire Red' },
+    { value: 'from-violet-600 via-purple-600 to-indigo-600', label: 'Royal Purple' },
+  ];
+
+  useEffect(() => {
+    fetchBanners();
+  }, []);
+
+  const fetchBanners = async () => {
+    try {
+      const token = localStorage.getItem('lumina_token');
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/admin/banners`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setBanners(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch banners:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('lumina_token');
+      const url = editingBanner 
+        ? `${process.env.REACT_APP_BACKEND_URL}/api/admin/banners/${editingBanner.id}`
+        : `${process.env.REACT_APP_BACKEND_URL}/api/admin/banners`;
+      
+      const response = await fetch(url, {
+        method: editingBanner ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        toast.success(editingBanner ? 'Banner updated!' : 'Banner created!');
+        setModalOpen(false);
+        resetForm();
+        fetchBanners();
+      } else {
+        toast.error('Failed to save banner');
+      }
+    } catch (error) {
+      toast.error('Error saving banner');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this banner?')) return;
+    try {
+      const token = localStorage.getItem('lumina_token');
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/admin/banners/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        toast.success('Banner deleted');
+        fetchBanners();
+      }
+    } catch (error) {
+      toast.error('Failed to delete banner');
+    }
+  };
+
+  const handleToggle = async (id) => {
+    try {
+      const token = localStorage.getItem('lumina_token');
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/admin/banners/${id}/toggle`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        toast.success('Banner status updated');
+        fetchBanners();
+      }
+    } catch (error) {
+      toast.error('Failed to toggle banner');
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      subtitle: '',
+      description: '',
+      image_url: '',
+      button_text: 'Join Now',
+      button_link: '/portal/register',
+      background_gradient: 'from-amber-500 via-orange-500 to-pink-500',
+      is_active: true,
+      display_type: 'popup',
+      priority: 1
+    });
+    setEditingBanner(null);
+  };
+
+  const openEditModal = (banner) => {
+    setEditingBanner(banner);
+    setFormData({
+      title: banner.title || '',
+      subtitle: banner.subtitle || '',
+      description: banner.description || '',
+      image_url: banner.image_url || '',
+      button_text: banner.button_text || 'Join Now',
+      button_link: banner.button_link || '/portal/register',
+      background_gradient: banner.background_gradient || 'from-amber-500 via-orange-500 to-pink-500',
+      is_active: banner.is_active !== false,
+      display_type: banner.display_type || 'popup',
+      priority: banner.priority || 1
+    });
+    setModalOpen(true);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-pink-400" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6" data-testid="banners-section">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xl font-bold">Promotional Banners</h3>
+          <p className="text-slate-400 text-sm">Create popup ads and banners for the user site</p>
+        </div>
+        <Button 
+          onClick={() => { resetForm(); setModalOpen(true); }}
+          className="bg-gradient-to-r from-pink-500 to-violet-600"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Create Banner
+        </Button>
+      </div>
+
+      {/* Banners Grid */}
+      {banners.length === 0 ? (
+        <GlassCard title="No Banners Yet" icon={Megaphone}>
+          <div className="text-center py-10">
+            <Megaphone className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+            <p className="text-slate-400 mb-4">Create your first promotional banner</p>
+            <Button onClick={() => setModalOpen(true)} className="bg-gradient-to-r from-amber-500 to-orange-500">
+              <Plus className="w-4 h-4 mr-2" />
+              Create Banner
+            </Button>
+          </div>
+        </GlassCard>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {banners.map((banner) => (
+            <div key={banner.id} className="relative group">
+              {/* Banner Preview Card */}
+              <div className={`rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br ${banner.background_gradient}`}>
+                <div className="p-6 text-center relative">
+                  {/* Status Badge */}
+                  <div className="absolute top-3 right-3">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      banner.is_active 
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                        : 'bg-slate-500/20 text-slate-400 border border-slate-500/30'
+                    }`}>
+                      {banner.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+
+                  <Crown className="w-10 h-10 text-white/80 mx-auto mb-3" />
+                  <h4 className="font-syne text-xl font-bold text-white mb-1">{banner.title}</h4>
+                  {banner.subtitle && (
+                    <p className="text-white/80 text-sm mb-2">{banner.subtitle}</p>
+                  )}
+                  {banner.description && (
+                    <p className="text-white/60 text-xs line-clamp-2">{banner.description}</p>
+                  )}
+                  <div className="mt-4">
+                    <span className="inline-block px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium">
+                      {banner.button_text}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Actions Overlay */}
+                <div className="bg-black/40 backdrop-blur-sm p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-white/60">Type: {banner.display_type}</span>
+                    <span className="text-xs text-white/60">• Priority: {banner.priority}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      onClick={() => handleToggle(banner.id)}
+                      className="text-white hover:bg-white/20"
+                    >
+                      {banner.is_active ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      onClick={() => openEditModal(banner)}
+                      className="text-white hover:bg-white/20"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      onClick={() => handleDelete(banner.id)}
+                      className="text-red-400 hover:bg-red-500/20"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Create/Edit Modal */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="bg-[#0f0f15] border-white/10 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-syne text-xl flex items-center gap-2">
+              <Megaphone className="w-5 h-5 text-pink-400" />
+              {editingBanner ? 'Edit Banner' : 'Create New Banner'}
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+            {/* Preview */}
+            <div className={`rounded-xl overflow-hidden bg-gradient-to-br ${formData.background_gradient} p-6 text-center`}>
+              <Crown className="w-8 h-8 text-white/80 mx-auto mb-2" />
+              <h4 className="font-syne text-lg font-bold text-white">{formData.title || 'Banner Title'}</h4>
+              {formData.subtitle && <p className="text-white/80 text-sm">{formData.subtitle}</p>}
+              <div className="mt-3">
+                <span className="inline-block px-4 py-2 bg-white/20 rounded-full text-white text-sm">
+                  {formData.button_text}
+                </span>
+              </div>
+            </div>
+
+            {/* Form Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <Label className="text-slate-300">Banner Title *</Label>
+                <Input
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="e.g., Join Now & Win Big!"
+                  required
+                  className="bg-white/5 border-white/10 text-white mt-1"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <Label className="text-slate-300">Subtitle</Label>
+                <Input
+                  value={formData.subtitle}
+                  onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+                  placeholder="e.g., $35,000 Prize Pool"
+                  className="bg-white/5 border-white/10 text-white mt-1"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <Label className="text-slate-300">Description</Label>
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Additional details about the promotion..."
+                  className="bg-white/5 border-white/10 text-white mt-1"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label className="text-slate-300">Button Text</Label>
+                <Input
+                  value={formData.button_text}
+                  onChange={(e) => setFormData({ ...formData, button_text: e.target.value })}
+                  placeholder="Join Now"
+                  className="bg-white/5 border-white/10 text-white mt-1"
+                />
+              </div>
+
+              <div>
+                <Label className="text-slate-300">Button Link</Label>
+                <Input
+                  value={formData.button_link}
+                  onChange={(e) => setFormData({ ...formData, button_link: e.target.value })}
+                  placeholder="/portal/register"
+                  className="bg-white/5 border-white/10 text-white mt-1"
+                />
+              </div>
+
+              <div>
+                <Label className="text-slate-300">Background Style</Label>
+                <Select 
+                  value={formData.background_gradient} 
+                  onValueChange={(value) => setFormData({ ...formData, background_gradient: value })}
+                >
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white mt-1">
+                    <SelectValue placeholder="Select gradient" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1a25] border-white/10">
+                    {gradientOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value} className="text-white hover:bg-white/10">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded bg-gradient-to-r ${opt.value}`} />
+                          {opt.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-slate-300">Priority (1-10)</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={formData.priority}
+                  onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
+                  className="bg-white/5 border-white/10 text-white mt-1"
+                />
+              </div>
+
+              <div className="md:col-span-2 flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+                <div>
+                  <p className="font-medium">Active Status</p>
+                  <p className="text-sm text-slate-500">Show this banner to users</p>
+                </div>
+                <Switch
+                  checked={formData.is_active}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end pt-4 border-t border-white/10">
+              <Button type="button" variant="outline" onClick={() => setModalOpen(false)} className="border-white/20">
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-gradient-to-r from-pink-500 to-violet-600">
+                {editingBanner ? 'Update Banner' : 'Create Banner'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
 // ============ SETTINGS SECTION ============
 function SettingsSection() {
   const [contestSettings, setContestSettings] = useState({
