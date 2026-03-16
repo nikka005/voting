@@ -221,6 +221,61 @@ export default function AdminPanel() {
     }
   };
 
+  // Contest handlers
+  const handleContestSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const data = {
+        ...contestForm,
+        entry_fee: parseFloat(contestForm.entry_fee) || 50,
+        max_participants: parseInt(contestForm.max_participants) || 100,
+        prize_pool: parseFloat(contestForm.prize_pool) || 35000,
+      };
+      if (editingContest) {
+        await contestsAPI.update(editingContest.id, data);
+        toast.success('Contest updated successfully');
+      } else {
+        await contestsAPI.create(data);
+        toast.success('Contest created successfully');
+      }
+      setContestModalOpen(false);
+      setContestForm({
+        name: '', description: '', entry_fee: 50, max_participants: 100,
+        start_date: '', end_date: '', registration_deadline: '',
+        voting_start_date: '', voting_end_date: '', prize_pool: 35000,
+        rules: '', status: 'draft'
+      });
+      setEditingContest(null);
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to save contest');
+    }
+  };
+
+  const handleContestAction = async (contestId, action) => {
+    try {
+      switch (action) {
+        case 'start-voting':
+          await contestsAPI.startVoting(contestId);
+          toast.success('Voting started');
+          break;
+        case 'stop-voting':
+          await contestsAPI.stopVoting(contestId);
+          toast.success('Voting stopped');
+          break;
+        case 'complete':
+          await contestsAPI.complete(contestId);
+          toast.success('Contest completed');
+          break;
+        default:
+          break;
+      }
+      fetchData();
+    } catch (error) {
+      toast.error(`Failed to ${action.replace('-', ' ')}`);
+    }
+  };
+
   // Contestant handlers
   const handleStatusChange = async (contestantId, newStatus) => {
     try {
