@@ -10,10 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Progress } from '../../components/ui/progress';
 import { Switch } from '../../components/ui/switch';
-import { contestantsAPI, categoriesAPI, leaderboardAPI } from '../../lib/api';
+import { contestantsAPI, categoriesAPI, leaderboardAPI, entryFeeAPI } from '../../lib/api';
 import { formatNumber, formatDate } from '../../lib/utils';
 import { useVoteUpdates } from '../../hooks/useWebSocket';
 import { toast } from 'sonner';
+import { EntryFeePayment } from '../../components/EntryFeePayment';
 import {
   User, Heart, Link as LinkIcon, Camera, Instagram, Facebook, Twitter,
   MapPin, Calendar, Copy, Check, Trash2, Upload, Loader2, AlertCircle,
@@ -21,7 +22,7 @@ import {
   TrendingDown, Share2, QrCode, Globe, BarChart3, Eye, Bell, Clock,
   Settings, HelpCircle, Mail, Shield, ChevronRight, Award, Star,
   Target, Zap, ArrowUpRight, ArrowDownRight, Users, CheckCircle2,
-  Smartphone, Send, MessageSquare, Lock, LogOut
+  Smartphone, Send, MessageSquare, Lock, LogOut, CreditCard
 } from 'lucide-react';
 
 // ============ CONTESTANT DASHBOARD - PREMIUM LIGHT WEB3 DESIGN ============
