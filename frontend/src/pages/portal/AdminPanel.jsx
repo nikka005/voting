@@ -508,6 +508,11 @@ export default function AdminPanel() {
             <VotingSection votes={votes} contestants={contestants} />
           )}
 
+          {/* ============ PAYMENTS SECTION ============ */}
+          {activeSection === 'payments' && (
+            <PaymentsSection payments={payments} dashboardStats={dashboardStats} />
+          )}
+
           {/* ============ BANNERS/PROMOTIONS SECTION ============ */}
           {activeSection === 'banners' && (
             <BannersSection />
