@@ -416,6 +416,8 @@ export default function ContestantDashboard() {
               copyVotingLink={copyVotingLink}
               copied={copied}
               setActiveTab={setActiveTab}
+              entryFeePaid={entryFeePaid}
+              onPaymentSuccess={() => { setEntryFeePaid(true); fetchProfile(); }}
             />
           )}
 
