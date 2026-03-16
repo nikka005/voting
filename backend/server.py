@@ -1521,30 +1521,38 @@ async def get_checkout_status(session_id: str):
 @api_router.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
     """Handle Stripe webhook events"""
-    from emergentintegrations.payments.stripe.checkout import StripeCheckout
+    import stripe
+    stripe.api_key = STRIPE_API_KEY
     
     body = await request.body()
     signature = request.headers.get("Stripe-Signature", "")
-    
-    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url="")
+    webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
     
     try:
-        event = await stripe_checkout.handle_webhook(body, signature)
+        if webhook_secret:
+            event = stripe.Webhook.construct_event(body, signature, webhook_secret)
+        else:
+            # Parse without signature verification (dev mode)
+            import json
+            event = stripe.Event.construct_from(json.loads(body), stripe.api_key)
         
-        if event.payment_status == "paid":
-            # Process payment (same logic as get_checkout_status)
-            transaction = await db.payment_transactions.find_one({"session_id": event.session_id}, {"_id": 0})
+        if event.type == "checkout.session.completed":
+            session = event.data.object
             
-            if transaction and transaction["payment_status"] != "completed":
-                await db.contestants.update_one(
-                    {"id": transaction["contestant_id"]},
-                    {"$inc": {"vote_count": transaction["votes"], "paid_vote_count": transaction["votes"]}}
-                )
+            if session.payment_status == "paid":
+                # Process payment
+                transaction = await db.payment_transactions.find_one({"session_id": session.id}, {"_id": 0})
                 
-                await db.payment_transactions.update_one(
-                    {"session_id": event.session_id},
-                    {"$set": {"payment_status": "completed", "completed_at": datetime.now(timezone.utc).isoformat()}}
-                )
+                if transaction and transaction["payment_status"] != "completed":
+                    await db.contestants.update_one(
+                        {"id": transaction["contestant_id"]},
+                        {"$inc": {"vote_count": transaction["votes"], "paid_vote_count": transaction["votes"]}}
+                    )
+                    
+                    await db.payment_transactions.update_one(
+                        {"session_id": session.id},
+                        {"$set": {"payment_status": "completed", "completed_at": datetime.now(timezone.utc).isoformat()}}
+                    )
         
         return {"status": "success"}
     except Exception as e:
