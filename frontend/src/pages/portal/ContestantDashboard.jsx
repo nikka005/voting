@@ -30,6 +30,9 @@ export default function ContestantDashboard() {
   const { user, isContestant, logout } = useAuth();
   const navigate = useNavigate();
   
+  // Real-time WebSocket updates
+  const { lastVoteUpdate, isConnected } = useVoteUpdates();
+  
   // Core States
   const [profile, setProfile] = useState(null);
   const [categories, setCategories] = useState([]);
