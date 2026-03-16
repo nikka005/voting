@@ -802,6 +802,8 @@ async def register(user: UserCreate):
         "vote_count": 0,
         "paid_vote_count": 0,
         "status": "pending",
+        "payment_status": "unpaid",
+        "entry_fee_paid": False,
         "round": None,
         "qa_items": [],
         "profession": "",
