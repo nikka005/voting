@@ -43,6 +43,7 @@ export default function ContestantDashboard() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [entryFeePaid, setEntryFeePaid] = useState(false);
   
   // UI States
   const [activeTab, setActiveTab] = useState('dashboard');
