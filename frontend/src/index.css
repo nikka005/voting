@@ -41,6 +41,7 @@
 /* Gradient text */
 .gradient-text { @apply bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent; }
 .gradient-text-pink { @apply bg-gradient-to-r from-pink-500 to-violet-600 bg-clip-text text-transparent; }
+.gradient-text-gold { @apply bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 bg-clip-text text-transparent; }
 
 /* Glass effect */
 .glass { @apply bg-white/60 backdrop-blur-xl border border-white/80; }
