@@ -243,10 +243,10 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-syne font-bold text-slate-900 mb-3 sm:mb-4 text-sm sm:text-base">Contestants</h4>
+            <h4 className="font-syne font-bold text-slate-900 mb-3 sm:mb-4 text-sm sm:text-base">Quick Links</h4>
             <ul className="space-y-1.5 sm:space-y-2">
-              <li><a href="https://glowingstar.net/portal/register" className="text-slate-500 hover:text-amber-500 text-xs sm:text-sm transition-colors">Join Contest</a></li>
-              <li><a href="https://glowingstar.net/portal/login" className="text-slate-500 hover:text-amber-500 text-xs sm:text-sm transition-colors">Sign In</a></li>
+              <li><Link to="/" className="text-slate-500 hover:text-amber-500 text-xs sm:text-sm transition-colors">Home</Link></li>
+              <li><Link to="/contestants" className="text-slate-500 hover:text-amber-500 text-xs sm:text-sm transition-colors">Vote Now</Link></li>
             </ul>
           </div>
         </div>
