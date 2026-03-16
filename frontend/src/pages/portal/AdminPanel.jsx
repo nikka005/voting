@@ -2057,10 +2057,16 @@ function ContestantsSection({
 
 // ============ VOTING SECTION ============
 function VotingSection({ votes, contestants }) {
+  const [selectedContestant, setSelectedContestant] = useState(null);
   const todayVotes = votes?.filter(v => {
     const voteDate = new Date(v.created_at).toDateString();
     return voteDate === new Date().toDateString();
   }) || [];
+
+  // Get vote history for selected contestant
+  const contestantVotes = selectedContestant 
+    ? votes?.filter(v => v.contestant_id === selectedContestant.id) || []
+    : [];
 
   return (
     <div className="space-y-6" data-testid="voting-section">
@@ -2096,6 +2102,75 @@ function VotingSection({ votes, contestants }) {
             </div>
             <p className="text-xs text-slate-500">One vote per email every 24 hours</p>
           </div>
+          <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium">Paid Voting</span>
+              <Switch defaultChecked />
+            </div>
+            <p className="text-xs text-slate-500">Allow purchasing vote packages</p>
+          </div>
+          <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium">Reset Votes (New Round)</span>
+              <Button size="sm" variant="outline" className="text-red-400 border-red-500/30 hover:bg-red-500/10">
+                Reset
+              </Button>
+            </div>
+            <p className="text-xs text-slate-500">Reset all votes for new round</p>
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* Vote History by Contestant */}
+      <GlassCard title="Contestant Vote History" icon={Eye}>
+        <div className="space-y-4">
+          <Select onValueChange={(id) => setSelectedContestant(contestants?.find(c => c.id === id) || null)}>
+            <SelectTrigger className="bg-white/5 border-white/10 text-white">
+              <SelectValue placeholder="Select a contestant to view vote history" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#15151f] border-white/10 text-white max-h-60">
+              {contestants?.filter(c => c.status === 'approved').map(c => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.full_name} ({c.vote_count} votes)
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {selectedContestant && (
+            <div className="p-4 rounded-xl bg-gradient-to-r from-pink-500/10 to-violet-500/10 border border-pink-500/20">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-14 h-14 rounded-xl overflow-hidden bg-white/10">
+                  {selectedContestant.photos?.[0] ? (
+                    <img src={selectedContestant.photos[0]} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <Users className="w-full h-full p-3 text-slate-500" />
+                  )}
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg">{selectedContestant.full_name}</h4>
+                  <p className="text-sm text-slate-400">{selectedContestant.vote_count} total votes</p>
+                </div>
+              </div>
+              
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {contestantVotes.length > 0 ? contestantVotes.slice(0, 20).map((vote, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-white/5">
+                    <div className="flex items-center gap-2">
+                      <Heart className={`w-4 h-4 ${vote.vote_type === 'paid' ? 'text-amber-400' : 'text-pink-400'}`} />
+                      <span className="text-sm">{vote.email}</span>
+                      {vote.vote_type === 'paid' && (
+                        <span className="px-1.5 py-0.5 text-[10px] bg-amber-500/20 text-amber-400 rounded">PAID</span>
+                      )}
+                    </div>
+                    <span className="text-xs text-slate-500">{formatDate(vote.created_at)}</span>
+                  </div>
+                )) : (
+                  <p className="text-center text-slate-500 py-4">No votes recorded for this contestant</p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </GlassCard>
 
