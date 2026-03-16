@@ -117,7 +117,7 @@ export default function PortalHome() {
           </Link>
 
           {/* Secondary Card */}
-          <a href="/" target="_blank" rel="noopener noreferrer" className="group">
+          <a href="https://glowingstar.vote" target="_blank" rel="noopener noreferrer" className="group">
             <div className="relative p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-white/20 transition-all overflow-hidden">
               <div className="absolute top-0 right-0 w-40 h-40 bg-cyan-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
               <div className="relative">
