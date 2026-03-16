@@ -1376,7 +1376,8 @@ async def get_vote_packages():
 @api_router.post("/checkout/create", response_model=CheckoutResponse)
 async def create_checkout_session(request: CheckoutRequest, http_request: Request):
     """Create Stripe checkout session for paid votes"""
-    from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+    import stripe
+    stripe.api_key = STRIPE_API_KEY
     
     # Validate package
     if request.package_id not in VOTE_PACKAGES:
@@ -1393,48 +1394,55 @@ async def create_checkout_session(request: CheckoutRequest, http_request: Reques
     success_url = f"{request.origin_url}/payment/success?session_id={{CHECKOUT_SESSION_ID}}"
     cancel_url = f"{request.origin_url}/payment/cancel"
     
-    # Initialize Stripe
-    host_url = str(http_request.base_url)
-    webhook_url = f"{host_url}api/webhook/stripe"
-    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
-    
-    # Create checkout session with metadata
-    checkout_request = CheckoutSessionRequest(
-        amount=package.price,
-        currency="usd",
-        success_url=success_url,
-        cancel_url=cancel_url,
-        metadata={
+    try:
+        # Create Stripe checkout session
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'usd',
+                    'unit_amount': int(package.price * 100),  # Convert to cents
+                    'product_data': {
+                        'name': f"{package.name} - {package.votes} Votes",
+                        'description': f"Vote package for {contestant['full_name']}",
+                    },
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={
+                "package_id": package.id,
+                "package_name": package.name,
+                "votes": str(package.votes),
+                "contestant_id": request.contestant_id,
+                "contestant_name": contestant["full_name"]
+            }
+        )
+        
+        # Create payment transaction record
+        transaction_doc = {
+            "id": str(uuid.uuid4()),
+            "session_id": session.id,
             "package_id": package.id,
             "package_name": package.name,
-            "votes": str(package.votes),
+            "votes": package.votes,
+            "amount": package.price,
+            "currency": "usd",
             "contestant_id": request.contestant_id,
-            "contestant_name": contestant["full_name"]
+            "contestant_name": contestant["full_name"],
+            "payment_status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat()
         }
-    )
-    
-    session = await stripe_checkout.create_checkout_session(checkout_request)
-    
-    # Create payment transaction record
-    transaction_doc = {
-        "id": str(uuid.uuid4()),
-        "session_id": session.session_id,
-        "package_id": package.id,
-        "package_name": package.name,
-        "votes": package.votes,
-        "amount": package.price,
-        "currency": "usd",
-        "contestant_id": request.contestant_id,
-        "contestant_name": contestant["full_name"],
-        "payment_status": "pending",
-        "created_at": datetime.now(timezone.utc).isoformat()
-    }
-    await db.payment_transactions.insert_one(transaction_doc)
-    
-    return CheckoutResponse(
-        checkout_url=session.url,
-        session_id=session.session_id
-    )
+        await db.payment_transactions.insert_one(transaction_doc)
+        
+        return CheckoutResponse(
+            checkout_url=session.url,
+            session_id=session.id
+        )
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @api_router.get("/checkout/status/{session_id}")
 async def get_checkout_status(session_id: str):
