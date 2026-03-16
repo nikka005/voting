@@ -1634,6 +1634,190 @@ async def seed_admin():
     await db.users.insert_one(admin_doc)
     return {"message": "Admin created", "email": "admin@glowingstar.net", "password": "admin123"}
 
+# ============ SEED 50 PROFESSIONAL CONTESTANTS ============
+
+@api_router.post("/seed/contestants")
+async def seed_professional_contestants():
+    """Seed 50 professional contestant profiles with realistic data"""
+    
+    # Professional contestant data
+    contestants_data = [
+        {"name": "Isabella Rodriguez", "location": "Miami, Florida, USA", "age": 24, "profession": "Fashion Model", "bio": "International runway model with 5 years of experience. Featured in Vogue and Elle magazines."},
+        {"name": "Sophie Chen", "location": "Los Angeles, California, USA", "age": 22, "profession": "Actress & Model", "bio": "Rising actress and commercial model. Passionate about fitness and healthy living."},
+        {"name": "Amara Williams", "location": "Atlanta, Georgia, USA", "age": 25, "profession": "Fitness Influencer", "bio": "Certified personal trainer with 500K+ followers. Advocate for body positivity."},
+        {"name": "Olivia Thompson", "location": "New York City, USA", "age": 23, "profession": "Dance Instructor", "bio": "Professional dancer and choreographer. Performed on Broadway and music videos."},
+        {"name": "Emma Davis", "location": "Chicago, Illinois, USA", "age": 26, "profession": "Nurse & Model", "bio": "Healthcare hero by day, aspiring model by passion. Believes in inner and outer beauty."},
+        {"name": "Mia Johnson", "location": "Houston, Texas, USA", "age": 21, "profession": "College Student", "bio": "Pre-med student with a passion for pageantry. Miss Texas Teen 2023 finalist."},
+        {"name": "Charlotte Brown", "location": "Phoenix, Arizona, USA", "age": 24, "profession": "Marketing Executive", "bio": "Business professional who loves fashion and photography. Former cheerleader."},
+        {"name": "Ava Martinez", "location": "San Diego, California, USA", "age": 23, "profession": "Yoga Instructor", "bio": "Certified yoga teacher spreading wellness and positivity. Beach lover and surfer."},
+        {"name": "Luna Garcia", "location": "San Antonio, Texas, USA", "age": 25, "profession": "Television Host", "bio": "Local TV personality with dreams of national recognition. Bilingual in English and Spanish."},
+        {"name": "Chloe Wilson", "location": "Philadelphia, USA", "age": 22, "profession": "Makeup Artist", "bio": "Professional MUA with celebrity clients. Beauty content creator on YouTube."},
+        {"name": "Zoe Anderson", "location": "San Jose, California, USA", "age": 24, "profession": "Software Engineer", "bio": "Tech professional breaking stereotypes. Proving beauty and brains go together."},
+        {"name": "Lily Taylor", "location": "Austin, Texas, USA", "age": 23, "profession": "Music Artist", "bio": "Singer-songwriter with 2 albums released. Performing at local venues and festivals."},
+        {"name": "Grace Thomas", "location": "Jacksonville, Florida, USA", "age": 26, "profession": "Real Estate Agent", "bio": "Top-selling realtor who believes confidence is the key to success."},
+        {"name": "Scarlett Moore", "location": "Columbus, Ohio, USA", "age": 21, "profession": "College Athlete", "bio": "Division 1 volleyball player. Balancing sports, studies, and style."},
+        {"name": "Victoria Jackson", "location": "Charlotte, NC, USA", "age": 25, "profession": "Fashion Designer", "bio": "Founder of boutique fashion line. Creating sustainable and stylish clothing."},
+        {"name": "Aria White", "location": "Indianapolis, Indiana, USA", "age": 24, "profession": "Photographer", "bio": "Award-winning portrait photographer. Now stepping in front of the camera."},
+        {"name": "Hannah Harris", "location": "Seattle, Washington, USA", "age": 22, "profession": "Barista & Model", "bio": "Coffee enthusiast and part-time model. Miss Washington 2024 contestant."},
+        {"name": "Penelope Clark", "location": "Denver, Colorado, USA", "age": 23, "profession": "Ski Instructor", "bio": "Professional skier and outdoor enthusiast. Adventure seeker with style."},
+        {"name": "Layla Lewis", "location": "Nashville, Tennessee, USA", "age": 25, "profession": "Country Singer", "bio": "Emerging country music artist. Performed at Grand Ole Opry."},
+        {"name": "Riley Robinson", "location": "Boston, Massachusetts, USA", "age": 24, "profession": "Law Student", "bio": "Harvard Law student with a passion for advocacy and fashion."},
+        {"name": "Zoey Walker", "location": "Portland, Oregon, USA", "age": 22, "profession": "Environmental Activist", "bio": "Fighting for climate change while representing sustainable beauty."},
+        {"name": "Nora Hall", "location": "Las Vegas, Nevada, USA", "age": 26, "profession": "Casino Host", "bio": "Hospitality professional with pageant experience. Miss Nevada 2023 top 10."},
+        {"name": "Stella Young", "location": "Oklahoma City, USA", "age": 23, "profession": "Flight Attendant", "bio": "Traveling the world while pursuing modeling dreams."},
+        {"name": "Maya King", "location": "Louisville, Kentucky, USA", "age": 21, "profession": "Equestrian", "bio": "Professional horse rider and Kentucky Derby ambassador."},
+        {"name": "Aurora Wright", "location": "Memphis, Tennessee, USA", "age": 24, "profession": "Soul Singer", "bio": "R&B vocalist carrying on Memphis music tradition."},
+        {"name": "Savannah Scott", "location": "Baltimore, Maryland, USA", "age": 25, "profession": "Physical Therapist", "bio": "Healthcare professional helping others recover while pursuing passion."},
+        {"name": "Brooklyn Green", "location": "Milwaukee, Wisconsin, USA", "age": 22, "profession": "Brewery Marketing", "bio": "Craft beer industry professional with a creative spirit."},
+        {"name": "Paisley Adams", "location": "Albuquerque, NM, USA", "age": 23, "profession": "Art Gallery Curator", "bio": "Art enthusiast bringing culture and beauty together."},
+        {"name": "Skylar Nelson", "location": "Tucson, Arizona, USA", "age": 24, "profession": "Wildlife Biologist", "bio": "Scientist and nature lover. Combining brains with natural beauty."},
+        {"name": "Nova Carter", "location": "Fresno, California, USA", "age": 21, "profession": "Agricultural Student", "bio": "Farm girl with big dreams. Representing rural America."},
+        {"name": "Willow Mitchell", "location": "Sacramento, California, USA", "age": 25, "profession": "State Employee", "bio": "Government professional with community service passion."},
+        {"name": "Ivy Perez", "location": "Long Beach, California, USA", "age": 23, "profession": "Marine Biologist", "bio": "Ocean conservationist and scuba diving instructor."},
+        {"name": "Violet Turner", "location": "Kansas City, Missouri, USA", "age": 24, "profession": "BBQ Restaurant Owner", "bio": "Entrepreneur in the food industry. Miss Kansas City 2024."},
+        {"name": "Hazel Phillips", "location": "Mesa, Arizona, USA", "age": 22, "profession": "Dental Hygienist", "bio": "Creating beautiful smiles professionally and personally."},
+        {"name": "Ruby Campbell", "location": "Virginia Beach, VA, USA", "age": 26, "profession": "Navy Veteran", "bio": "Served 4 years in the Navy. Now pursuing modeling career."},
+        {"name": "Jade Parker", "location": "Atlanta, Georgia, USA", "age": 23, "profession": "Hip Hop Dancer", "bio": "Professional dancer featured in music videos. ATL native."},
+        {"name": "Rose Evans", "location": "Colorado Springs, CO, USA", "age": 24, "profession": "Air Force Officer", "bio": "Military officer balancing service with pageant dreams."},
+        {"name": "Iris Edwards", "location": "Raleigh, North Carolina, USA", "age": 21, "profession": "Tech Startup Founder", "bio": "Young entrepreneur in the tech space. Forbes 30 Under 30 nominee."},
+        {"name": "Daisy Collins", "location": "Minneapolis, Minnesota, USA", "age": 25, "profession": "Ice Hockey Player", "bio": "Professional women's hockey player. Minnesota native and proud."},
+        {"name": "Poppy Stewart", "location": "Tampa, Florida, USA", "age": 22, "profession": "Marine Biology Student", "bio": "USF student passionate about ocean conservation."},
+        {"name": "Jasmine Sanchez", "location": "Honolulu, Hawaii, USA", "age": 24, "profession": "Hula Dancer", "bio": "Traditional Hawaiian dancer preserving island culture."},
+        {"name": "Autumn Morris", "location": "Cleveland, Ohio, USA", "age": 23, "profession": "Pediatric Nurse", "bio": "Caring for children while inspiring them to dream big."},
+        {"name": "Summer Rogers", "location": "New Orleans, Louisiana, USA", "age": 25, "profession": "Jazz Vocalist", "bio": "Performing in French Quarter. Miss Louisiana 2024 contestant."},
+        {"name": "Winter Reed", "location": "Anchorage, Alaska, USA", "age": 21, "profession": "Wildlife Guide", "bio": "Alaska native sharing the beauty of the Last Frontier."},
+        {"name": "Sierra Cook", "location": "Salt Lake City, Utah, USA", "age": 24, "profession": "Ski Resort Manager", "bio": "Outdoor enthusiast managing world-class ski resort."},
+        {"name": "Meadow Morgan", "location": "Boise, Idaho, USA", "age": 22, "profession": "Organic Farmer", "bio": "Sustainable agriculture advocate. Natural beauty inside and out."},
+        {"name": "River Bell", "location": "Portland, Maine, USA", "age": 23, "profession": "Lobster Boat Captain", "bio": "Third-generation lobster fisher. Maine's ocean princess."},
+        {"name": "Ocean Murphy", "location": "San Francisco, CA, USA", "age": 26, "profession": "Tech Executive", "bio": "VP at major tech company. Breaking glass ceilings with grace."},
+        {"name": "Storm Bailey", "location": "Oklahoma City, USA", "age": 24, "profession": "Storm Chaser", "bio": "Meteorologist and adventure seeker. Weather Channel contributor."},
+        {"name": "Crystal Rivera", "location": "Miami, Florida, USA", "age": 23, "profession": "Jewelry Designer", "bio": "Creating stunning pieces while being a stunning contestant."},
+    ]
+    
+    # Create categories if not exist
+    categories = ["Fashion & Glamour", "Fitness & Sports", "Arts & Entertainment", "Professional & Business", "Nature & Adventure"]
+    category_ids = {}
+    
+    for cat_name in categories:
+        existing_cat = await db.categories.find_one({"name": cat_name})
+        if existing_cat:
+            category_ids[cat_name] = existing_cat["id"]
+        else:
+            cat_id = str(uuid.uuid4())
+            await db.categories.insert_one({
+                "id": cat_id,
+                "name": cat_name,
+                "description": f"Contestants in {cat_name} category",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            })
+            category_ids[cat_name] = cat_id
+    
+    # Professional placeholder photos (using picsum for variety)
+    photo_urls = [
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600",
+        "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600",
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600",
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600",
+        "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=600",
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600",
+        "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600",
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600",
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600",
+        "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=600",
+    ]
+    
+    created_count = 0
+    
+    for i, contestant in enumerate(contestants_data):
+        # Check if contestant already exists
+        existing = await db.contestants.find_one({"full_name": contestant["name"]})
+        if existing:
+            continue
+        
+        # Create user account
+        user_id = str(uuid.uuid4())
+        contestant_id = str(uuid.uuid4())
+        email = contestant["name"].lower().replace(" ", ".") + "@contestant.glowingstar.net"
+        
+        # Determine category based on profession
+        if any(x in contestant["profession"].lower() for x in ["model", "fashion", "designer"]):
+            category = "Fashion & Glamour"
+        elif any(x in contestant["profession"].lower() for x in ["fitness", "athlete", "trainer", "sport", "hockey", "volleyball"]):
+            category = "Fitness & Sports"
+        elif any(x in contestant["profession"].lower() for x in ["singer", "dancer", "artist", "actor", "music", "host"]):
+            category = "Arts & Entertainment"
+        elif any(x in contestant["profession"].lower() for x in ["farm", "wildlife", "nature", "ski", "outdoor", "marine", "ocean"]):
+            category = "Nature & Adventure"
+        else:
+            category = "Professional & Business"
+        
+        # Create user
+        await db.users.insert_one({
+            "id": user_id,
+            "email": email,
+            "full_name": contestant["name"],
+            "password": hash_password("contestant123"),
+            "role": "contestant",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        # Generate random vote count for variety
+        vote_count = random.randint(50, 5000)
+        
+        # Create contestant profile
+        slug = contestant["name"].lower().replace(" ", "-")
+        
+        await db.contestants.insert_one({
+            "id": contestant_id,
+            "user_id": user_id,
+            "full_name": contestant["name"],
+            "email": email,
+            "bio": contestant["bio"],
+            "location": contestant["location"],
+            "age": contestant["age"],
+            "profession": contestant["profession"],
+            "category_id": category_ids[category],
+            "category_name": category,
+            "photos": [photo_urls[i % len(photo_urls)]],
+            "vote_count": vote_count,
+            "slug": slug,
+            "status": "approved",
+            "is_verified": random.choice([True, False, False]),  # 33% verified
+            "is_featured": random.choice([True, False, False, False]),  # 25% featured
+            "social_media": {
+                "instagram": f"@{slug.replace('-', '_')}",
+                "twitter": f"@{slug.replace('-', '')}",
+                "tiktok": f"@{slug.replace('-', '_')}"
+            },
+            "q_and_a": [
+                {"question": "What inspired you to join this contest?", "answer": "I want to inspire others and prove that dreams can come true with hard work."},
+                {"question": "What's your hidden talent?", "answer": contestant["bio"].split('.')[0]}
+            ],
+            "created_at": (datetime.now(timezone.utc) - timedelta(days=random.randint(1, 30))).isoformat()
+        })
+        
+        # Add some random votes for this contestant
+        for _ in range(min(vote_count, 50)):  # Max 50 vote records per contestant
+            await db.votes.insert_one({
+                "id": str(uuid.uuid4()),
+                "contestant_id": contestant_id,
+                "email": f"voter{random.randint(1000,9999)}@example.com",
+                "ip": f"192.168.{random.randint(1,255)}.{random.randint(1,255)}",
+                "type": random.choice(["free", "free", "free", "paid"]),
+                "otp_verified": True,
+                "created_at": (datetime.now(timezone.utc) - timedelta(hours=random.randint(1, 720))).isoformat()
+            })
+        
+        created_count += 1
+    
+    return {
+        "success": True,
+        "message": f"Created {created_count} professional contestant profiles",
+        "total_contestants": created_count,
+        "categories_created": list(category_ids.keys())
+    }
+
 # ============ ADVANCED RATE LIMITING SYSTEM ============
 
 class RateLimiter:
