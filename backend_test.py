@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 class LuminaAPITester:
-    def __init__(self, base_url="https://contest-platform-9.preview.emergentagent.com"):
+    def __init__(self, base_url="https://beauty-pageant.preview.emergentagent.com"):
         self.base_url = base_url
         self.admin_token = None
         self.contestant_token = None

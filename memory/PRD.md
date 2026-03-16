@@ -82,10 +82,10 @@ Build a premium, high-class online voting contest platform inspired by mshealtha
 ### Public Voting Site (glowingstar.vote)
 | Page | URL |
 |------|-----|
-| Homepage | https://contest-platform-9.preview.emergentagent.com/ |
-| Contestants | https://contest-platform-9.preview.emergentagent.com/contestants |
-| Leaderboard | https://contest-platform-9.preview.emergentagent.com/leaderboard |
-| Vote for Contestant | https://contest-platform-9.preview.emergentagent.com/2026/{slug} |
+| Homepage | https://beauty-pageant.preview.emergentagent.com/ |
+| Contestants | https://beauty-pageant.preview.emergentagent.com/contestants |
+| Leaderboard | https://beauty-pageant.preview.emergentagent.com/leaderboard |
+| Vote for Contestant | https://beauty-pageant.preview.emergentagent.com/2026/{slug} |
 
 ### Management Portal (glowingstar.net)
 | Page | URL | Credentials |
