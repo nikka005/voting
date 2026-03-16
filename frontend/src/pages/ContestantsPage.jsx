@@ -126,7 +126,7 @@ export default function ContestantsPage() {
               <span className="text-xs sm:text-sm font-semibold text-amber-600">{filteredContestants.length} Contestants</span>
             </div>
             <h1 className="font-syne text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-3 sm:mb-4">
-              Browse <span className="gradient-text-gold">Contestants</span>
+              Browse <span className="gradient-text-gold-gold">Contestants</span>
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-slate-600">
               Discover amazing talents and cast your vote for your favorites

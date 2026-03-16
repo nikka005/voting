@@ -289,7 +289,7 @@ export default function VotingPage() {
                 <div className="bg-gradient-to-br from-pink-50 to-violet-50 rounded-3xl p-6 md:p-8 border border-pink-100">
                   <p className="text-slate-500 text-sm mb-2 text-center">Currently</p>
                   <div className="text-center mb-4">
-                    <span className="font-syne text-6xl md:text-7xl font-bold gradient-text">
+                    <span className="font-syne text-6xl md:text-7xl font-bold gradient-text-gold">
                       {contestant.rank || '—'}{contestant.rank ? getRankSuffix(contestant.rank) : ''}
                     </span>
                   </div>
