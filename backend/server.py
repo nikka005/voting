@@ -1634,11 +1634,558 @@ async def seed_admin():
     await db.users.insert_one(admin_doc)
     return {"message": "Admin created", "email": "admin@glowingstar.net", "password": "admin123"}
 
+# ============ ADVANCED RATE LIMITING SYSTEM ============
+
+class RateLimiter:
+    """Smart rate limiting to prevent abuse"""
+    def __init__(self):
+        self.requests: Dict[str, List[datetime]] = defaultdict(list)
+        self.vote_attempts: Dict[str, List[datetime]] = defaultdict(list)
+    
+    def clean_old_entries(self, entries: List[datetime], window_seconds: int) -> List[datetime]:
+        """Remove entries older than the window"""
+        cutoff = datetime.now(timezone.utc) - timedelta(seconds=window_seconds)
+        return [e for e in entries if e > cutoff]
+    
+    def check_rate_limit(self, identifier: str, limit: int, window_seconds: int) -> dict:
+        """Check if rate limit exceeded"""
+        self.requests[identifier] = self.clean_old_entries(self.requests[identifier], window_seconds)
+        
+        if len(self.requests[identifier]) >= limit:
+            return {
+                "allowed": False,
+                "reason": f"Rate limit exceeded: {limit} requests per {window_seconds}s",
+                "retry_after": window_seconds
+            }
+        
+        self.requests[identifier].append(datetime.now(timezone.utc))
+        return {"allowed": True}
+    
+    def check_vote_limit(self, ip: str, limit: int = 10, window_seconds: int = 60) -> dict:
+        """Check vote rate limit per IP per minute"""
+        self.vote_attempts[ip] = self.clean_old_entries(self.vote_attempts[ip], window_seconds)
+        
+        if len(self.vote_attempts[ip]) >= limit:
+            return {
+                "allowed": False,
+                "reason": f"Too many vote attempts. Max {limit} per minute.",
+                "current_count": len(self.vote_attempts[ip])
+            }
+        
+        self.vote_attempts[ip].append(datetime.now(timezone.utc))
+        return {"allowed": True, "current_count": len(self.vote_attempts[ip])}
+
+rate_limiter = RateLimiter()
+
+# ============ ANALYTICS TRACKING SYSTEM ============
+
+class AnalyticsTracker:
+    """Track site analytics for admin dashboard"""
+    
+    async def track_page_view(self, request: Request, page: str):
+        """Track a page view"""
+        await db.analytics_pageviews.insert_one({
+            "id": str(uuid.uuid4()),
+            "page": page,
+            "ip": request.client.host if request.client else "unknown",
+            "user_agent": request.headers.get("user-agent", "unknown"),
+            "referer": request.headers.get("referer", "direct"),
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+    
+    async def track_vote(self, contestant_id: str, voter_ip: str, vote_type: str, country: str = None):
+        """Track a vote for analytics"""
+        await db.analytics_votes.insert_one({
+            "id": str(uuid.uuid4()),
+            "contestant_id": contestant_id,
+            "ip": voter_ip,
+            "vote_type": vote_type,
+            "country": country,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+    
+    async def get_dashboard_stats(self, days: int = 30) -> dict:
+        """Get analytics dashboard stats"""
+        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+        cutoff_str = cutoff.isoformat()
+        
+        # Total page views
+        total_views = await db.analytics_pageviews.count_documents({
+            "timestamp": {"$gte": cutoff_str}
+        })
+        
+        # Total votes in period
+        total_votes = await db.analytics_votes.count_documents({
+            "timestamp": {"$gte": cutoff_str}
+        })
+        
+        # Votes by type
+        pipeline = [
+            {"$match": {"timestamp": {"$gte": cutoff_str}}},
+            {"$group": {"_id": "$vote_type", "count": {"$sum": 1}}}
+        ]
+        votes_by_type = {doc["_id"]: doc["count"] async for doc in db.analytics_votes.aggregate(pipeline)}
+        
+        # Top traffic sources
+        pipeline = [
+            {"$match": {"timestamp": {"$gte": cutoff_str}}},
+            {"$group": {"_id": "$referer", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": 10}
+        ]
+        traffic_sources = [{"source": doc["_id"], "count": doc["count"]} async for doc in db.analytics_pageviews.aggregate(pipeline)]
+        
+        # Votes by country
+        pipeline = [
+            {"$match": {"timestamp": {"$gte": cutoff_str}, "country": {"$ne": None}}},
+            {"$group": {"_id": "$country", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": 10}
+        ]
+        votes_by_country = [{"country": doc["_id"], "count": doc["count"]} async for doc in db.analytics_votes.aggregate(pipeline)]
+        
+        # Daily votes trend
+        pipeline = [
+            {"$match": {"timestamp": {"$gte": cutoff_str}}},
+            {"$addFields": {"date": {"$substr": ["$timestamp", 0, 10]}}},
+            {"$group": {"_id": "$date", "count": {"$sum": 1}}},
+            {"$sort": {"_id": 1}}
+        ]
+        daily_votes = [{"date": doc["_id"], "count": doc["count"]} async for doc in db.analytics_votes.aggregate(pipeline)]
+        
+        return {
+            "total_page_views": total_views,
+            "total_votes": total_votes,
+            "votes_by_type": votes_by_type,
+            "traffic_sources": traffic_sources,
+            "votes_by_country": votes_by_country,
+            "daily_votes_trend": daily_votes
+        }
+
+analytics = AnalyticsTracker()
+
+# ============ DEVICE FINGERPRINT SYSTEM ============
+
+class DeviceFingerprintTracker:
+    """Track device fingerprints for fraud detection"""
+    
+    def generate_fingerprint(self, request: Request) -> str:
+        """Generate a device fingerprint from request headers"""
+        user_agent = request.headers.get("user-agent", "")
+        accept_lang = request.headers.get("accept-language", "")
+        accept_enc = request.headers.get("accept-encoding", "")
+        ip = request.client.host if request.client else ""
+        
+        # Create a simple fingerprint hash
+        fingerprint_str = f"{user_agent}|{accept_lang}|{accept_enc}"
+        import hashlib
+        return hashlib.md5(fingerprint_str.encode()).hexdigest()
+    
+    async def track_fingerprint(self, fingerprint: str, contestant_id: str, email: str):
+        """Track a fingerprint vote"""
+        await db.device_fingerprints.insert_one({
+            "fingerprint": fingerprint,
+            "contestant_id": contestant_id,
+            "email": email,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+    
+    async def check_fingerprint_abuse(self, fingerprint: str, contestant_id: str) -> dict:
+        """Check if fingerprint has voted too many times"""
+        today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        
+        # Count votes from this fingerprint today
+        count = await db.device_fingerprints.count_documents({
+            "fingerprint": fingerprint,
+            "timestamp": {"$regex": f"^{today}"}
+        })
+        
+        # Count votes for same contestant from this fingerprint
+        contestant_count = await db.device_fingerprints.count_documents({
+            "fingerprint": fingerprint,
+            "contestant_id": contestant_id,
+            "timestamp": {"$regex": f"^{today}"}
+        })
+        
+        is_suspicious = count > 20 or contestant_count > 3
+        
+        return {
+            "fingerprint": fingerprint,
+            "total_votes_today": count,
+            "votes_for_contestant": contestant_count,
+            "suspicious": is_suspicious,
+            "reason": "Multiple votes from same device" if is_suspicious else None
+        }
+
+fingerprint_tracker = DeviceFingerprintTracker()
+
+# ============ CONTESTANT BADGES & VERIFICATION ============
+
+class ContestantBadge(BaseModel):
+    is_verified: bool = False
+    is_featured: bool = False
+    is_trending: bool = False
+    is_new: bool = False
+    badge_reason: Optional[str] = None
+
+@api_router.put("/admin/contestants/{contestant_id}/badges")
+async def update_contestant_badges(
+    contestant_id: str,
+    is_verified: bool = Query(None),
+    is_featured: bool = Query(None),
+    admin: dict = Depends(require_admin)
+):
+    """Update contestant verification/featured badges"""
+    update_data = {}
+    if is_verified is not None:
+        update_data["is_verified"] = is_verified
+    if is_featured is not None:
+        update_data["is_featured"] = is_featured
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No badge updates provided")
+    
+    result = await db.contestants.update_one(
+        {"id": contestant_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Contestant not found")
+    
+    return {"success": True, "updated": update_data}
+
+# ============ CONTESTANT HIGHLIGHTS SYSTEM ============
+
+@api_router.get("/contestants/highlights")
+async def get_contestant_highlights():
+    """Get highlighted contestants for homepage"""
+    
+    # Get trending contestants (most votes in last 7 days)
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    pipeline = [
+        {"$match": {"created_at": {"$gte": week_ago}}},
+        {"$group": {"_id": "$contestant_id", "recent_votes": {"$sum": 1}}},
+        {"$sort": {"recent_votes": -1}},
+        {"$limit": 6}
+    ]
+    trending_ids = [doc["_id"] async for doc in db.votes.aggregate(pipeline)]
+    trending = await db.contestants.find(
+        {"id": {"$in": trending_ids}, "status": "approved"},
+        {"_id": 0}
+    ).to_list(6)
+    
+    # Get new contestants (joined in last 14 days)
+    two_weeks_ago = (datetime.now(timezone.utc) - timedelta(days=14)).isoformat()
+    new_contestants = await db.contestants.find(
+        {"status": "approved", "created_at": {"$gte": two_weeks_ago}},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(6).to_list(6)
+    
+    # Get featured contestants
+    featured = await db.contestants.find(
+        {"status": "approved", "is_featured": True},
+        {"_id": 0}
+    ).limit(6).to_list(6)
+    
+    # Get verified contestants
+    verified = await db.contestants.find(
+        {"status": "approved", "is_verified": True},
+        {"_id": 0}
+    ).limit(6).to_list(6)
+    
+    # Get rising stars (biggest vote increase in last 24 hours)
+    yesterday = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+    pipeline = [
+        {"$match": {"created_at": {"$gte": yesterday}}},
+        {"$group": {"_id": "$contestant_id", "daily_votes": {"$sum": 1}}},
+        {"$sort": {"daily_votes": -1}},
+        {"$limit": 6}
+    ]
+    rising_ids = [doc["_id"] async for doc in db.votes.aggregate(pipeline)]
+    rising = await db.contestants.find(
+        {"id": {"$in": rising_ids}, "status": "approved"},
+        {"_id": 0}
+    ).to_list(6)
+    
+    return {
+        "trending": trending,
+        "new": new_contestants,
+        "featured": featured,
+        "verified": verified,
+        "rising": rising
+    }
+
+# ============ ADVANCED LEADERBOARD FILTERS ============
+
+@api_router.get("/leaderboard/filtered")
+async def get_filtered_leaderboard(
+    filter_type: str = Query("global", enum=["global", "category", "country", "daily", "weekly"]),
+    category_id: Optional[str] = None,
+    country: Optional[str] = None,
+    limit: int = Query(50, le=200)
+):
+    """Get filtered leaderboard data"""
+    
+    if filter_type == "global":
+        # Global ranking by total votes
+        contestants = await db.contestants.find(
+            {"status": "approved"},
+            {"_id": 0}
+        ).sort("vote_count", -1).limit(limit).to_list(limit)
+        
+    elif filter_type == "category":
+        if not category_id:
+            raise HTTPException(status_code=400, detail="category_id required for category filter")
+        contestants = await db.contestants.find(
+            {"status": "approved", "category_id": category_id},
+            {"_id": 0}
+        ).sort("vote_count", -1).limit(limit).to_list(limit)
+        
+    elif filter_type == "country":
+        if not country:
+            raise HTTPException(status_code=400, detail="country required for country filter")
+        contestants = await db.contestants.find(
+            {"status": "approved", "location": {"$regex": country, "$options": "i"}},
+            {"_id": 0}
+        ).sort("vote_count", -1).limit(limit).to_list(limit)
+        
+    elif filter_type == "daily":
+        # Top contestants by votes in last 24 hours
+        yesterday = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+        pipeline = [
+            {"$match": {"created_at": {"$gte": yesterday}}},
+            {"$group": {"_id": "$contestant_id", "daily_votes": {"$sum": 1}}},
+            {"$sort": {"daily_votes": -1}},
+            {"$limit": limit}
+        ]
+        vote_data = {doc["_id"]: doc["daily_votes"] async for doc in db.votes.aggregate(pipeline)}
+        contestant_ids = list(vote_data.keys())
+        contestants = await db.contestants.find(
+            {"id": {"$in": contestant_ids}, "status": "approved"},
+            {"_id": 0}
+        ).to_list(limit)
+        # Add daily_votes to each contestant
+        for c in contestants:
+            c["daily_votes"] = vote_data.get(c["id"], 0)
+        contestants.sort(key=lambda x: x.get("daily_votes", 0), reverse=True)
+        
+    elif filter_type == "weekly":
+        # Top contestants by votes in last 7 days
+        week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+        pipeline = [
+            {"$match": {"created_at": {"$gte": week_ago}}},
+            {"$group": {"_id": "$contestant_id", "weekly_votes": {"$sum": 1}}},
+            {"$sort": {"weekly_votes": -1}},
+            {"$limit": limit}
+        ]
+        vote_data = {doc["_id"]: doc["weekly_votes"] async for doc in db.votes.aggregate(pipeline)}
+        contestant_ids = list(vote_data.keys())
+        contestants = await db.contestants.find(
+            {"id": {"$in": contestant_ids}, "status": "approved"},
+            {"_id": 0}
+        ).to_list(limit)
+        for c in contestants:
+            c["weekly_votes"] = vote_data.get(c["id"], 0)
+        contestants.sort(key=lambda x: x.get("weekly_votes", 0), reverse=True)
+    
+    # Add rank to each contestant
+    for i, c in enumerate(contestants):
+        c["rank"] = i + 1
+    
+    return {
+        "filter_type": filter_type,
+        "contestants": contestants,
+        "total": len(contestants)
+    }
+
+# ============ ANALYTICS API ENDPOINTS ============
+
+@api_router.get("/admin/analytics")
+async def get_analytics_dashboard(
+    days: int = Query(30, le=365),
+    admin: dict = Depends(require_admin)
+):
+    """Get comprehensive analytics dashboard data"""
+    return await analytics.get_dashboard_stats(days)
+
+@api_router.post("/analytics/pageview")
+async def track_pageview(request: Request, page: str = Query(...)):
+    """Track a page view (called from frontend)"""
+    await analytics.track_page_view(request, page)
+    return {"success": True}
+
+# ============ GLOBAL SEARCH SYSTEM ============
+
+@api_router.get("/search")
+async def global_search(
+    q: str = Query(..., min_length=2),
+    search_type: str = Query("all", enum=["all", "name", "category", "country"]),
+    limit: int = Query(20, le=100)
+):
+    """Global search for contestants"""
+    query = {"status": "approved"}
+    
+    if search_type == "all":
+        query["$or"] = [
+            {"full_name": {"$regex": q, "$options": "i"}},
+            {"location": {"$regex": q, "$options": "i"}},
+            {"bio": {"$regex": q, "$options": "i"}}
+        ]
+    elif search_type == "name":
+        query["full_name"] = {"$regex": q, "$options": "i"}
+    elif search_type == "country":
+        query["location"] = {"$regex": q, "$options": "i"}
+    elif search_type == "category":
+        # First find category by name
+        category = await db.categories.find_one({"name": {"$regex": q, "$options": "i"}})
+        if category:
+            query["category_id"] = category["id"]
+        else:
+            return {"results": [], "total": 0, "query": q}
+    
+    results = await db.contestants.find(query, {"_id": 0}).limit(limit).to_list(limit)
+    
+    return {
+        "results": results,
+        "total": len(results),
+        "query": q,
+        "search_type": search_type
+    }
+
+# ============ CONTEST TIMELINE SYSTEM ============
+
+@api_router.get("/contest/timeline")
+async def get_contest_timeline():
+    """Get contest timeline with phases"""
+    rounds = await db.rounds.find({}, {"_id": 0}).sort("order", 1).to_list(100)
+    
+    # Add status based on dates
+    now = datetime.now(timezone.utc).isoformat()
+    timeline = []
+    
+    for round_data in rounds:
+        status = "upcoming"
+        if round_data.get("start_date") and round_data["start_date"] <= now:
+            status = "active" if not round_data.get("end_date") or round_data["end_date"] > now else "completed"
+        
+        timeline.append({
+            **round_data,
+            "status": status
+        })
+    
+    # Get current active round
+    active_round = next((r for r in timeline if r["status"] == "active"), None)
+    
+    return {
+        "timeline": timeline,
+        "active_round": active_round
+    }
+
+# ============ FRAUD RISK SCORE SYSTEM ============
+
+@api_router.get("/admin/fraud-analysis/{contestant_id}")
+async def get_contestant_fraud_analysis(contestant_id: str, admin: dict = Depends(require_admin)):
+    """Get fraud risk analysis for a contestant"""
+    
+    # Get all votes for this contestant
+    votes = await db.votes.find({"contestant_id": contestant_id}, {"_id": 0}).to_list(10000)
+    
+    # Analyze IP patterns
+    ip_counts = defaultdict(int)
+    email_domains = defaultdict(int)
+    vote_times = []
+    
+    for vote in votes:
+        if "ip" in vote:
+            ip_counts[vote["ip"]] += 1
+        if "email" in vote:
+            domain = vote["email"].split("@")[-1]
+            email_domains[domain] += 1
+        if "created_at" in vote:
+            vote_times.append(vote["created_at"])
+    
+    # Calculate risk factors
+    risk_score = 0
+    risk_factors = []
+    
+    # High concentration from single IP
+    max_ip_votes = max(ip_counts.values()) if ip_counts else 0
+    total_votes = len(votes)
+    if total_votes > 10 and max_ip_votes > total_votes * 0.3:
+        risk_score += 30
+        risk_factors.append(f"High IP concentration: {max_ip_votes} votes from single IP")
+    
+    # Suspicious email domains
+    suspicious_domain_votes = sum(
+        count for domain, count in email_domains.items() 
+        if any(x in domain.lower() for x in ['temp', 'fake', 'throw', 'disposable'])
+    )
+    if suspicious_domain_votes > total_votes * 0.1:
+        risk_score += 25
+        risk_factors.append(f"Suspicious email domains: {suspicious_domain_votes} votes")
+    
+    # Velocity analysis (votes too close together)
+    if len(vote_times) > 5:
+        sorted_times = sorted(vote_times)
+        short_intervals = 0
+        for i in range(1, len(sorted_times)):
+            try:
+                t1 = datetime.fromisoformat(sorted_times[i-1].replace('Z', '+00:00'))
+                t2 = datetime.fromisoformat(sorted_times[i].replace('Z', '+00:00'))
+                if (t2 - t1).total_seconds() < 10:
+                    short_intervals += 1
+            except:
+                pass
+        if short_intervals > len(vote_times) * 0.2:
+            risk_score += 25
+            risk_factors.append(f"Suspicious velocity: {short_intervals} rapid votes")
+    
+    # Many unique IPs with single vote each (potential bot farm)
+    single_vote_ips = sum(1 for count in ip_counts.values() if count == 1)
+    if total_votes > 50 and single_vote_ips > total_votes * 0.8:
+        risk_score += 20
+        risk_factors.append(f"Potential bot farm: {single_vote_ips} single-vote IPs")
+    
+    risk_level = "low" if risk_score < 30 else "medium" if risk_score < 60 else "high"
+    
+    return {
+        "contestant_id": contestant_id,
+        "total_votes": total_votes,
+        "risk_score": min(risk_score, 100),
+        "risk_level": risk_level,
+        "risk_factors": risk_factors,
+        "ip_analysis": {
+            "unique_ips": len(ip_counts),
+            "max_votes_per_ip": max_ip_votes,
+            "top_ips": sorted(ip_counts.items(), key=lambda x: -x[1])[:10]
+        },
+        "email_analysis": {
+            "unique_domains": len(email_domains),
+            "top_domains": sorted(email_domains.items(), key=lambda x: -x[1])[:10]
+        }
+    }
+
 # ============ HEALTH CHECK ============
 
 @api_router.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "glowing-star-contest-api", "features": ["stripe", "websocket", "fraud-detection", "email-templates"]}
+    return {
+        "status": "healthy", 
+        "service": "glowing-star-contest-api", 
+        "features": [
+            "stripe", 
+            "websocket", 
+            "fraud-detection", 
+            "email-templates",
+            "rate-limiting",
+            "analytics",
+            "device-fingerprinting",
+            "contestant-badges",
+            "advanced-leaderboard",
+            "global-search"
+        ]
+    }
 
 # Include the router
 app.include_router(api_router)
