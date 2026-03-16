@@ -159,7 +159,10 @@ function App() {
           <Route path="/register" element={<Navigate to="/portal/register" replace />} />
           <Route path="/dashboard" element={<Navigate to="/portal/dashboard" replace />} />
           <Route path="/admin" element={<Navigate to="/portal/admin" replace />} />
-          <Route path="/backbone" element={<Navigate to="/portal/admin" replace />} />
+          <Route path="/backbone" element={<Navigate to="/portal/login" replace />} />
+          <Route path="/backend" element={<Navigate to="/portal/login" replace />} />
+          <Route path="/control" element={<Navigate to="/portal/login" replace />} />
+          <Route path="/manage" element={<Navigate to="/portal/login" replace />} />
           
           {/* Catch all - redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
