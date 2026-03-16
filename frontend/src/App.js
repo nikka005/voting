@@ -4,7 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from './components/ui/sonner';
 
 // ===============================================================
-// DOMAIN 1: PUBLIC VOTING WEBSITE
+// DOMAIN 1: PUBLIC VOTING WEBSITE (glowingstar.vote)
 // Routes: /, /contestants, /leaderboard, /:year/:slug, /payment/*
 // ===============================================================
 import HomePage from './pages/HomePage';
@@ -14,9 +14,10 @@ import VotingPage from './pages/VotingPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 
 // ===============================================================
-// DOMAIN 2: MANAGEMENT PORTAL
-// Routes: /portal, /portal/admin/*, /portal/dashboard/*
+// DOMAIN 2: USER SITE / CONTESTANT PORTAL (glowingstar.net)
+// Routes: /join, /portal, /portal/admin/*, /portal/dashboard/*
 // ===============================================================
+import UserSiteLanding from './pages/UserSiteLanding';
 import PortalHome from './pages/portal/PortalHome';
 import PortalLogin from './pages/portal/PortalLogin';
 import PortalRegister from './pages/portal/PortalRegister';
