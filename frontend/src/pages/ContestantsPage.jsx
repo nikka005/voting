@@ -390,7 +390,7 @@ function ContestantCard({ contestant, rank }) {
 // List Item Component
 function ContestantListItem({ contestant, rank }) {
   return (
-    <Link to={`/${contestant.slug}`} className="block">
+    <Link to={`/2026/${contestant.slug}`} className="block">
       <div className="flex items-center gap-4 p-4 bg-white rounded-2xl shadow hover:shadow-lg transition-all hover:-translate-y-0.5">
         {/* Rank */}
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold flex-shrink-0 ${
