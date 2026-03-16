@@ -334,7 +334,7 @@ export default function ContestantsPage() {
 // Grid Card Component
 function ContestantCard({ contestant, rank }) {
   return (
-    <Link to={`/${contestant.slug}`} className="group">
+    <Link to={`/2026/${contestant.slug}`} className="group">
       <div className="relative rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">
         <div className="aspect-[3/4] overflow-hidden">
           <img 
