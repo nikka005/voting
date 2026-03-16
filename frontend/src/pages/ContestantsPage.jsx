@@ -107,7 +107,7 @@ export default function ContestantsPage() {
       <Layout>
         <div className="min-h-[60vh] flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="w-10 h-10 text-pink-500 animate-spin mx-auto mb-4" />
+            <Loader2 className="w-10 h-10 text-amber-500 animate-spin mx-auto mb-4" />
             <p className="text-slate-500">Loading contestants...</p>
           </div>
         </div>
@@ -118,17 +118,17 @@ export default function ContestantsPage() {
   return (
     <Layout>
       {/* Header */}
-      <section className="bg-gradient-to-br from-slate-50 via-pink-50/30 to-violet-50/30 border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
+      <section className="bg-gradient-to-br from-slate-50 via-amber-50/30 to-orange-50/30 border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-8 sm:py-12 md:py-16">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500/10 to-violet-500/10 border border-pink-200 mb-6">
-              <Star className="w-4 h-4 text-pink-500" />
-              <span className="text-sm font-semibold text-pink-600">{filteredContestants.length} Contestants</span>
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-200 mb-4 sm:mb-6">
+              <Star className="w-3 h-3 sm:w-4 sm:h-4 text-amber-500 fill-amber-500" />
+              <span className="text-xs sm:text-sm font-semibold text-amber-600">{filteredContestants.length} Contestants</span>
             </div>
-            <h1 className="font-syne text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              Browse <span className="gradient-text">Contestants</span>
+            <h1 className="font-syne text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-3 sm:mb-4">
+              Browse <span className="gradient-text-gold">Contestants</span>
             </h1>
-            <p className="text-lg text-slate-600">
+            <p className="text-sm sm:text-base md:text-lg text-slate-600">
               Discover amazing talents and cast your vote for your favorites
             </p>
           </div>
@@ -136,17 +136,17 @@ export default function ContestantsPage() {
       </section>
 
       {/* Filters Bar */}
-      <section className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
+      <section className="sticky top-14 sm:top-16 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-3 sm:gap-4">
             {/* Search */}
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
               <Input
-                placeholder="Search by name or location..."
+                placeholder="Search by name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 rounded-xl bg-slate-50 border-slate-200 focus:border-pink-300 focus:ring-pink-200"
+                className="pl-10 sm:pl-12 h-10 sm:h-12 rounded-xl bg-slate-50 border-slate-200 focus:border-amber-300 focus:ring-amber-200 text-sm sm:text-base"
               />
               {searchQuery && (
                 <button
