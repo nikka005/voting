@@ -128,8 +128,8 @@ export default function HomePage() {
                 </div>
                 <div className="w-px h-8 sm:h-12 bg-slate-200" />
                 <div className="text-center">
-                  <p className="font-syne text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">$10K</p>
-                  <p className="text-xs sm:text-sm text-slate-500">Grand Prize</p>
+                  <p className="font-syne text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">$35K</p>
+                  <p className="text-xs sm:text-sm text-slate-500">Prize Pool</p>
                 </div>
               </div>
             </div>
