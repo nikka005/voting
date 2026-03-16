@@ -361,6 +361,11 @@ export default function AdminPanel() {
             />
           )}
 
+          {/* ============ HOW IT WORKS / GUIDE SECTION ============ */}
+          {activeSection === 'guide' && (
+            <AdminGuideSection />
+          )}
+
           {/* ============ CONTESTS SECTION ============ */}
           {activeSection === 'contests' && (
             <ContestsSection
