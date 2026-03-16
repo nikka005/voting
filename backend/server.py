@@ -37,7 +37,7 @@ JWT_EXPIRATION_HOURS = 24
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
 
 # Create the main app
-app = FastAPI(title="Glamour - Premium Beauty Contest Platform")
+app = FastAPI(title="Glowing Star - Premium Beauty Contest Platform")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
