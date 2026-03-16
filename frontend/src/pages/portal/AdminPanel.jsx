@@ -77,8 +77,8 @@ export default function AdminPanel() {
       setDashboardStats(dashboardRes.data);
       setCategories(categoriesRes.data);
       setRounds(roundsRes.data);
-      setVotes(votesRes.data);
-      setPayments(paymentsRes.data);
+      setVotes(votesRes.data?.votes || votesRes.data || []);
+      setPayments(paymentsRes.data?.payments || paymentsRes.data || []);
     } catch (error) {
       console.error('Failed to fetch admin data:', error);
       toast.error('Failed to load dashboard data');
