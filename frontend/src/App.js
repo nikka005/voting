@@ -74,18 +74,37 @@ const AuthRoute = ({ children }) => {
 // MAIN APP COMPONENT
 // ===============================================================
 
+// Smart Home Router - Shows different pages based on domain
+function SmartHome() {
+  const hostname = window.location.hostname;
+  
+  // If on user site domain (glowingstar.net), show landing page
+  if (hostname.includes('glowingstar.net') || hostname.includes('.net')) {
+    return <UserSiteLanding />;
+  }
+  
+  // Otherwise show voting homepage (glowingstar.vote)
+  return <HomePage />;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
           {/* ============================================
+              SMART HOME ROUTING
+              glowingstar.vote -> Voting HomePage
+              glowingstar.net -> User Site Landing
+              ============================================ */}
+          
+          {/* Homepage - Smart routing based on domain */}
+          <Route path="/" element={<SmartHome />} />
+          
+          {/* ============================================
               DOMAIN 1: PUBLIC VOTING WEBSITE
               Accessible to all visitors without login
               ============================================ */}
-          
-          {/* Homepage - Contest overview */}
-          <Route path="/" element={<HomePage />} />
           
           {/* Contestants - Browse all contestants */}
           <Route path="/contestants" element={<ContestantsPage />} />
