@@ -916,7 +916,7 @@ function AdminGuideSection() {
 // ============ DASHBOARD SECTION ============
 function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, payments }) {
   const activeRound = rounds?.find(r => r.is_active);
-  const todayVotes = dashboardStats?.votes_today || votes?.filter(v => {
+  const todayVotes = dashboardStats?.votes?.total || votes?.filter(v => {
     const voteDate = new Date(v.created_at).toDateString();
     return voteDate === new Date().toDateString();
   }).length || 0;
@@ -927,7 +927,7 @@ function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, p
     .slice(0, 5);
 
   // Get contest info from dashboardStats
-  const activeContest = dashboardStats?.active_contest;
+  const contestInfo = dashboardStats?.contest;
   const contestantStats = dashboardStats?.contestants || {};
   const paymentStats = dashboardStats?.payments || {};
 
@@ -946,8 +946,8 @@ function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, p
         <StatCard 
           icon={Heart} 
           label="Total Votes" 
-          value={dashboardStats?.total_votes || stats?.total_votes || 0}
-          trend={`${todayVotes} today`}
+          value={dashboardStats?.votes?.total || stats?.total_votes || 0}
+          trend={`${dashboardStats?.votes?.paid || 0} paid`}
           trendUp={true}
           gradient="from-violet-500 to-purple-500"
         />
@@ -955,7 +955,7 @@ function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, p
           icon={Zap} 
           label="Revenue" 
           value={`$${((paymentStats.total_revenue || 0) / 100).toFixed(0)}`}
-          trend={`${paymentStats.successful || 0} payments`}
+          trend={`$${((paymentStats.entry_fees_total || 0) / 100).toFixed(0)} entry fees`}
           trendUp={true}
           gradient="from-cyan-500 to-blue-500"
         />
@@ -970,7 +970,7 @@ function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, p
       </div>
 
       {/* Active Contest Banner */}
-      {activeContest && (
+      {contestInfo?.active && (
         <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
@@ -979,25 +979,21 @@ function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, p
               </div>
               <div>
                 <p className="text-sm text-amber-400 font-medium">Active Contest</p>
-                <h3 className="text-xl font-bold">{activeContest.name}</h3>
+                <h3 className="text-xl font-bold">{contestInfo.name}</h3>
                 <p className="text-xs text-slate-400">
-                  {activeContest.current_participants || 0} / {activeContest.max_participants || '∞'} slots filled
+                  {contestInfo.slots_filled || 0} / {contestInfo.max_slots || '∞'} slots filled
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-2xl font-bold text-amber-400">${activeContest.entry_fee || 0}</p>
-                <p className="text-xs text-slate-500">Entry Fee</p>
-              </div>
               <span className={`px-3 py-1 text-xs font-bold rounded-full border ${
-                activeContest.status === 'voting' 
+                contestInfo.status === 'voting' 
                   ? 'bg-green-500/20 text-green-400 border-green-500/20' 
-                  : activeContest.status === 'registration'
+                  : contestInfo.status === 'registration'
                   ? 'bg-blue-500/20 text-blue-400 border-blue-500/20'
                   : 'bg-slate-500/20 text-slate-400 border-slate-500/20'
               }`}>
-                {activeContest.status?.toUpperCase() || 'DRAFT'}
+                {contestInfo.status?.toUpperCase() || 'DRAFT'}
               </span>
             </div>
           </div>
@@ -1087,10 +1083,10 @@ function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, p
               <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    payment.status === 'completed' ? 'bg-green-500/20' : 
+                    payment.status === 'completed' || payment.payment_status === 'completed' ? 'bg-green-500/20' : 
                     payment.status === 'pending' ? 'bg-yellow-500/20' : 'bg-red-500/20'
                   }`}>
-                    {payment.status === 'completed' ? (
+                    {payment.status === 'completed' || payment.payment_status === 'completed' ? (
                       <CheckCircle2 className="w-4 h-4 text-green-400" />
                     ) : payment.status === 'pending' ? (
                       <Clock className="w-4 h-4 text-yellow-400" />
@@ -1099,8 +1095,8 @@ function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, p
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium">{payment.user_email || 'Unknown'}</p>
-                    <p className="text-xs text-slate-500">{payment.type || 'vote_package'}</p>
+                    <p className="text-sm font-medium">{payment.user_email || payment.email || 'Unknown'}</p>
+                    <p className="text-xs text-slate-500">{payment.payment_type || payment.type || 'Payment'}</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -1122,14 +1118,14 @@ function DashboardSection({ stats, dashboardStats, contestants, votes, rounds, p
               <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    vote.type === 'paid' ? 'bg-amber-500/20' : 'bg-pink-500/20'
+                    vote.vote_type === 'paid' ? 'bg-amber-500/20' : 'bg-pink-500/20'
                   }`}>
-                    <Heart className={`w-4 h-4 ${vote.type === 'paid' ? 'text-amber-400' : 'text-pink-400'}`} />
+                    <Heart className={`w-4 h-4 ${vote.vote_type === 'paid' ? 'text-amber-400' : 'text-pink-400'}`} />
                   </div>
                   <div>
                     <p className="text-sm font-medium">{vote.email}</p>
                     <p className="text-xs text-slate-500">
-                      {vote.type === 'paid' ? '💰 Paid vote' : 'Free vote'}
+                      {vote.vote_type === 'paid' ? '💰 Paid vote' : 'Free vote'}
                     </p>
                   </div>
                 </div>
