@@ -101,6 +101,34 @@ export default function AdminPanel() {
     if (isAdmin) fetchContestants();
   }, [isAdmin, statusFilter, searchQuery, fetchContestants]);
 
+  // Handle real-time vote updates
+  useEffect(() => {
+    if (lastVoteUpdate) {
+      // Update stats
+      setStats(prev => prev ? {
+        ...prev,
+        total_votes: (prev.total_votes || 0) + 1
+      } : prev);
+      
+      // Update contestants vote count
+      setContestants(prev => prev.map(c => 
+        c.id === lastVoteUpdate.contestant_id 
+          ? { ...c, vote_count: lastVoteUpdate.vote_count }
+          : c
+      ));
+      
+      // Add to recent votes
+      setVotes(prev => [{
+        id: `live-${Date.now()}`,
+        contestant_id: lastVoteUpdate.contestant_id,
+        contestant_name: lastVoteUpdate.contestant_name,
+        email: 'Live vote',
+        type: lastVoteUpdate.vote_type || 'free',
+        timestamp: new Date().toISOString()
+      }, ...prev.slice(0, 49)]);
+    }
+  }, [lastVoteUpdate]);
+
   // Category handlers
   const handleCategorySubmit = async (e) => {
     e.preventDefault();
