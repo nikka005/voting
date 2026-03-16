@@ -361,9 +361,11 @@ export default function AdminPanel() {
           {activeSection === 'dashboard' && (
             <DashboardSection 
               stats={stats} 
+              dashboardStats={dashboardStats}
               contestants={contestants} 
               votes={votes}
               rounds={rounds}
+              payments={payments}
             />
           )}
 
