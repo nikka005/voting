@@ -1347,7 +1347,7 @@ function SettingsSection() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label className="text-slate-300">Contest Name</Label>
-                <Input defaultValue="Glamour Beauty Contest 2026" className="bg-white/5 border-white/10 text-white mt-1" />
+                <Input defaultValue="Glowing Star Contest 2026" className="bg-white/5 border-white/10 text-white mt-1" />
               </div>
               <div>
                 <Label className="text-slate-300">Contest Year</Label>
