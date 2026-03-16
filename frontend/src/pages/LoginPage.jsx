@@ -54,7 +54,7 @@ export default function LoginPage() {
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center shadow-lg shadow-pink-500/30">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
-                <span className="font-syne text-2xl font-bold gradient-text-pink">Glamour</span>
+                <span className="font-syne text-2xl font-bold gradient-text-gold">Glowing Star</span>
               </Link>
               <h1 className="font-syne text-2xl font-bold text-slate-900 mb-2">Welcome Back</h1>
               <p className="text-slate-500">Sign in to your account</p>

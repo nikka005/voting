@@ -119,8 +119,8 @@ export default function VotingPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Vote for ${contestant.full_name} - Glamour Contest`,
-          text: `Support ${contestant.full_name} in the Glamour Beauty Contest!`,
+          title: `Vote for ${contestant.full_name} - Glowing Star Contest`,
+          text: `Support ${contestant.full_name} in the Glowing Star Contest!`,
           url,
         });
       } catch (error) {

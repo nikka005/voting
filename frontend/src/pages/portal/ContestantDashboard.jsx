@@ -218,7 +218,7 @@ export default function ContestantDashboard() {
 
   const shareToSocial = (platform) => {
     const link = `${window.location.origin}/${profile?.slug}`;
-    const text = `Vote for ${profile?.full_name} in the Glamour Beauty Contest!`;
+    const text = `Vote for ${profile?.full_name} in the Glowing Star Contest!`;
     const urls = {
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`,
       twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`,
@@ -285,7 +285,7 @@ export default function ContestantDashboard() {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="font-syne font-bold text-lg text-slate-900">Glamour</h1>
+              <h1 className="font-syne font-bold text-lg text-slate-900">Glowing Star</h1>
               <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gradient-to-r from-pink-100 to-violet-100 text-pink-600">
                 CONTESTANT
               </span>
@@ -357,7 +357,7 @@ export default function ContestantDashboard() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-violet-600 flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="font-syne font-bold text-slate-900">Glamour</span>
+            <span className="font-syne font-bold text-slate-900">Glowing Star</span>
           </Link>
           <div className="flex items-center gap-2">
             <button
