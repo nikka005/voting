@@ -190,11 +190,7 @@ export default function PortalLogin() {
               </p>
             </div>
 
-            {/* Demo Credentials */}
-            <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <p className="text-amber-400 text-xs font-semibold mb-2">Demo Credentials:</p>
-              <p className="text-amber-300/70 text-xs">Admin: admin@glowingstar.net / admin123</p>
-            </div>
+            {/* Demo Credentials - Removed for production */}
           </div>
 
           {/* Back to Voting Site */}
