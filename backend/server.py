@@ -2543,6 +2543,93 @@ async def update_contest_settings(settings: ContestSettings, admin: dict = Depen
     updated = await db.contest_settings.find_one({"active": True}, {"_id": 0})
     return {"success": True, "message": "Contest settings updated", "settings": updated}
 
+# ============ PROMOTIONAL BANNER SYSTEM ============
+
+class PromoBanner(BaseModel):
+    title: str
+    subtitle: Optional[str] = None
+    description: Optional[str] = None
+    image_url: Optional[str] = None
+    button_text: Optional[str] = "Learn More"
+    button_link: Optional[str] = "/portal/register"
+    background_gradient: Optional[str] = "from-amber-500 via-orange-500 to-pink-500"
+    is_active: bool = True
+    display_type: str = "popup"  # popup, banner, fullscreen
+    show_on_pages: List[str] = ["home"]
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    priority: int = 1
+
+@api_router.get("/banners/active")
+async def get_active_banners():
+    """Get all active promotional banners for public display"""
+    now = datetime.now(timezone.utc).isoformat()
+    banners = await db.promo_banners.find(
+        {"is_active": True},
+        {"_id": 0}
+    ).sort("priority", -1).to_list(10)
+    return banners
+
+@api_router.get("/admin/banners")
+async def get_all_banners(admin: dict = Depends(require_admin)):
+    """Get all banners for admin management"""
+    banners = await db.promo_banners.find({}, {"_id": 0}).sort("created_at", -1).to_list(50)
+    return banners
+
+@api_router.post("/admin/banners")
+async def create_banner(banner: PromoBanner, admin: dict = Depends(require_admin)):
+    """Create a new promotional banner"""
+    banner_dict = banner.dict()
+    banner_dict["id"] = str(uuid.uuid4())
+    banner_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    banner_dict["created_by"] = admin.get("email", "admin")
+    
+    await db.promo_banners.insert_one(banner_dict)
+    banner_dict.pop("_id", None)
+    
+    return {"success": True, "message": "Banner created successfully", "banner": banner_dict}
+
+@api_router.put("/admin/banners/{banner_id}")
+async def update_banner(banner_id: str, banner: PromoBanner, admin: dict = Depends(require_admin)):
+    """Update an existing banner"""
+    banner_dict = banner.dict()
+    banner_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    banner_dict["updated_by"] = admin.get("email", "admin")
+    
+    result = await db.promo_banners.update_one(
+        {"id": banner_id},
+        {"$set": banner_dict}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    
+    updated = await db.promo_banners.find_one({"id": banner_id}, {"_id": 0})
+    return {"success": True, "message": "Banner updated", "banner": updated}
+
+@api_router.delete("/admin/banners/{banner_id}")
+async def delete_banner(banner_id: str, admin: dict = Depends(require_admin)):
+    """Delete a banner"""
+    result = await db.promo_banners.delete_one({"id": banner_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    return {"success": True, "message": "Banner deleted"}
+
+@api_router.post("/admin/banners/{banner_id}/toggle")
+async def toggle_banner(banner_id: str, admin: dict = Depends(require_admin)):
+    """Toggle banner active status"""
+    banner = await db.promo_banners.find_one({"id": banner_id})
+    if not banner:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    
+    new_status = not banner.get("is_active", True)
+    await db.promo_banners.update_one(
+        {"id": banner_id},
+        {"$set": {"is_active": new_status, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"success": True, "is_active": new_status}
+
 # ============ COMPETITION MANAGEMENT SYSTEM ============
 
 class CompetitionPhase(BaseModel):
