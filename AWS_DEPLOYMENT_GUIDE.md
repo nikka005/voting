@@ -440,20 +440,56 @@ CMD ["nginx", "-g", "daemon off;"]
 ## 📦 Required Python Packages (requirements.txt)
 
 ```txt
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-motor==3.3.2
-pymongo==4.6.1
-python-jose[cryptography]==3.3.0
+# Glowing Star - Backend Requirements
+# For AWS Deployment
+
+# Core Framework
+fastapi==0.110.1
+uvicorn[standard]==0.25.0
+starlette==0.37.2
+
+# Database
+motor==3.3.1
+pymongo==4.5.0
+
+# Authentication
+python-jose[cryptography]==3.5.0
 passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
-pydantic==2.5.3
-stripe==7.12.0
-sendgrid==6.11.0
-websockets==12.0
-python-dotenv==1.0.0
-httpx==0.26.0
+PyJWT==2.11.0
+bcrypt==4.1.3
+
+# Validation & Parsing
+pydantic==2.12.5
+python-multipart==0.0.22
+email-validator==2.3.0
+
+# HTTP Client
+httpx==0.28.1
+requests==2.32.5
+
+# Payments
+stripe==14.4.0
+
+# Email
+sendgrid==6.12.5
+python-http-client==3.3.7
+
+# WebSockets
+websockets==16.0
+
+# Environment
+python-dotenv==1.2.1
+
+# Utilities
+cryptography==46.0.5
+python-dateutil==2.9.0.post0
+
+# Async Support
+anyio==4.12.1
+sniffio==1.3.1
 ```
+
+> ⚠️ **Note**: This project does NOT require `emergentintegrations`. All dependencies are standard open-source packages available on PyPI.
 
 ---
 
