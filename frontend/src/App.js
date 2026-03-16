@@ -132,6 +132,16 @@ function App() {
             } 
           />
           
+          {/* Admin Secret Login */}
+          <Route 
+            path="/backbon/admin-login" 
+            element={
+              <AuthRoute>
+                <AdminLogin />
+              </AuthRoute>
+            } 
+          />
+          
           {/* Admin Panel */}
           <Route
             path="/portal/admin"
