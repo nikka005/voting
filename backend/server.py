@@ -637,6 +637,62 @@ VOTE_PACKAGES = {
     "ultimate": VotePackage(id="ultimate", name="Ultimate Pack", votes=250, price=75.00, popular=False),
 }
 
+# ============ CONTEST MANAGEMENT MODELS ============
+
+class ContestCreate(BaseModel):
+    name: str
+    description: Optional[str] = ""
+    entry_fee: float = 50.0
+    max_participants: int = 100
+    start_date: str
+    end_date: str
+    registration_deadline: Optional[str] = None
+    voting_start_date: Optional[str] = None
+    voting_end_date: Optional[str] = None
+    prize_pool: float = 35000.0
+    categories: Optional[List[str]] = []
+    status: str = "draft"  # draft, registration, voting, completed
+    rules: Optional[str] = ""
+
+class ContestResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    name: str
+    description: str
+    entry_fee: float
+    max_participants: int
+    current_participants: int
+    start_date: str
+    end_date: str
+    registration_deadline: Optional[str]
+    voting_start_date: Optional[str]
+    voting_end_date: Optional[str]
+    prize_pool: float
+    status: str
+    is_voting_active: bool
+    created_at: str
+
+class EntryFeePayment(BaseModel):
+    contest_id: str
+    origin_url: str
+
+class PaymentTransactionResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    user_id: str
+    contestant_id: Optional[str]
+    contestant_name: Optional[str]
+    payment_type: str  # entry_fee, vote_package
+    amount: float
+    status: str  # pending, completed, failed, refunded
+    stripe_session_id: Optional[str]
+    created_at: str
+    completed_at: Optional[str]
+
+class RefundRequest(BaseModel):
+    transaction_id: str
+    reason: Optional[str] = ""
+
 # ============ HELPER FUNCTIONS ============
 
 def generate_slug(name: str, year: int = 2026) -> str:
