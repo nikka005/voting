@@ -9,7 +9,7 @@ import { formatNumber, getPlaceholderImage } from '../lib/utils';
 import { 
   Search, Heart, Filter, SlidersHorizontal, Grid, List,
   ChevronDown, Loader2, Trophy, TrendingUp, Clock, Star,
-  MapPin, Crown, X, Sparkles
+  MapPin, Crown, X
 } from 'lucide-react';
 
 export default function ContestantsPage() {
