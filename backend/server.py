@@ -2391,6 +2391,87 @@ async def health_check():
         ]
     }
 
+# ============ CONTEST SETTINGS SYSTEM ============
+
+class ContestSettings(BaseModel):
+    contest_name: str = "Glowing Star Beauty Contest"
+    contest_tagline: Optional[str] = "Vote for Your Favorite Star"
+    contest_description: Optional[str] = None
+    contest_rules: Optional[str] = None
+    prize_pool: float = 35000
+    prize_distribution: Optional[List[dict]] = None
+    max_participants: int = 100
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    banner_image: Optional[str] = None
+    logo_image: Optional[str] = None
+    status: str = "active"  # draft, active, completed
+
+@api_router.get("/contest/settings")
+async def get_contest_settings():
+    """Get current contest settings"""
+    settings = await db.contest_settings.find_one({"active": True}, {"_id": 0})
+    if not settings:
+        # Return default settings
+        return {
+            "contest_name": "Glowing Star Beauty Contest 2026",
+            "contest_tagline": "Vote for Your Favorite Star",
+            "contest_description": "Join the world's most prestigious online beauty contest. Showcase your beauty, gain followers, and compete for amazing prizes!",
+            "contest_rules": "",
+            "prize_pool": 35000,
+            "prize_distribution": [
+                {"position": 1, "title": "Grand Winner", "amount": 15000, "description": "$15,000 Cash Prize + Magazine Feature + Brand Partnerships"},
+                {"position": 2, "title": "1st Runner Up", "amount": 8000, "description": "$8,000 Cash Prize + Professional Photo Shoot"},
+                {"position": 3, "title": "2nd Runner Up", "amount": 5000, "description": "$5,000 Cash Prize + Modeling Contract Opportunity"},
+                {"position": 4, "title": "3rd Runner Up", "amount": 4000, "description": "$4,000 Cash Prize + Beauty Product Package"},
+                {"position": 5, "title": "4th Runner Up", "amount": 3000, "description": "$3,000 Cash Prize + Gift Package"}
+            ],
+            "max_participants": 100,
+            "status": "active",
+            "active": True
+        }
+    return settings
+
+@api_router.post("/admin/contest/settings")
+async def create_contest_settings(settings: ContestSettings, admin: dict = Depends(require_admin)):
+    """Create or update contest settings"""
+    settings_dict = settings.dict()
+    settings_dict["active"] = True
+    settings_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    settings_dict["updated_by"] = admin.get("email", "admin")
+    
+    # Deactivate any existing settings
+    await db.contest_settings.update_many({}, {"$set": {"active": False}})
+    
+    # Create new settings
+    settings_dict["id"] = str(uuid.uuid4())
+    settings_dict["created_at"] = datetime.now(timezone.utc).isoformat()
+    await db.contest_settings.insert_one(settings_dict)
+    
+    # Remove _id before returning
+    settings_dict.pop("_id", None)
+    
+    return {"success": True, "message": "Contest settings saved", "settings": settings_dict}
+
+@api_router.put("/admin/contest/settings")
+async def update_contest_settings(settings: ContestSettings, admin: dict = Depends(require_admin)):
+    """Update existing contest settings"""
+    existing = await db.contest_settings.find_one({"active": True})
+    if not existing:
+        return await create_contest_settings(settings, admin)
+    
+    settings_dict = settings.dict()
+    settings_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    settings_dict["updated_by"] = admin.get("email", "admin")
+    
+    await db.contest_settings.update_one(
+        {"active": True},
+        {"$set": settings_dict}
+    )
+    
+    updated = await db.contest_settings.find_one({"active": True}, {"_id": 0})
+    return {"success": True, "message": "Contest settings updated", "settings": updated}
+
 # ============ COMPETITION MANAGEMENT SYSTEM ============
 
 class CompetitionPhase(BaseModel):
