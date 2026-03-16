@@ -67,12 +67,15 @@
 
 /* Gradient buttons */
 .btn-gradient {
-    @apply bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-600 hover:to-violet-700 text-white font-semibold rounded-full shadow-lg shadow-pink-500/20 transition-all duration-200;
+    @apply bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-full shadow-lg shadow-amber-500/20 transition-all duration-200;
 }
 .btn-gradient:hover { transform: scale(1.02); }
 .btn-gradient:active { transform: scale(0.98); }
 .btn-jelly { transition: transform 0.15s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
 .btn-jelly:active { transform: scale(0.95); }
+
+/* Shadow utilities */
+.shadow-gold-lg { box-shadow: 0 10px 40px -10px rgba(245, 158, 11, 0.3); }
 
 /* Card hover */
 .card-hover { @apply transition-all duration-300; }
