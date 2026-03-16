@@ -9,11 +9,9 @@ import {
   Trophy, 
   Users, 
   Home, 
-  User,
+  Heart,
   LogOut,
-  LayoutDashboard,
-  Settings,
-  ExternalLink
+  LayoutDashboard
 } from 'lucide-react';
 
 // ===== PUBLIC HEADER (Voting Site - glowingstar.vote) =====
