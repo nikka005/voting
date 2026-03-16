@@ -246,6 +246,7 @@ export default function AdminPanel() {
   // Navigation items
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+    { id: 'guide', label: 'How It Works', icon: HelpCircle },
     { id: 'contests', label: 'Contests', icon: Trophy },
     { id: 'contestants', label: 'Contestants', icon: Users },
     { id: 'banners', label: 'Promotions', icon: Megaphone },
