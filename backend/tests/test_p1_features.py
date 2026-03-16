@@ -144,13 +144,13 @@ class TestPaymentManagementAPI:
         assert "totals" in data, "No totals key in response"
         assert "counts" in data, "No counts key in response"
         
-        # Verify totals structure
+        # Verify totals structure - API returns entry_fees, vote_packages, total
         totals = data["totals"]
-        assert "total_revenue" in totals, "No total_revenue in totals"
         assert "entry_fees" in totals, "No entry_fees in totals"
         assert "vote_packages" in totals, "No vote_packages in totals"
+        assert "total" in totals, "No total in totals"
         
-        print(f"Total Revenue: ${totals.get('total_revenue', 0) / 100}")
+        print(f"Total Revenue: ${totals.get('total', 0) / 100}")
         print(f"Entry Fees: ${totals.get('entry_fees', 0) / 100}")
         print(f"Vote Packages: ${totals.get('vote_packages', 0) / 100}")
         print(f"Total Transactions: {len(data['payments'])}")
