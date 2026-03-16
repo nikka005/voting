@@ -2410,7 +2410,36 @@ function MediaSection({ contestants }) {
 
 // ============ SECURITY SECTION ============
 function SecuritySection({ votes }) {
+  const [blockedIPs, setBlockedIPs] = useState([]);
+  const [blockedEmails, setBlockedEmails] = useState([]);
+  const [newBlockIP, setNewBlockIP] = useState('');
+  const [newBlockEmail, setNewBlockEmail] = useState('');
   const uniqueEmails = new Set(votes?.map(v => v.email)).size;
+
+  // Mock activity logs
+  const activityLogs = [
+    { action: 'Admin Login', user: 'admin@glowingstar.net', ip: '192.168.1.1', time: '2 mins ago', type: 'auth' },
+    { action: 'Contestant Approved', user: 'admin@glowingstar.net', ip: '192.168.1.1', time: '15 mins ago', type: 'action' },
+    { action: 'Vote Removed (Fraud)', user: 'System', ip: '45.33.22.11', time: '1 hour ago', type: 'security' },
+    { action: 'Settings Updated', user: 'admin@glowingstar.net', ip: '192.168.1.1', time: '3 hours ago', type: 'action' },
+    { action: 'IP Blocked', user: 'System', ip: '103.45.67.89', time: '5 hours ago', type: 'security' },
+  ];
+
+  const handleBlockIP = () => {
+    if (newBlockIP && !blockedIPs.includes(newBlockIP)) {
+      setBlockedIPs([...blockedIPs, newBlockIP]);
+      setNewBlockIP('');
+      toast.success(`IP ${newBlockIP} blocked`);
+    }
+  };
+
+  const handleBlockEmail = () => {
+    if (newBlockEmail && !blockedEmails.includes(newBlockEmail)) {
+      setBlockedEmails([...blockedEmails, newBlockEmail]);
+      setNewBlockEmail('');
+      toast.success(`Email ${newBlockEmail} blocked`);
+    }
+  };
 
   return (
     <div className="space-y-6" data-testid="security-section">
@@ -2444,13 +2473,7 @@ function SecuritySection({ votes }) {
                   <p className="text-sm text-slate-500">{feature.desc}</p>
                 </div>
               </div>
-              <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                feature.active 
-                  ? 'bg-green-500/20 text-green-400 border border-green-500/20' 
-                  : 'bg-slate-500/20 text-slate-400 border border-slate-500/20'
-              }`}>
-                {feature.active ? 'Active' : 'Inactive'}
-              </span>
+              <Switch defaultChecked={feature.active} />
             </div>
           ))}
         </div>
@@ -2460,16 +2483,136 @@ function SecuritySection({ votes }) {
       <GlassCard title="Fraud Detection" icon={AlertTriangle}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
-            <p className="text-3xl font-bold text-green-400 mb-1">0</p>
-            <p className="text-sm text-slate-500">Suspicious IPs</p>
+            <p className="text-3xl font-bold text-green-400 mb-1">{blockedIPs.length}</p>
+            <p className="text-sm text-slate-500">Blocked IPs</p>
+          </div>
+          <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
+            <p className="text-3xl font-bold text-green-400 mb-1">{blockedEmails.length}</p>
+            <p className="text-sm text-slate-500">Blocked Emails</p>
           </div>
           <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
             <p className="text-3xl font-bold text-green-400 mb-1">0</p>
-            <p className="text-sm text-slate-500">Blocked Voters</p>
+            <p className="text-sm text-slate-500">Invalid Votes Removed</p>
           </div>
-          <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
-            <p className="text-3xl font-bold text-green-400 mb-1">0</p>
-            <p className="text-sm text-slate-500">Invalid Votes</p>
+        </div>
+      </GlassCard>
+
+      {/* Block IP / Email Management */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Block IP */}
+        <GlassCard title="Block IP Address" icon={Ban}>
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Input 
+                value={newBlockIP}
+                onChange={(e) => setNewBlockIP(e.target.value)}
+                placeholder="Enter IP address (e.g., 192.168.1.1)"
+                className="bg-white/5 border-white/10 text-white flex-1"
+              />
+              <Button onClick={handleBlockIP} className="bg-red-500/20 text-red-400 border border-red-500/20 hover:bg-red-500/30">
+                <Ban className="w-4 h-4 mr-2" />
+                Block
+              </Button>
+            </div>
+            <div className="space-y-2 max-h-32 overflow-y-auto">
+              {blockedIPs.map((ip, idx) => (
+                <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <span className="text-sm font-mono text-red-400">{ip}</span>
+                  <Button size="sm" variant="ghost" onClick={() => setBlockedIPs(blockedIPs.filter(i => i !== ip))} className="h-6 px-2 text-slate-400 hover:text-white">
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+              ))}
+              {blockedIPs.length === 0 && (
+                <p className="text-sm text-slate-500 text-center py-2">No blocked IPs</p>
+              )}
+            </div>
+          </div>
+        </GlassCard>
+
+        {/* Block Email */}
+        <GlassCard title="Block Email Domain" icon={Mail}>
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Input 
+                value={newBlockEmail}
+                onChange={(e) => setNewBlockEmail(e.target.value)}
+                placeholder="Enter email or domain (e.g., spam.com)"
+                className="bg-white/5 border-white/10 text-white flex-1"
+              />
+              <Button onClick={handleBlockEmail} className="bg-red-500/20 text-red-400 border border-red-500/20 hover:bg-red-500/30">
+                <Ban className="w-4 h-4 mr-2" />
+                Block
+              </Button>
+            </div>
+            <div className="space-y-2 max-h-32 overflow-y-auto">
+              {blockedEmails.map((email, idx) => (
+                <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <span className="text-sm text-red-400">{email}</span>
+                  <Button size="sm" variant="ghost" onClick={() => setBlockedEmails(blockedEmails.filter(e => e !== email))} className="h-6 px-2 text-slate-400 hover:text-white">
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+              ))}
+              {blockedEmails.length === 0 && (
+                <p className="text-sm text-slate-500 text-center py-2">No blocked emails</p>
+              )}
+            </div>
+          </div>
+        </GlassCard>
+      </div>
+
+      {/* Activity Logs */}
+      <GlassCard title="Activity Logs" icon={Activity}>
+        <div className="space-y-2 max-h-72 overflow-y-auto">
+          {activityLogs.map((log, idx) => (
+            <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                  log.type === 'auth' ? 'bg-blue-500/20' :
+                  log.type === 'security' ? 'bg-red-500/20' : 'bg-green-500/20'
+                }`}>
+                  {log.type === 'auth' ? <Lock className="w-5 h-5 text-blue-400" /> :
+                   log.type === 'security' ? <AlertTriangle className="w-5 h-5 text-red-400" /> :
+                   <Check className="w-5 h-5 text-green-400" />}
+                </div>
+                <div>
+                  <p className="font-medium text-sm">{log.action}</p>
+                  <p className="text-xs text-slate-500">{log.user} • IP: {log.ip}</p>
+                </div>
+              </div>
+              <span className="text-xs text-slate-500">{log.time}</span>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
+
+      {/* Two-Factor Authentication */}
+      <GlassCard title="Admin Security" icon={Shield}>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center">
+                <Smartphone className="w-5 h-5 text-violet-400" />
+              </div>
+              <div>
+                <p className="font-medium">Two-Factor Authentication</p>
+                <p className="text-sm text-slate-500">Add extra security to admin login</p>
+              </div>
+            </div>
+            <Switch />
+          </div>
+          <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                <Globe className="w-5 h-5 text-amber-400" />
+              </div>
+              <div>
+                <p className="font-medium">IP Whitelist</p>
+                <p className="text-sm text-slate-500">Only allow admin access from specific IPs</p>
+              </div>
+            </div>
+            <Switch />
           </div>
         </div>
       </GlassCard>
