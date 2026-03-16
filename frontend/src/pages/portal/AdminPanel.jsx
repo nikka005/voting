@@ -450,6 +450,461 @@ export default function AdminPanel() {
   );
 }
 
+// ============ ADMIN GUIDE / HOW IT WORKS SECTION ============
+function AdminGuideSection() {
+  const [activeGuide, setActiveGuide] = useState('overview');
+
+  const guideItems = [
+    { id: 'overview', label: 'Platform Overview', icon: Rocket },
+    { id: 'contestants', label: 'Managing Contestants', icon: Users },
+    { id: 'voting', label: 'Voting System', icon: Heart },
+    { id: 'rounds', label: 'Contest Rounds', icon: Trophy },
+    { id: 'promotions', label: 'Promotions & Banners', icon: Megaphone },
+    { id: 'security', label: 'Security & Fraud', icon: Shield },
+    { id: 'prizes', label: 'Prize Distribution', icon: Gift },
+  ];
+
+  return (
+    <div className="space-y-6" data-testid="guide-section">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-bold flex items-center gap-3">
+            <BookOpen className="w-7 h-7 text-amber-400" />
+            Admin Guide - How It Works
+          </h3>
+          <p className="text-slate-400 mt-1">Complete guide to managing your Glowing Star contest platform</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Guide Navigation */}
+        <div className="lg:col-span-1">
+          <div className="bg-white/5 rounded-2xl border border-white/10 p-4 sticky top-6">
+            <h4 className="font-semibold text-sm text-slate-400 mb-3 px-2">GUIDE SECTIONS</h4>
+            <nav className="space-y-1">
+              {guideItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveGuide(item.id)}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
+                    activeGuide === item.id
+                      ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border border-amber-500/30'
+                      : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span className="text-sm font-medium">{item.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        {/* Guide Content */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Platform Overview */}
+          {activeGuide === 'overview' && (
+            <div className="space-y-6">
+              <GlassCard title="Platform Overview" icon={Rocket}>
+                <div className="space-y-6">
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+                    <h4 className="font-semibold text-amber-400 mb-2">🌟 Welcome to Glowing Star Admin</h4>
+                    <p className="text-slate-300 text-sm">
+                      Glowing Star is a premium online beauty contest platform with two main websites:
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                          <Users className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h5 className="font-semibold">glowingstar.net</h5>
+                          <p className="text-xs text-slate-500">User Site</p>
+                        </div>
+                      </div>
+                      <ul className="text-sm text-slate-400 space-y-2">
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-400 mt-0.5" /> Contestants register & join contest</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-400 mt-0.5" /> Manage profile & upload photos</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-400 mt-0.5" /> View stats & share voting link</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-400 mt-0.5" /> Admin dashboard access</li>
+                      </ul>
+                    </div>
+
+                    <div className="p-5 rounded-xl bg-white/5 border border-white/10">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-violet-500 flex items-center justify-center">
+                          <Heart className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h5 className="font-semibold">glowingstar.vote</h5>
+                          <p className="text-xs text-slate-500">Public Voting Site</p>
+                        </div>
+                      </div>
+                      <ul className="text-sm text-slate-400 space-y-2">
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-400 mt-0.5" /> Public can browse contestants</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-400 mt-0.5" /> Vote for favorite contestants</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-400 mt-0.5" /> View live leaderboard</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-400 mt-0.5" /> Purchase vote packages</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                    <h5 className="font-semibold text-blue-400 mb-2">📊 Contest Flow</h5>
+                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                      <span className="px-3 py-1 rounded-full bg-white/10">1. Registration Opens</span>
+                      <ChevronRight className="w-4 h-4 text-slate-500" />
+                      <span className="px-3 py-1 rounded-full bg-white/10">2. Contestants Join</span>
+                      <ChevronRight className="w-4 h-4 text-slate-500" />
+                      <span className="px-3 py-1 rounded-full bg-white/10">3. Admin Approves</span>
+                      <ChevronRight className="w-4 h-4 text-slate-500" />
+                      <span className="px-3 py-1 rounded-full bg-white/10">4. Voting Starts</span>
+                      <ChevronRight className="w-4 h-4 text-slate-500" />
+                      <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-400">5. Winners Announced</span>
+                    </div>
+                  </div>
+                </div>
+              </GlassCard>
+
+              <GlassCard title="Quick Start Checklist" icon={CheckCircle2}>
+                <div className="space-y-3">
+                  {[
+                    { step: 1, title: 'Configure Contest Settings', desc: 'Set prize pool, rules, and timeline in Settings', done: true },
+                    { step: 2, title: 'Create Contest Rounds', desc: 'Set up competition rounds (Top 100, Top 50, Finals)', done: false },
+                    { step: 3, title: 'Review & Approve Contestants', desc: 'Check registrations and approve valid contestants', done: false },
+                    { step: 4, title: 'Create Promotional Banners', desc: 'Add popup banners to attract more participants', done: false },
+                    { step: 5, title: 'Monitor Voting Activity', desc: 'Watch for fraud and track vote statistics', done: false },
+                    { step: 6, title: 'Announce Winners', desc: 'Complete rounds and distribute prizes', done: false },
+                  ].map((item) => (
+                    <div key={item.step} className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                        item.done ? 'bg-green-500/20 text-green-400' : 'bg-white/10 text-slate-400'
+                      }`}>
+                        {item.done ? <Check className="w-4 h-4" /> : item.step}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium">{item.title}</p>
+                        <p className="text-xs text-slate-500">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </GlassCard>
+            </div>
+          )}
+
+          {/* Managing Contestants */}
+          {activeGuide === 'contestants' && (
+            <div className="space-y-6">
+              <GlassCard title="Managing Contestants" icon={Users}>
+                <div className="space-y-6">
+                  <p className="text-slate-300">
+                    The Contestants section allows you to review, approve, and manage all participants in your contest.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-center">
+                      <Clock className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
+                      <h5 className="font-semibold text-yellow-400">Pending</h5>
+                      <p className="text-xs text-slate-400 mt-1">New registrations awaiting review</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-center">
+                      <CheckCircle2 className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                      <h5 className="font-semibold text-green-400">Approved</h5>
+                      <p className="text-xs text-slate-400 mt-1">Active contestants in the contest</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-center">
+                      <XCircle className="w-8 h-8 text-red-400 mx-auto mb-2" />
+                      <h5 className="font-semibold text-red-400">Rejected</h5>
+                      <p className="text-xs text-slate-400 mt-1">Contestants not meeting criteria</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <h5 className="font-semibold mb-3 flex items-center gap-2">
+                      <MousePointer className="w-4 h-4 text-pink-400" />
+                      How to Approve/Reject Contestants
+                    </h5>
+                    <ol className="text-sm text-slate-400 space-y-2 list-decimal list-inside">
+                      <li>Go to <strong className="text-white">Contestants</strong> section</li>
+                      <li>Filter by <strong className="text-yellow-400">Pending</strong> status</li>
+                      <li>Review contestant profile, photos, and bio</li>
+                      <li>Click <strong className="text-green-400">✓ Approve</strong> or <strong className="text-red-400">✗ Reject</strong></li>
+                      <li>Approved contestants appear on the voting site</li>
+                    </ol>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                    <h5 className="font-semibold text-amber-400 mb-2">⚠️ Review Criteria</h5>
+                    <ul className="text-sm text-slate-300 space-y-1">
+                      <li>• Clear, appropriate photos (no explicit content)</li>
+                      <li>• Complete profile information</li>
+                      <li>• Valid email address</li>
+                      <li>• Meets age requirement (18+)</li>
+                    </ul>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          )}
+
+          {/* Voting System */}
+          {activeGuide === 'voting' && (
+            <div className="space-y-6">
+              <GlassCard title="Voting System" icon={Heart}>
+                <div className="space-y-6">
+                  <p className="text-slate-300">
+                    Understand how the voting system works and monitor vote activity.
+                  </p>
+
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-pink-500/10 to-violet-500/10 border border-pink-500/20">
+                    <h5 className="font-semibold text-pink-400 mb-3">Voting Rules</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="flex items-start gap-3">
+                        <Mail className="w-5 h-5 text-pink-400 mt-0.5" />
+                        <div>
+                          <p className="font-medium">Email Verification</p>
+                          <p className="text-slate-400">All votes require OTP email verification</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Clock className="w-5 h-5 text-pink-400 mt-0.5" />
+                        <div>
+                          <p className="font-medium">24-Hour Limit</p>
+                          <p className="text-slate-400">1 free vote per email every 24 hours</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Gift className="w-5 h-5 text-pink-400 mt-0.5" />
+                        <div>
+                          <p className="font-medium">Paid Votes</p>
+                          <p className="text-slate-400">Users can purchase vote packages via Stripe</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Shield className="w-5 h-5 text-pink-400 mt-0.5" />
+                        <div>
+                          <p className="font-medium">Fraud Detection</p>
+                          <p className="text-slate-400">AI monitors for suspicious voting patterns</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <h5 className="font-semibold mb-3">Vote Types</h5>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-2 rounded-lg bg-white/5">
+                        <span className="text-sm">Free Vote</span>
+                        <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">1 vote / 24hrs</span>
+                      </div>
+                      <div className="flex items-center justify-between p-2 rounded-lg bg-white/5">
+                        <span className="text-sm">Paid Vote Package</span>
+                        <span className="text-xs px-2 py-1 rounded-full bg-amber-500/20 text-amber-400">Multiple votes</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          )}
+
+          {/* Contest Rounds */}
+          {activeGuide === 'rounds' && (
+            <div className="space-y-6">
+              <GlassCard title="Contest Rounds" icon={Trophy}>
+                <div className="space-y-6">
+                  <p className="text-slate-300">
+                    Manage competition rounds to create an exciting elimination-style contest.
+                  </p>
+
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <h5 className="font-semibold mb-4">Recommended Round Structure</h5>
+                    <div className="space-y-3">
+                      {[
+                        { round: 'Round 1', name: 'Qualification', desc: 'All approved contestants compete', participants: '100' },
+                        { round: 'Round 2', name: 'Top 50', desc: 'Top 50 advance based on votes', participants: '50' },
+                        { round: 'Round 3', name: 'Top 20', desc: 'Competition intensifies', participants: '20' },
+                        { round: 'Round 4', name: 'Semi-Finals', desc: 'Elite contestants battle', participants: '10' },
+                        { round: 'Round 5', name: 'Grand Finale', desc: 'Top 5 compete for the crown', participants: '5' },
+                      ].map((r, idx) => (
+                        <div key={idx} className="flex items-center gap-4 p-3 rounded-lg bg-white/5">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-sm font-bold">
+                            {idx + 1}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium">{r.name}</p>
+                            <p className="text-xs text-slate-500">{r.desc}</p>
+                          </div>
+                          <span className="text-xs px-2 py-1 rounded-full bg-white/10">{r.participants} contestants</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                    <h5 className="font-semibold text-blue-400 mb-2">💡 How to Create Rounds</h5>
+                    <ol className="text-sm text-slate-300 space-y-1 list-decimal list-inside">
+                      <li>Go to <strong>Contests</strong> section</li>
+                      <li>Click <strong>Create Round</strong></li>
+                      <li>Set round name, start/end dates</li>
+                      <li>Activate round when ready to start</li>
+                      <li>System tracks votes for that round period</li>
+                    </ol>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          )}
+
+          {/* Promotions & Banners */}
+          {activeGuide === 'promotions' && (
+            <div className="space-y-6">
+              <GlassCard title="Promotions & Banners" icon={Megaphone}>
+                <div className="space-y-6">
+                  <p className="text-slate-300">
+                    Create eye-catching popup banners to promote your contest and attract more participants.
+                  </p>
+
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-amber-500/10 to-pink-500/10 border border-amber-500/20">
+                    <h5 className="font-semibold text-amber-400 mb-3">Banner Features</h5>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-sm">
+                      <div className="p-3 rounded-lg bg-white/5">
+                        <Star className="w-5 h-5 text-amber-400 mx-auto mb-1" />
+                        <p>Custom Title</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-white/5">
+                        <Layers className="w-5 h-5 text-pink-400 mx-auto mb-1" />
+                        <p>6 Gradient Styles</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-white/5">
+                        <MousePointer className="w-5 h-5 text-blue-400 mx-auto mb-1" />
+                        <p>Custom CTA Button</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-white/5">
+                        <Eye className="w-5 h-5 text-green-400 mx-auto mb-1" />
+                        <p>Active/Inactive Toggle</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <h5 className="font-semibold mb-3">How to Create a Banner</h5>
+                    <ol className="text-sm text-slate-400 space-y-2 list-decimal list-inside">
+                      <li>Go to <strong className="text-white">Promotions</strong> section</li>
+                      <li>Click <strong className="text-pink-400">Create Banner</strong></li>
+                      <li>Enter banner title and subtitle</li>
+                      <li>Choose a gradient background style</li>
+                      <li>Set button text and link (e.g., "/portal/register")</li>
+                      <li>Toggle <strong className="text-green-400">Active</strong> to show on user site</li>
+                      <li>Banner popup appears on glowingstar.net!</li>
+                    </ol>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          )}
+
+          {/* Security & Fraud */}
+          {activeGuide === 'security' && (
+            <div className="space-y-6">
+              <GlassCard title="Security & Fraud Detection" icon={Shield}>
+                <div className="space-y-6">
+                  <p className="text-slate-300">
+                    The platform includes advanced security features to ensure fair voting.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                      <AlertTriangle className="w-6 h-6 text-red-400 mb-2" />
+                      <h5 className="font-semibold text-red-400 mb-2">Fraud Detection</h5>
+                      <ul className="text-sm text-slate-400 space-y-1">
+                        <li>• IP address tracking</li>
+                        <li>• Device fingerprinting</li>
+                        <li>• Voting pattern analysis</li>
+                        <li>• Automatic flagging</li>
+                      </ul>
+                    </div>
+                    <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+                      <Shield className="w-6 h-6 text-green-400 mb-2" />
+                      <h5 className="font-semibold text-green-400 mb-2">Protection Features</h5>
+                      <ul className="text-sm text-slate-400 space-y-1">
+                        <li>• Email OTP verification</li>
+                        <li>• Rate limiting</li>
+                        <li>• CAPTCHA protection</li>
+                        <li>• Admin vote blocking</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                    <h5 className="font-semibold text-amber-400 mb-2">⚠️ What to Monitor</h5>
+                    <ul className="text-sm text-slate-300 space-y-1">
+                      <li>• Sudden vote spikes for a single contestant</li>
+                      <li>• Multiple votes from same IP range</li>
+                      <li>• Votes from suspicious email patterns</li>
+                      <li>• Unusual voting times (bot patterns)</li>
+                    </ul>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          )}
+
+          {/* Prize Distribution */}
+          {activeGuide === 'prizes' && (
+            <div className="space-y-6">
+              <GlassCard title="Prize Distribution" icon={Gift}>
+                <div className="space-y-6">
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20">
+                    <h5 className="font-semibold text-amber-400 mb-3">💰 Default Prize Pool: $35,000</h5>
+                    <div className="space-y-2">
+                      {[
+                        { pos: '🥇 1st', title: 'Grand Winner', amount: '$15,000' },
+                        { pos: '🥈 2nd', title: '1st Runner Up', amount: '$8,000' },
+                        { pos: '🥉 3rd', title: '2nd Runner Up', amount: '$5,000' },
+                        { pos: '4th', title: '3rd Runner Up', amount: '$4,000' },
+                        { pos: '5th', title: '4th Runner Up', amount: '$3,000' },
+                      ].map((p, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-white/5">
+                          <span className="text-sm">{p.pos} - {p.title}</span>
+                          <span className="font-bold text-amber-400">{p.amount}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <h5 className="font-semibold mb-3">Prize Distribution Process</h5>
+                    <ol className="text-sm text-slate-400 space-y-2 list-decimal list-inside">
+                      <li>Contest ends and final votes are counted</li>
+                      <li>System ranks contestants by total votes</li>
+                      <li>Admin verifies winner identities</li>
+                      <li>Prizes distributed via bank transfer / PayPal</li>
+                      <li>Winners announced on platform</li>
+                    </ol>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                    <h5 className="font-semibold text-blue-400 mb-2">💡 Customize Prizes</h5>
+                    <p className="text-sm text-slate-300">
+                      Go to <strong>Settings</strong> → <strong>Prize Distribution</strong> to customize prize amounts and positions.
+                    </p>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ============ DASHBOARD SECTION ============
 function DashboardSection({ stats, contestants, votes, rounds }) {
   const activeRound = rounds?.find(r => r.is_active);
