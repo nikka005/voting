@@ -184,7 +184,7 @@ export default function PortalLogin() {
             <div className="mt-6 pt-6 border-t border-white/10 text-center">
               <p className="text-slate-400 text-sm">
                 New contestant?{' '}
-                <Link to="/portal/register" className="text-pink-400 hover:text-pink-300 font-semibold">
+                <Link to="/portal/register" className="text-amber-400 hover:text-amber-300 font-semibold">
                   Register here
                 </Link>
               </p>
