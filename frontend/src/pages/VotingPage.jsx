@@ -41,6 +41,9 @@ export default function VotingPage() {
   const [votePackages, setVotePackages] = useState([]);
   const [purchasingPackage, setPurchasingPackage] = useState(null);
   
+  // Real-time WebSocket updates for this contestant
+  const { lastVoteUpdate, isConnected } = useVoteUpdates(contestant?.id);
+  
   // Countdown state
   const [timeLeft, setTimeLeft] = useState({
     days: 15,
@@ -64,6 +67,16 @@ export default function VotingPage() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Update vote count in real-time
+  useEffect(() => {
+    if (lastVoteUpdate && contestant && lastVoteUpdate.contestant_id === contestant.id) {
+      setContestant(prev => ({
+        ...prev,
+        vote_count: lastVoteUpdate.vote_count
+      }));
+    }
+  }, [lastVoteUpdate, contestant?.id]);
 
   useEffect(() => {
     const fetchContestant = async () => {
