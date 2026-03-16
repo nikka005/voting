@@ -337,7 +337,7 @@ export default function AdminPanel() {
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
               </Button>
-              <a href="/" target="_blank" rel="noopener noreferrer">
+              <a href="https://glowingstar.vote" target="_blank" rel="noopener noreferrer">
                 <Button size="sm" className="bg-gradient-to-r from-pink-500 to-violet-600 hover:from-pink-600 hover:to-violet-700">
                   <Globe className="w-4 h-4 mr-2" />
                   View Site
