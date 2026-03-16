@@ -66,23 +66,14 @@ const PublicHeader = () => {
             ))}
           </nav>
 
-          {/* Right Side - No Join Contest on public site */}
+          {/* Right Side - No login links on public voting site */}
           <div className="hidden md:flex items-center gap-3">
-            {user ? (
-              <Link to="/portal">
-                <Button variant="outline" size="sm" className="border-amber-200 text-amber-600 hover:bg-amber-50 rounded-full">
-                  <LayoutDashboard className="w-4 h-4 mr-2" />
-                  Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <a href="https://glowingstar.net/portal/login" target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" size="sm" className="text-slate-600 hover:text-amber-600">
-                  <ExternalLink className="w-3 h-3 mr-1" />
-                  Contestant Login
-                </Button>
-              </a>
-            )}
+            <Link to="/contestants">
+              <Button className="btn-gradient btn-jelly">
+                <Heart className="w-4 h-4 mr-2" />
+                Vote Now
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
