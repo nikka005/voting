@@ -20,6 +20,7 @@ import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PortalHome from './pages/portal/PortalHome';
 import PortalLogin from './pages/portal/PortalLogin';
 import PortalRegister from './pages/portal/PortalRegister';
+import AdminLogin from './pages/portal/AdminLogin';
 import AdminPanel from './pages/portal/AdminPanel';
 import ContestantDashboard from './pages/portal/ContestantDashboard';
 
