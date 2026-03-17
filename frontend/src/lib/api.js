@@ -143,6 +143,12 @@ export const entryFeeAPI = {
   getMyStatus: () => api.get('/payments/my-status'),
 };
 
+// Contestant Wallet API
+export const walletAPI = {
+  get: () => api.get('/contestant/wallet'),
+  withdraw: (amount, method, details) => api.post('/contestant/wallet/withdraw', { amount, withdrawal_method: method, payment_details: details }),
+};
+
 // Platform Settings API - with fallback to stripe-settings
 export const platformSettingsAPI = {
   get: async () => {
