@@ -44,6 +44,7 @@ export default function ContestantDashboard() {
   const [uploading, setUploading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [entryFeePaid, setEntryFeePaid] = useState(false);
+  const [wallet, setWallet] = useState({ balance: 0, transactions: [] });
   
   // UI States
   const [activeTab, setActiveTab] = useState('dashboard');
