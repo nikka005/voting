@@ -36,6 +36,26 @@ JWT_EXPIRATION_HOURS = 24
 # Stripe Configuration
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
 
+# SMTP Email Configuration (loaded from DB or env)
+SMTP_CONFIG = {
+    'voting_site': {
+        'host': os.environ.get('SMTP_HOST_VOTING', ''),
+        'port': int(os.environ.get('SMTP_PORT_VOTING', 587)),
+        'username': os.environ.get('SMTP_USER_VOTING', ''),
+        'password': os.environ.get('SMTP_PASS_VOTING', ''),
+        'from_email': os.environ.get('SMTP_FROM_VOTING', 'noreply@glowingstar.vote'),
+        'from_name': os.environ.get('SMTP_FROM_NAME_VOTING', 'Glowing Star Voting'),
+    },
+    'user_site': {
+        'host': os.environ.get('SMTP_HOST_USER', ''),
+        'port': int(os.environ.get('SMTP_PORT_USER', 587)),
+        'username': os.environ.get('SMTP_USER_USER', ''),
+        'password': os.environ.get('SMTP_PASS_USER', ''),
+        'from_email': os.environ.get('SMTP_FROM_USER', 'noreply@glowingstar.net'),
+        'from_name': os.environ.get('SMTP_FROM_NAME_USER', 'Glowing Star Contest'),
+    }
+}
+
 # Create the main app
 app = FastAPI(title="Glowing Star - Premium Beauty Contest Platform")
 
