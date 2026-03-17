@@ -130,6 +130,7 @@ export const contestsAPI = {
   getAll: () => api.get('/admin/contests'),
   create: (data) => api.post('/admin/contests', data),
   update: (id, data) => api.put(`/admin/contests/${id}`, data),
+  delete: (id) => api.delete(`/admin/contests/${id}`),
   startVoting: (id) => api.post(`/admin/contests/${id}/start-voting`),
   stopVoting: (id) => api.post(`/admin/contests/${id}/stop-voting`),
   complete: (id) => api.post(`/admin/contests/${id}/complete`),
