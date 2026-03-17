@@ -3817,7 +3817,7 @@ PRIZES:
       {/* Save Button */}
       <div className="flex justify-end">
         <Button 
-          onClick={handleSave}
+          onClick={handleSaveContestSettings}
           disabled={saving}
           className="bg-gradient-to-r from-pink-500 to-violet-600 px-8"
         >
