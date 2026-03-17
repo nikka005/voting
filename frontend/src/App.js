@@ -12,6 +12,7 @@ import ContestantsPage from './pages/ContestantsPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import VotingPage from './pages/VotingPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentFailedPage from './pages/PaymentFailedPage';
 
 // ===============================================================
 // DOMAIN 2: USER SITE / CONTESTANT PORTAL (glowingstar.net)
