@@ -3278,7 +3278,7 @@ function SettingsSection() {
                 value={contestSettings.contest_name || ''} 
                 onChange={(e) => setContestSettings({ ...contestSettings, contest_name: e.target.value })}
                 className="bg-white/5 border-white/10 text-white mt-1" 
-                placeholder="e.g., Glomer Beauty Contest 2026"
+                placeholder="e.g., Glamour Beauty Contest 2026"
               />
             </div>
             <div>
