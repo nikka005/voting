@@ -64,6 +64,7 @@ export const contestantsAPI = {
   },
   getById: (id) => api.get(`/contestants/${id}`),
   getBySlug: (year, slug) => api.get(`/contestants/slug/${year}/${slug}`),
+  getBySimpleSlug: (slug) => api.get(`/contestants/by-slug/${slug}`),
   getMyProfile: () => api.get('/contestants/me/profile'),
   updateMyProfile: (data) => api.put('/contestants/me/profile', data),
   uploadPhoto: (file) => {
