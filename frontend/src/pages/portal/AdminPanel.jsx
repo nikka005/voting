@@ -3455,6 +3455,9 @@ PRIZES:
                 <p className="font-medium text-white">Stripe Integration</p>
                 <p className="text-xs text-slate-400">Process payments securely with Stripe</p>
               </div>
+              {platformSettings.stripe_secret_key_masked && (
+                <span className="ml-auto px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded-full">Connected</span>
+              )}
             </div>
           </div>
           
@@ -3462,6 +3465,8 @@ PRIZES:
             <Label className="text-slate-300">Stripe Publishable Key</Label>
             <Input 
               type="text"
+              value={platformSettings.stripe_publishable_key || ''}
+              onChange={(e) => setPlatformSettings(prev => ({ ...prev, stripe_publishable_key: e.target.value }))}
               placeholder="pk_live_..."
               className="bg-white/5 border-white/10 text-white mt-1 font-mono text-sm" 
             />
@@ -3472,7 +3477,9 @@ PRIZES:
             <Label className="text-slate-300">Stripe Secret Key</Label>
             <Input 
               type="password"
-              placeholder="sk_live_..."
+              value={platformSettings.stripe_secret_key || ''}
+              onChange={(e) => setPlatformSettings(prev => ({ ...prev, stripe_secret_key: e.target.value }))}
+              placeholder={platformSettings.stripe_secret_key_masked || "sk_live_..."}
               className="bg-white/5 border-white/10 text-white mt-1 font-mono text-sm" 
             />
             <p className="text-xs text-slate-500 mt-1">Keep this secret! Used for backend processing</p>
@@ -3482,7 +3489,9 @@ PRIZES:
             <Label className="text-slate-300">Webhook Secret</Label>
             <Input 
               type="password"
-              placeholder="whsec_..."
+              value={platformSettings.stripe_webhook_secret || ''}
+              onChange={(e) => setPlatformSettings(prev => ({ ...prev, stripe_webhook_secret: e.target.value }))}
+              placeholder={platformSettings.stripe_webhook_secret_masked || "whsec_..."}
               className="bg-white/5 border-white/10 text-white mt-1 font-mono text-sm" 
             />
             <p className="text-xs text-slate-500 mt-1">For Stripe webhook verification</p>
@@ -3493,8 +3502,16 @@ PRIZES:
               <p className="font-medium">Test Mode</p>
               <p className="text-sm text-slate-500">Use Stripe test keys for development</p>
             </div>
-            <Switch defaultChecked />
+            <Switch 
+              checked={platformSettings.stripe_test_mode}
+              onCheckedChange={(checked) => setPlatformSettings(prev => ({ ...prev, stripe_test_mode: checked }))}
+            />
           </div>
+          
+          <Button onClick={handleSavePlatformSettings} disabled={saving} className="w-full bg-gradient-to-r from-violet-500 to-purple-600">
+            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
+            Save Stripe Settings
+          </Button>
         </div>
       </GlassCard>
 
