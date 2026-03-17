@@ -1147,73 +1147,74 @@ function WalletTab({ wallet }) {
 
   return (
     <div className="space-y-6" data-testid="wallet-tab">
+      <div>
+        <h1 className="font-syne text-2xl font-bold text-slate-900">My Wallet</h1>
+        <p className="text-slate-500">Manage your earnings and withdrawals</p>
+      </div>
+
       {/* Balance Card */}
-      <GlassCard className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-amber-400" />
-            My Wallet
-          </h2>
+      <GlassCard className="bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200">
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
+              <CreditCard className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <p className="text-slate-500 text-sm">Available Balance</p>
+              <p className="text-3xl font-bold text-slate-900">${(wallet?.balance || 0).toFixed(2)}</p>
+            </div>
+          </div>
+          <p className="text-sm text-slate-500">Prize money and contest earnings</p>
         </div>
-        
-        <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-2xl p-6 border border-amber-500/30 mb-6">
-          <p className="text-slate-400 text-sm mb-1">Available Balance</p>
-          <p className="text-4xl font-bold text-white">${(wallet?.balance || 0).toFixed(2)}</p>
-          <p className="text-slate-400 text-sm mt-2">Prize money and earnings</p>
-        </div>
-        
-        {/* Withdraw Section */}
-        <div className="border-t border-slate-700 pt-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Withdraw Funds</h3>
+      </GlassCard>
+      
+      {/* Withdraw Section */}
+      <GlassCard title="Withdraw Funds" icon={CreditCard}>
+        <div className="space-y-4">
           <div className="flex gap-4">
             <div className="flex-1">
-              <input
+              <Input
                 type="number"
                 placeholder="Enter amount"
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
-                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="h-11 rounded-xl bg-white border-slate-200"
               />
             </div>
             <Button
               onClick={handleWithdraw}
               disabled={withdrawing || !withdrawAmount}
-              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-6"
+              className="btn-gradient btn-jelly px-6"
             >
-              {withdrawing ? 'Processing...' : 'Withdraw'}
+              {withdrawing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Withdraw'}
             </Button>
           </div>
-          <p className="text-slate-500 text-sm mt-2">Minimum withdrawal: $10.00</p>
+          <p className="text-sm text-slate-500">Minimum withdrawal: $10.00</p>
         </div>
       </GlassCard>
       
       {/* Transaction History */}
-      <GlassCard className="p-6">
-        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <Clock className="w-5 h-5 text-amber-400" />
-          Transaction History
-        </h2>
-        
+      <GlassCard title="Transaction History" icon={Clock}>
         {wallet?.transactions && wallet.transactions.length > 0 ? (
           <div className="space-y-3">
             {wallet.transactions.map((tx, idx) => (
-              <div key={idx} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-xl">
+              <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    tx.type === 'credit' ? 'bg-green-500/20' : 'bg-red-500/20'
+                    tx.type === 'credit' ? 'bg-green-100' : 'bg-red-100'
                   }`}>
                     {tx.type === 'credit' ? (
-                      <TrendingUp className="w-5 h-5 text-green-400" />
+                      <TrendingUp className="w-5 h-5 text-green-600" />
                     ) : (
-                      <TrendingDown className="w-5 h-5 text-red-400" />
+                      <TrendingDown className="w-5 h-5 text-red-600" />
                     )}
                   </div>
                   <div>
-                    <p className="text-white font-medium">{tx.description || tx.type}</p>
-                    <p className="text-slate-400 text-sm">{new Date(tx.created_at).toLocaleDateString()}</p>
+                    <p className="text-slate-900 font-medium">{tx.description || tx.type}</p>
+                    <p className="text-slate-500 text-sm">{new Date(tx.created_at).toLocaleDateString()}</p>
                   </div>
                 </div>
-                <p className={`text-lg font-bold ${tx.type === 'credit' ? 'text-green-400' : 'text-red-400'}`}>
+                <p className={`text-lg font-bold ${tx.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
                   {tx.type === 'credit' ? '+' : '-'}${tx.amount?.toFixed(2)}
                 </p>
               </div>
@@ -1221,9 +1222,11 @@ function WalletTab({ wallet }) {
           </div>
         ) : (
           <div className="text-center py-12">
-            <CreditCard className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-400">No transactions yet</p>
-            <p className="text-slate-500 text-sm">Your earnings and withdrawals will appear here</p>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+              <CreditCard className="w-8 h-8 text-slate-400" />
+            </div>
+            <p className="text-slate-600 font-medium">No transactions yet</p>
+            <p className="text-slate-500 text-sm mt-1">Your earnings and withdrawals will appear here</p>
           </div>
         )}
       </GlassCard>
