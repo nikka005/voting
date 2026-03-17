@@ -298,7 +298,7 @@ export default function LeaderboardPage() {
               { icon: Users, label: 'Total Contestants', value: leaderboard.length },
               { icon: Heart, label: 'Total Votes', value: leaderboard.reduce((acc, l) => acc + l.vote_count, 0) },
               { icon: Trophy, label: 'Categories', value: categories.length },
-              { icon: Gift, label: 'Prize Pool', value: '$10,000' },
+              { icon: Gift, label: 'Prize Pool', value: '$35,000' },
             ].map((stat, idx) => (
               <div key={idx} className="text-center p-6 rounded-2xl bg-white/5 backdrop-blur border border-white/10">
                 <stat.icon className="w-8 h-8 text-amber-400 mx-auto mb-3" />

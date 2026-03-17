@@ -62,7 +62,7 @@ export default function PortalRegister() {
   const benefits = [
     { icon: Star, text: 'Create your contestant profile' },
     { icon: Heart, text: 'Receive votes from fans worldwide' },
-    { icon: Trophy, text: 'Compete for $10,000 grand prize' },
+    { icon: Trophy, text: 'Compete for $35,000 grand prize' },
   ];
 
   return (
@@ -255,7 +255,7 @@ export default function PortalRegister() {
               </div>
               <div>
                 <p className="text-amber-400 text-sm font-semibold">Grand Prize</p>
-                <p className="text-2xl font-bold text-white">$10,000</p>
+                <p className="text-2xl font-bold text-white">$15,000</p>
                 <p className="text-slate-400 text-sm">+ Magazine Feature</p>
               </div>
             </div>
