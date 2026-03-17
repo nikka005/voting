@@ -982,6 +982,14 @@ async def activate_round(round_id: str, admin: dict = Depends(require_admin)):
         raise HTTPException(status_code=404, detail="Round not found")
     return {"success": True, "message": "Round activated"}
 
+@api_router.delete("/rounds/{round_id}")
+async def delete_round(round_id: str, admin: dict = Depends(require_admin)):
+    """Delete a round (Admin only)"""
+    result = await db.rounds.delete_one({"id": round_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Round not found")
+    return {"success": True, "message": "Round deleted"}
+
 # ============ CONTESTANT ROUTES ============
 
 @api_router.get("/contestants", response_model=List[ContestantResponse])
