@@ -194,7 +194,9 @@ class TestAdminContestDelete:
         )
         
         assert create_response.status_code == 200, f"Contest creation failed: {create_response.text}"
-        created_contest = create_response.json()
+        response_data = create_response.json()
+        # Contest is nested under 'contest' key
+        created_contest = response_data.get("contest", response_data)
         contest_id = created_contest["id"]
         print(f"✓ Created test contest: {contest_id}")
         
