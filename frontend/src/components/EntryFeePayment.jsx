@@ -103,7 +103,7 @@ export function EntryFeePayment({ onPaymentSuccess }) {
   }
 
   // Show payment required banner
-  const entryFee = contest?.entry_fee || 50;
+  const entryFee = contest?.entry_fee || 30;
 
   return (
     <div className="space-y-4">

@@ -68,7 +68,7 @@ export default function AdminPanel() {
   const [contestForm, setContestForm] = useState({
     name: '',
     description: '',
-    entry_fee: 50,
+    entry_fee: 30,
     max_participants: 100,
     start_date: '',
     end_date: '',
