@@ -1118,6 +1118,119 @@ function LeaderboardTab({ leaderboard, profile, currentRank }) {
   );
 }
 
+// ============ WALLET TAB ============
+function WalletTab({ wallet }) {
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [withdrawing, setWithdrawing] = useState(false);
+  
+  const handleWithdraw = async () => {
+    if (!withdrawAmount || parseFloat(withdrawAmount) <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    if (parseFloat(withdrawAmount) > (wallet?.balance || 0)) {
+      toast.error('Insufficient balance');
+      return;
+    }
+    
+    setWithdrawing(true);
+    try {
+      await walletAPI.withdraw(parseFloat(withdrawAmount), 'bank_transfer', {});
+      toast.success('Withdrawal request submitted successfully');
+      setWithdrawAmount('');
+    } catch (error) {
+      toast.error('Failed to process withdrawal');
+    } finally {
+      setWithdrawing(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6" data-testid="wallet-tab">
+      {/* Balance Card */}
+      <GlassCard className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <CreditCard className="w-5 h-5 text-amber-400" />
+            My Wallet
+          </h2>
+        </div>
+        
+        <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-2xl p-6 border border-amber-500/30 mb-6">
+          <p className="text-slate-400 text-sm mb-1">Available Balance</p>
+          <p className="text-4xl font-bold text-white">${(wallet?.balance || 0).toFixed(2)}</p>
+          <p className="text-slate-400 text-sm mt-2">Prize money and earnings</p>
+        </div>
+        
+        {/* Withdraw Section */}
+        <div className="border-t border-slate-700 pt-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Withdraw Funds</h3>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <input
+                type="number"
+                placeholder="Enter amount"
+                value={withdrawAmount}
+                onChange={(e) => setWithdrawAmount(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+            <Button
+              onClick={handleWithdraw}
+              disabled={withdrawing || !withdrawAmount}
+              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-6"
+            >
+              {withdrawing ? 'Processing...' : 'Withdraw'}
+            </Button>
+          </div>
+          <p className="text-slate-500 text-sm mt-2">Minimum withdrawal: $10.00</p>
+        </div>
+      </GlassCard>
+      
+      {/* Transaction History */}
+      <GlassCard className="p-6">
+        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <Clock className="w-5 h-5 text-amber-400" />
+          Transaction History
+        </h2>
+        
+        {wallet?.transactions && wallet.transactions.length > 0 ? (
+          <div className="space-y-3">
+            {wallet.transactions.map((tx, idx) => (
+              <div key={idx} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-xl">
+                <div className="flex items-center gap-4">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    tx.type === 'credit' ? 'bg-green-500/20' : 'bg-red-500/20'
+                  }`}>
+                    {tx.type === 'credit' ? (
+                      <TrendingUp className="w-5 h-5 text-green-400" />
+                    ) : (
+                      <TrendingDown className="w-5 h-5 text-red-400" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-white font-medium">{tx.description || tx.type}</p>
+                    <p className="text-slate-400 text-sm">{new Date(tx.created_at).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <p className={`text-lg font-bold ${tx.type === 'credit' ? 'text-green-400' : 'text-red-400'}`}>
+                  {tx.type === 'credit' ? '+' : '-'}${tx.amount?.toFixed(2)}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <CreditCard className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+            <p className="text-slate-400">No transactions yet</p>
+            <p className="text-slate-500 text-sm">Your earnings and withdrawals will appear here</p>
+          </div>
+        )}
+      </GlassCard>
+    </div>
+  );
+}
+
 // ============ NOTIFICATIONS TAB ============
 function NotificationsTab({ notifications, setNotifications }) {
   const markAllRead = () => {
