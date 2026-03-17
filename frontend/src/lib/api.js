@@ -141,6 +141,13 @@ export const entryFeeAPI = {
   getMyStatus: () => api.get('/payments/my-status'),
 };
 
+// Platform Settings API
+export const platformSettingsAPI = {
+  get: () => api.get('/admin/platform-settings'),
+  update: (data) => api.put('/admin/platform-settings', data),
+  testSMTP: (data) => api.post('/admin/test-smtp', data),
+};
+
 // Voting API
 export const votingAPI = {
   requestOTP: (data) => api.post('/vote/request-otp', data),
