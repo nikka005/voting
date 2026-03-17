@@ -3147,8 +3147,32 @@ function SettingsSection() {
     max_participants: 100,
     status: 'active'
   });
+  
+  // Platform Settings State
+  const [platformSettings, setPlatformSettings] = useState({
+    stripe_publishable_key: '',
+    stripe_secret_key: '',
+    stripe_webhook_secret: '',
+    stripe_test_mode: true,
+    smtp_voting: {
+      host: '', port: 587, username: '', password: '',
+      from_email: 'noreply@glowingstar.vote', from_name: 'Glowing Star Voting', use_tls: true
+    },
+    smtp_user: {
+      host: '', port: 587, username: '', password: '',
+      from_email: 'noreply@glowingstar.net', from_name: 'Glowing Star Contest', use_tls: true
+    },
+    vote_packages: [
+      { name: 'Starter Pack', votes: 10, price: 500, popular: false },
+      { name: 'Support Pack', votes: 50, price: 2000, popular: true },
+      { name: 'Champion Pack', votes: 100, price: 3500, popular: false },
+      { name: 'Ultimate Pack', votes: 500, price: 15000, popular: false },
+    ]
+  });
+  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [testingEmail, setTestingEmail] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -3156,9 +3180,12 @@ function SettingsSection() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/contest/settings`);
-      const data = await response.json();
-      setContestSettings(data);
+      const [contestRes, platformRes] = await Promise.all([
+        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/contest/settings`).then(r => r.json()).catch(() => ({})),
+        platformSettingsAPI.get().catch(() => ({ data: {} }))
+      ]);
+      if (contestRes) setContestSettings(prev => ({ ...prev, ...contestRes }));
+      if (platformRes.data) setPlatformSettings(prev => ({ ...prev, ...platformRes.data }));
     } catch (error) {
       console.error('Failed to fetch settings:', error);
     } finally {
@@ -3166,29 +3193,63 @@ function SettingsSection() {
     }
   };
 
-  const handleSave = async () => {
+  const handleSaveContestSettings = async () => {
     setSaving(true);
     try {
       const token = localStorage.getItem('lumina_token');
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/admin/contest/settings`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(contestSettings)
       });
       const data = await response.json();
       if (data.success) {
-        toast.success('Contest settings saved successfully!');
-      } else {
-        toast.error('Failed to save settings');
+        toast.success('Contest settings saved!');
       }
     } catch (error) {
-      toast.error('Failed to save settings');
+      toast.error('Failed to save contest settings');
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSavePlatformSettings = async () => {
+    setSaving(true);
+    try {
+      await platformSettingsAPI.update(platformSettings);
+      toast.success('Platform settings saved successfully!');
+      fetchSettings(); // Refresh to get masked keys
+    } catch (error) {
+      toast.error('Failed to save platform settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleTestSMTP = async (siteType) => {
+    setTestingEmail(true);
+    try {
+      const adminEmail = JSON.parse(localStorage.getItem('lumina_user') || '{}').email;
+      await platformSettingsAPI.testSMTP({ site_type: siteType, test_email: adminEmail });
+      toast.success(`Test email sent to ${adminEmail}`);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'SMTP test failed');
+    } finally {
+      setTestingEmail(false);
+    }
+  };
+
+  const updateSMTP = (site, field, value) => {
+    setPlatformSettings(prev => ({
+      ...prev,
+      [`smtp_${site}`]: { ...prev[`smtp_${site}`], [field]: value }
+    }));
+  };
+
+  const updateVotePackage = (index, field, value) => {
+    const newPackages = [...platformSettings.vote_packages];
+    newPackages[index] = { ...newPackages[index], [field]: value };
+    setPlatformSettings(prev => ({ ...prev, vote_packages: newPackages }));
   };
 
   const updatePrize = (index, field, value) => {
