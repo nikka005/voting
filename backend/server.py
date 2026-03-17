@@ -1173,6 +1173,54 @@ async def get_contestant_by_slug(year: str, slug: str):
         achievements=contestant.get("achievements")
     )
 
+@api_router.get("/contestants/by-slug/{slug}", response_model=ContestantResponse)
+async def get_contestant_by_simple_slug(slug: str):
+    """Get contestant by simple slug (without year) for public voting page"""
+    # First try exact match
+    contestant = await db.contestants.find_one({"slug": slug, "status": "approved"}, {"_id": 0})
+    
+    if not contestant:
+        # Try with regex to match slug ending
+        contestant = await db.contestants.find_one(
+            {"slug": {"$regex": f".*{slug}$"}, "status": "approved"}, 
+            {"_id": 0}
+        )
+    
+    if not contestant:
+        raise HTTPException(status_code=404, detail="Contestant not found")
+    
+    category_name = ""
+    if contestant.get("category_id"):
+        cat = await db.categories.find_one({"id": contestant["category_id"]}, {"_id": 0})
+        category_name = cat["name"] if cat else ""
+    
+    base_url = os.environ.get('FRONTEND_URL', 'https://glamour-contest.com')
+    return ContestantResponse(
+        id=contestant["id"],
+        user_id=contestant["user_id"],
+        full_name=contestant["full_name"],
+        email=contestant["email"],
+        slug=contestant["slug"],
+        bio=contestant.get("bio", ""),
+        photos=contestant.get("photos", []),
+        social_instagram=contestant.get("social_instagram", ""),
+        social_facebook=contestant.get("social_facebook", ""),
+        social_twitter=contestant.get("social_twitter", ""),
+        social_tiktok=contestant.get("social_tiktok", ""),
+        age=contestant.get("age"),
+        location=contestant.get("location", ""),
+        category_id=contestant.get("category_id"),
+        category_name=category_name,
+        vote_count=contestant.get("vote_count", 0),
+        status=contestant["status"],
+        voting_link=f"{base_url}/{contestant['slug']}",
+        created_at=contestant["created_at"],
+        round=contestant.get("round"),
+        qa_items=contestant.get("qa_items", []),
+        profession=contestant.get("profession"),
+        achievements=contestant.get("achievements")
+    )
+
 # ============ CONTESTANT HIGHLIGHTS SYSTEM ============
 # NOTE: This route MUST be defined BEFORE /contestants/{contestant_id} to avoid route conflicts
 
