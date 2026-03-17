@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Progress } from '../../components/ui/progress';
 import { Switch } from '../../components/ui/switch';
-import { contestantsAPI, categoriesAPI, leaderboardAPI, entryFeeAPI } from '../../lib/api';
+import { contestantsAPI, categoriesAPI, leaderboardAPI, entryFeeAPI, walletAPI } from '../../lib/api';
 import { formatNumber, formatDate } from '../../lib/utils';
 import { useVoteUpdates } from '../../hooks/useWebSocket';
 import { toast } from 'sonner';
