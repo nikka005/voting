@@ -471,6 +471,11 @@ export default function ContestantDashboard() {
             <AnalyticsTab profile={profile} />
           )}
 
+          {/* ============ WALLET TAB ============ */}
+          {activeTab === 'wallet' && (
+            <WalletTab wallet={wallet} />
+          )}
+
           {/* ============ LEADERBOARD TAB ============ */}
           {activeTab === 'leaderboard' && (
             <LeaderboardTab 
