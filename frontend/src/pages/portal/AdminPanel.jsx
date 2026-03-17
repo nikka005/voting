@@ -1624,6 +1624,24 @@ function ContestsSection({
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
+                  <Button 
+                    size="icon" 
+                    variant="ghost" 
+                    className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                    onClick={async () => {
+                      if (window.confirm(`Are you sure you want to delete "${contest.name}"? This action cannot be undone.`)) {
+                        try {
+                          await contestsAPI.delete(contest.id);
+                          toast.success('Contest deleted successfully');
+                          fetchDashboardData();
+                        } catch (error) {
+                          toast.error('Failed to delete contest: ' + (error.response?.data?.detail || error.message));
+                        }
+                      }
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             </div>
