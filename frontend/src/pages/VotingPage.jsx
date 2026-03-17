@@ -81,10 +81,17 @@ export default function VotingPage() {
   useEffect(() => {
     const fetchContestant = async () => {
       try {
-        const [contestantRes, packagesRes] = await Promise.all([
-          contestantsAPI.getBySlug(year, slug),
-          votingAPI.getVotePackages()
-        ]);
+        let contestantRes;
+        // If year is provided, use the year/slug format
+        // Otherwise, use simple slug format (for /contestant/:slug route)
+        if (year && slug) {
+          contestantRes = await contestantsAPI.getBySlug(year, slug);
+        } else {
+          // Simple slug - year param actually contains the slug
+          contestantRes = await contestantsAPI.getBySimpleSlug(slug || year);
+        }
+        
+        const packagesRes = await votingAPI.getVotePackages();
         setContestant(contestantRes.data);
         setVotePackages(packagesRes.data);
       } catch (error) {
