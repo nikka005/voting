@@ -127,7 +127,8 @@ function App() {
           
           {/* Payment Pages */}
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
-          <Route path="/payment/cancel" element={<Navigate to="/" replace />} />
+          <Route path="/payment/failed" element={<PaymentFailedPage />} />
+          <Route path="/payment/cancel" element={<PaymentFailedPage />} />
 
           {/* ============================================
               DOMAIN 2: MANAGEMENT PORTAL
