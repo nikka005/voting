@@ -118,8 +118,11 @@ function App() {
           {/* Leaderboard - Real-time rankings */}
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           
-          {/* Individual Voting Page */}
+          {/* Individual Voting Page - with year */}
           <Route path="/:year/:slug" element={<VotingPage />} />
+          
+          {/* Individual Voting Page - simple slug (no year) */}
+          <Route path="/contestant/:slug" element={<VotingPage />} />
           
           {/* Payment Pages */}
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
