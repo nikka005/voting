@@ -3714,3 +3714,234 @@ logger = logging.getLogger(__name__)
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
+# ============ PLATFORM SETTINGS API ============
+
+class SMTPSettings(BaseModel):
+    host: str = ""
+    port: int = 587
+    username: str = ""
+    password: str = ""
+    from_email: str = ""
+    from_name: str = ""
+    use_tls: bool = True
+
+class PlatformSettings(BaseModel):
+    # Stripe Settings
+    stripe_publishable_key: str = ""
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_test_mode: bool = True
+    
+    # SMTP Settings - Voting Site (glowingstar.vote)
+    smtp_voting: SMTPSettings = SMTPSettings()
+    
+    # SMTP Settings - User Site (glowingstar.net)
+    smtp_user: SMTPSettings = SMTPSettings()
+    
+    # Vote Packages
+    vote_packages: List[dict] = []
+
+@api_router.get("/admin/platform-settings")
+async def get_platform_settings(current_user: dict = Depends(require_admin)):
+    """Get platform settings (Admin only)"""
+    settings = await db.platform_settings.find_one({"_id": "main"})
+    if not settings:
+        # Return default settings
+        return {
+            "stripe_publishable_key": "",
+            "stripe_secret_key_masked": "",
+            "stripe_webhook_secret_masked": "",
+            "stripe_test_mode": True,
+            "smtp_voting": {
+                "host": "", "port": 587, "username": "", "password_set": False,
+                "from_email": "noreply@glowingstar.vote", "from_name": "Glowing Star Voting", "use_tls": True
+            },
+            "smtp_user": {
+                "host": "", "port": 587, "username": "", "password_set": False,
+                "from_email": "noreply@glowingstar.net", "from_name": "Glowing Star Contest", "use_tls": True
+            },
+            "vote_packages": [
+                {"name": "Starter Pack", "votes": 10, "price": 500, "popular": False},
+                {"name": "Support Pack", "votes": 50, "price": 2000, "popular": True},
+                {"name": "Champion Pack", "votes": 100, "price": 3500, "popular": False},
+                {"name": "Ultimate Pack", "votes": 500, "price": 15000, "popular": False},
+            ]
+        }
+    
+    # Mask sensitive data
+    return {
+        "stripe_publishable_key": settings.get("stripe_publishable_key", ""),
+        "stripe_secret_key_masked": "••••••" + settings.get("stripe_secret_key", "")[-4:] if settings.get("stripe_secret_key") else "",
+        "stripe_webhook_secret_masked": "••••••" + settings.get("stripe_webhook_secret", "")[-4:] if settings.get("stripe_webhook_secret") else "",
+        "stripe_test_mode": settings.get("stripe_test_mode", True),
+        "smtp_voting": {
+            **settings.get("smtp_voting", {}),
+            "password_set": bool(settings.get("smtp_voting", {}).get("password"))
+        },
+        "smtp_user": {
+            **settings.get("smtp_user", {}),
+            "password_set": bool(settings.get("smtp_user", {}).get("password"))
+        },
+        "vote_packages": settings.get("vote_packages", [])
+    }
+
+@api_router.put("/admin/platform-settings")
+async def update_platform_settings(settings: dict, current_user: dict = Depends(require_admin)):
+    """Update platform settings (Admin only)"""
+    # Get existing settings
+    existing = await db.platform_settings.find_one({"_id": "main"}) or {}
+    
+    # Update settings (preserve passwords if not provided)
+    update_data = {
+        "_id": "main",
+        "stripe_publishable_key": settings.get("stripe_publishable_key", existing.get("stripe_publishable_key", "")),
+        "stripe_test_mode": settings.get("stripe_test_mode", existing.get("stripe_test_mode", True)),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Only update secret key if provided and not masked
+    if settings.get("stripe_secret_key") and not settings["stripe_secret_key"].startswith("••"):
+        update_data["stripe_secret_key"] = settings["stripe_secret_key"]
+    else:
+        update_data["stripe_secret_key"] = existing.get("stripe_secret_key", "")
+    
+    if settings.get("stripe_webhook_secret") and not settings["stripe_webhook_secret"].startswith("••"):
+        update_data["stripe_webhook_secret"] = settings["stripe_webhook_secret"]
+    else:
+        update_data["stripe_webhook_secret"] = existing.get("stripe_webhook_secret", "")
+    
+    # SMTP Voting Site
+    smtp_voting = settings.get("smtp_voting", {})
+    existing_smtp_voting = existing.get("smtp_voting", {})
+    update_data["smtp_voting"] = {
+        "host": smtp_voting.get("host", existing_smtp_voting.get("host", "")),
+        "port": smtp_voting.get("port", existing_smtp_voting.get("port", 587)),
+        "username": smtp_voting.get("username", existing_smtp_voting.get("username", "")),
+        "password": smtp_voting.get("password", existing_smtp_voting.get("password", "")) if smtp_voting.get("password") else existing_smtp_voting.get("password", ""),
+        "from_email": smtp_voting.get("from_email", existing_smtp_voting.get("from_email", "noreply@glowingstar.vote")),
+        "from_name": smtp_voting.get("from_name", existing_smtp_voting.get("from_name", "Glowing Star Voting")),
+        "use_tls": smtp_voting.get("use_tls", existing_smtp_voting.get("use_tls", True)),
+    }
+    
+    # SMTP User Site
+    smtp_user = settings.get("smtp_user", {})
+    existing_smtp_user = existing.get("smtp_user", {})
+    update_data["smtp_user"] = {
+        "host": smtp_user.get("host", existing_smtp_user.get("host", "")),
+        "port": smtp_user.get("port", existing_smtp_user.get("port", 587)),
+        "username": smtp_user.get("username", existing_smtp_user.get("username", "")),
+        "password": smtp_user.get("password", existing_smtp_user.get("password", "")) if smtp_user.get("password") else existing_smtp_user.get("password", ""),
+        "from_email": smtp_user.get("from_email", existing_smtp_user.get("from_email", "noreply@glowingstar.net")),
+        "from_name": smtp_user.get("from_name", existing_smtp_user.get("from_name", "Glowing Star Contest")),
+        "use_tls": smtp_user.get("use_tls", existing_smtp_user.get("use_tls", True)),
+    }
+    
+    # Vote packages
+    if settings.get("vote_packages"):
+        update_data["vote_packages"] = settings["vote_packages"]
+    else:
+        update_data["vote_packages"] = existing.get("vote_packages", [])
+    
+    await db.platform_settings.replace_one({"_id": "main"}, update_data, upsert=True)
+    
+    # Update global Stripe key if provided
+    global STRIPE_API_KEY
+    if update_data.get("stripe_secret_key"):
+        STRIPE_API_KEY = update_data["stripe_secret_key"]
+    
+    return {"success": True, "message": "Settings updated successfully"}
+
+@api_router.post("/admin/test-smtp")
+async def test_smtp_connection(data: dict, current_user: dict = Depends(require_admin)):
+    """Test SMTP connection (Admin only)"""
+    site_type = data.get("site_type", "voting")  # "voting" or "user"
+    test_email = data.get("test_email", current_user.get("email"))
+    
+    # Get settings from DB
+    settings = await db.platform_settings.find_one({"_id": "main"})
+    if not settings:
+        raise HTTPException(status_code=400, detail="Platform settings not configured")
+    
+    smtp_config = settings.get(f"smtp_{site_type}", {})
+    
+    if not smtp_config.get("host") or not smtp_config.get("username"):
+        raise HTTPException(status_code=400, detail=f"SMTP settings for {site_type} site not configured")
+    
+    try:
+        # Create message
+        msg = MIMEMultipart()
+        msg['From'] = f"{smtp_config.get('from_name', 'Glowing Star')} <{smtp_config.get('from_email', '')}>"
+        msg['To'] = test_email
+        msg['Subject'] = "Glowing Star - SMTP Test Email"
+        
+        body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="color: #ec4899;">✨ SMTP Test Successful!</h2>
+            <p>This is a test email from your Glowing Star platform.</p>
+            <p><strong>Site:</strong> {site_type.title()} Site</p>
+            <p><strong>SMTP Host:</strong> {smtp_config.get('host')}</p>
+            <p><strong>From:</strong> {smtp_config.get('from_email')}</p>
+            <p style="color: #22c55e;">Your email configuration is working correctly! 🎉</p>
+        </body>
+        </html>
+        """
+        msg.attach(MIMEText(body, 'html'))
+        
+        # Connect and send
+        if smtp_config.get("use_tls", True):
+            server = smtplib.SMTP(smtp_config["host"], smtp_config.get("port", 587))
+            server.starttls()
+        else:
+            server = smtplib.SMTP_SSL(smtp_config["host"], smtp_config.get("port", 465))
+        
+        server.login(smtp_config["username"], smtp_config["password"])
+        server.sendmail(smtp_config["from_email"], test_email, msg.as_string())
+        server.quit()
+        
+        return {"success": True, "message": f"Test email sent to {test_email}"}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"SMTP Error: {str(e)}")
+
+# Helper function to send emails via SMTP
+async def send_email_smtp(to_email: str, subject: str, html_body: str, site_type: str = "voting"):
+    """Send email via SMTP"""
+    settings = await db.platform_settings.find_one({"_id": "main"})
+    
+    if not settings:
+        print(f"[EMAIL] No platform settings - logging email to console")
+        print(f"[EMAIL] To: {to_email}, Subject: {subject}")
+        return False
+    
+    smtp_config = settings.get(f"smtp_{site_type}", {})
+    
+    if not smtp_config.get("host") or not smtp_config.get("password"):
+        print(f"[EMAIL] SMTP not configured for {site_type} - logging to console")
+        print(f"[EMAIL] To: {to_email}, Subject: {subject}")
+        return False
+    
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = f"{smtp_config.get('from_name', 'Glowing Star')} <{smtp_config.get('from_email', '')}>"
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(html_body, 'html'))
+        
+        if smtp_config.get("use_tls", True):
+            server = smtplib.SMTP(smtp_config["host"], smtp_config.get("port", 587))
+            server.starttls()
+        else:
+            server = smtplib.SMTP_SSL(smtp_config["host"], smtp_config.get("port", 465))
+        
+        server.login(smtp_config["username"], smtp_config["password"])
+        server.sendmail(smtp_config["from_email"], to_email, msg.as_string())
+        server.quit()
+        
+        print(f"[EMAIL] Sent successfully to {to_email}")
+        return True
+    
+    except Exception as e:
+        print(f"[EMAIL] Failed to send: {str(e)}")
+        return False
