@@ -1059,6 +1059,20 @@ async def delete_round(round_id: str, admin: dict = Depends(require_admin)):
         raise HTTPException(status_code=404, detail="Round not found")
     return {"success": True, "message": "Round deleted"}
 
+@api_router.post("/admin/cleanup/empty-rounds")
+async def cleanup_empty_rounds(admin: dict = Depends(require_admin)):
+    """Delete all rounds with empty names (Admin only)"""
+    result = await db.rounds.delete_many({"$or": [{"name": ""}, {"name": None}, {"name": {"$exists": False}}]})
+    return {"success": True, "message": f"Deleted {result.deleted_count} empty rounds"}
+
+@api_router.post("/admin/cleanup/reorder-rounds")
+async def reorder_rounds(admin: dict = Depends(require_admin)):
+    """Reorder remaining rounds sequentially (Admin only)"""
+    rounds = await db.rounds.find({}).sort("order", 1).to_list(100)
+    for i, r in enumerate(rounds, 1):
+        await db.rounds.update_one({"id": r["id"]}, {"$set": {"order": i}})
+    return {"success": True, "message": f"Reordered {len(rounds)} rounds"}
+
 # ============ CONTESTANT ROUTES ============
 
 @api_router.get("/contestants", response_model=List[ContestantResponse])
