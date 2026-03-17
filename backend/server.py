@@ -3395,12 +3395,23 @@ async def advance_to_next_round(admin: dict = Depends(require_admin)):
     # Update round status
     await db.rounds.update_one(
         {"id": current_round["id"]},
-        {"$set": {"is_active": False, "end_date": datetime.now(timezone.utc).isoformat()}}
+        {"$set": {"is_active": False, "status": "completed", "completed_at": datetime.now(timezone.utc).isoformat()}}
     )
     await db.rounds.update_one(
         {"id": next_round["id"]},
-        {"$set": {"is_active": True, "start_date": datetime.now(timezone.utc).isoformat()}}
+        {"$set": {"is_active": True, "status": "active", "started_at": datetime.now(timezone.utc).isoformat()}}
     )
+    
+    # Store round results
+    await db.round_results.insert_one({
+        "id": str(uuid.uuid4()),
+        "round_id": current_round["id"],
+        "round_name": current_round["name"],
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "advanced": [{"id": c["id"], "name": c["full_name"], "votes": c["vote_count"]} for c in top_contestants],
+        "eliminated_count": await db.contestants.count_documents({"eliminated_at": current_round["name"]}),
+        "next_round": next_round["name"]
+    })
     
     # Get eliminated count
     eliminated_count = await db.contestants.count_documents({"eliminated_at": current_round["name"]})
@@ -3413,6 +3424,196 @@ async def advance_to_next_round(admin: dict = Depends(require_admin)):
         "eliminated_contestants": eliminated_count,
         "top_contestants": [{"name": c["full_name"], "votes": c["vote_count"]} for c in top_contestants[:5]]
     }
+
+# ============ PUBLIC RESULTS API ============
+
+@api_router.get("/contest/current-round")
+async def get_current_round():
+    """Get current active round info for public display"""
+    active_round = await db.rounds.find_one({"is_active": True}, {"_id": 0})
+    if not active_round:
+        # Check if there's a completed competition
+        final_results = await db.competition_results.find_one({"_id": "final"}, {"_id": 0})
+        if final_results:
+            return {"status": "completed", "results": final_results}
+        return {"status": "not_started", "message": "Contest has not started yet"}
+    
+    # Calculate time remaining
+    end_date = active_round.get("end_date")
+    time_remaining = None
+    if end_date:
+        try:
+            end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00')) if isinstance(end_date, str) else end_date
+            now = datetime.now(timezone.utc)
+            if end_dt > now:
+                delta = end_dt - now
+                time_remaining = {
+                    "days": delta.days,
+                    "hours": delta.seconds // 3600,
+                    "minutes": (delta.seconds % 3600) // 60,
+                    "seconds": delta.seconds % 60,
+                    "total_seconds": int(delta.total_seconds())
+                }
+        except:
+            pass
+    
+    return {
+        "status": "active",
+        "round": active_round,
+        "time_remaining": time_remaining
+    }
+
+@api_router.get("/contest/results")
+async def get_contest_results():
+    """Get all round results for public display"""
+    # Get all completed rounds
+    round_results = await db.round_results.find({}, {"_id": 0}).sort("completed_at", -1).to_list(100)
+    
+    # Get final competition results if exists
+    final_results = await db.competition_results.find_one({"_id": "final"})
+    
+    # Get current standings
+    current_standings = await db.contestants.find(
+        {"status": "approved", "eliminated": {"$ne": True}},
+        {"_id": 0, "id": 1, "full_name": 1, "vote_count": 1, "photos": 1, "current_round": 1}
+    ).sort("vote_count", -1).limit(20).to_list(20)
+    
+    return {
+        "round_results": round_results,
+        "final_results": final_results,
+        "current_standings": current_standings,
+        "is_completed": final_results is not None
+    }
+
+@api_router.get("/contest/round-results/{round_name}")
+async def get_round_results(round_name: str):
+    """Get specific round results"""
+    results = await db.round_results.find_one({"round_name": round_name}, {"_id": 0})
+    if not results:
+        raise HTTPException(status_code=404, detail="Round results not found")
+    return results
+
+# ============ AUTOMATIC ROUND MANAGEMENT ============
+
+async def check_and_advance_rounds():
+    """Background task to automatically check and advance rounds"""
+    while True:
+        try:
+            # Get current active round
+            active_round = await db.rounds.find_one({"is_active": True})
+            if active_round and active_round.get("end_date"):
+                end_date = active_round["end_date"]
+                try:
+                    end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00')) if isinstance(end_date, str) else end_date
+                    now = datetime.now(timezone.utc)
+                    
+                    # If round has ended, automatically advance
+                    if end_dt <= now:
+                        print(f"[AUTO-ROUND] Round '{active_round['name']}' has ended. Advancing to next round...")
+                        
+                        # Get next round
+                        next_round = await db.rounds.find_one({"order": active_round.get("order", 0) + 1})
+                        
+                        if next_round:
+                            # Get top contestants
+                            max_advance = next_round.get("max_contestants", 50)
+                            top_contestants = await db.contestants.find(
+                                {"status": "approved", "eliminated": {"$ne": True}},
+                                {"_id": 0}
+                            ).sort("vote_count", -1).limit(max_advance).to_list(max_advance)
+                            
+                            top_ids = [c["id"] for c in top_contestants]
+                            
+                            # Advance top contestants
+                            await db.contestants.update_many(
+                                {"id": {"$in": top_ids}},
+                                {"$set": {"current_round": next_round["name"]}}
+                            )
+                            
+                            # Eliminate others
+                            await db.contestants.update_many(
+                                {"status": "approved", "id": {"$nin": top_ids}, "eliminated": {"$ne": True}},
+                                {"$set": {"eliminated": True, "eliminated_at": active_round["name"]}}
+                            )
+                            
+                            # Update rounds
+                            await db.rounds.update_one(
+                                {"id": active_round["id"]},
+                                {"$set": {"is_active": False, "status": "completed", "completed_at": now.isoformat()}}
+                            )
+                            await db.rounds.update_one(
+                                {"id": next_round["id"]},
+                                {"$set": {"is_active": True, "status": "active", "started_at": now.isoformat()}}
+                            )
+                            
+                            # Store results
+                            await db.round_results.insert_one({
+                                "id": str(uuid.uuid4()),
+                                "round_id": active_round["id"],
+                                "round_name": active_round["name"],
+                                "completed_at": now.isoformat(),
+                                "advanced": [{"id": c["id"], "name": c["full_name"], "votes": c["vote_count"]} for c in top_contestants],
+                                "eliminated_count": await db.contestants.count_documents({"eliminated_at": active_round["name"]}),
+                                "next_round": next_round["name"],
+                                "auto_advanced": True
+                            })
+                            
+                            print(f"[AUTO-ROUND] Advanced {len(top_ids)} contestants to '{next_round['name']}'")
+                        else:
+                            # This is the final round - complete competition
+                            print(f"[AUTO-ROUND] Final round '{active_round['name']}' ended. Completing competition...")
+                            
+                            # Get winners
+                            winners = await db.contestants.find(
+                                {"status": "approved", "eliminated": {"$ne": True}},
+                                {"_id": 0}
+                            ).sort("vote_count", -1).limit(10).to_list(10)
+                            
+                            # Store final results
+                            await db.competition_results.replace_one(
+                                {"_id": "final"},
+                                {
+                                    "_id": "final",
+                                    "completed_at": now.isoformat(),
+                                    "winners": [
+                                        {
+                                            "rank": i + 1,
+                                            "id": w["id"],
+                                            "name": w["full_name"],
+                                            "votes": w["vote_count"],
+                                            "photo": w.get("photos", [None])[0],
+                                            "prize": "$15,000" if i == 0 else "$10,000" if i == 1 else "$5,000" if i == 2 else "$500"
+                                        }
+                                        for i, w in enumerate(winners)
+                                    ],
+                                    "total_votes": await db.votes.count_documents({}),
+                                    "total_contestants": await db.contestants.count_documents({"status": "approved"})
+                                },
+                                upsert=True
+                            )
+                            
+                            # Mark round as complete
+                            await db.rounds.update_one(
+                                {"id": active_round["id"]},
+                                {"$set": {"is_active": False, "status": "completed", "completed_at": now.isoformat()}}
+                            )
+                            
+                            # Update contest status
+                            await db.contests.update_many(
+                                {"status": "voting"},
+                                {"$set": {"status": "completed", "completed_at": now.isoformat()}}
+                            )
+                            
+                            print(f"[AUTO-ROUND] Competition completed! Winner: {winners[0]['full_name'] if winners else 'N/A'}")
+                
+                except Exception as e:
+                    print(f"[AUTO-ROUND] Error parsing date: {e}")
+        
+        except Exception as e:
+            print(f"[AUTO-ROUND] Error in background task: {e}")
+        
+        # Check every 60 seconds
+        await asyncio.sleep(60)
 
 @api_router.post("/admin/competition/complete")
 async def complete_competition(admin: dict = Depends(require_admin)):
