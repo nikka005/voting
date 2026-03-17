@@ -5,6 +5,52 @@ Build a premium, high-class online voting contest platform inspired by mshealtha
 
 ---
 
+## ✅ Backend Updates - Cleanup & Email System (Mar 17, 2026)
+
+### New API Endpoints Added:
+- `DELETE /api/rounds/{round_id}` - Delete a round
+- `DELETE /api/admin/contests/{contest_id}` - Delete/archive a contest
+- `POST /api/admin/cleanup/empty-rounds` - Bulk delete empty rounds
+- `POST /api/admin/cleanup/reorder-rounds` - Reorder rounds sequentially
+
+### Email System Wired to Dynamic SMTP:
+- `send_otp_email()` - Now uses SMTP settings from admin panel
+- `send_vote_confirmation_email()` - Now uses SMTP settings from admin panel
+- `send_welcome_email()` - Uses user site SMTP config
+- `send_approval_email()` - Uses user site SMTP config
+- `send_round_qualification_email()` - Uses user site SMTP config
+- `send_payment_confirmation_email()` - Uses voting site SMTP config
+
+### How Email System Works:
+1. Admin configures SMTP in Settings page (Admin Panel → Settings → SMTP Configuration)
+2. Two separate SMTP configs: `smtp_voting` (glowingstar.vote) and `smtp_user` (glowingstar.net)
+3. Emails automatically use the appropriate config based on email type
+4. If SMTP not configured, emails are logged to console for debugging
+
+### ⚠️ DEPLOYMENT REQUIRED for Live Site:
+After deploying the new code to your live server, run these cleanup commands:
+
+```bash
+# Login to get token
+TOKEN=$(curl -s -X POST "https://glowingstar.net/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@glowingstar.net","password":"admin123"}' | python3 -c "import sys,json;print(json.load(sys.stdin).get('token',''))")
+
+# 1. Delete empty rounds
+curl -X POST "https://glowingstar.net/api/admin/cleanup/empty-rounds" \
+  -H "Authorization: Bearer $TOKEN"
+
+# 2. Reorder remaining rounds
+curl -X POST "https://glowingstar.net/api/admin/cleanup/reorder-rounds" \
+  -H "Authorization: Bearer $TOKEN"
+
+# 3. Archive old unnamed contest
+curl -X DELETE "https://glowingstar.net/api/admin/contests/df2437b7-96d5-47b1-9ec9-5acb4a3ecd26" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+---
+
 ## ✅ Bug Fix - Typo Correction (Mar 17, 2026)
 - [x] Fixed "Glomer" → "Glamour" typo in default contest settings (server.py)
 - [x] Fixed placeholder text in AdminPanel.jsx Settings form
