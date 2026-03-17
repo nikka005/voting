@@ -2,6 +2,15 @@
 
 ## Original Problem Statement
 Build a premium, high-class online voting contest platform inspired by mshealthandfit.com with:
+
+---
+
+## ✅ Bug Fix - Typo Correction (Mar 17, 2026)
+- [x] Fixed "Glomer" → "Glamour" typo in default contest settings (server.py)
+- [x] Fixed placeholder text in AdminPanel.jsx Settings form
+- [x] Verified contest name displays correctly: "Glamour Beauty Contest 2026"
+
+---
 1. **Admin Panel**: Master dashboard for website owner
 2. **User Panel (Contestant Dashboard)**: Portal for participants
 3. **Public Voting Panel**: Public-facing voting website
