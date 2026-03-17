@@ -142,10 +142,38 @@ export const entryFeeAPI = {
   getMyStatus: () => api.get('/payments/my-status'),
 };
 
-// Platform Settings API
+// Platform Settings API - with fallback to stripe-settings
 export const platformSettingsAPI = {
-  get: () => api.get('/admin/platform-settings'),
-  update: (data) => api.put('/admin/platform-settings', data),
+  get: async () => {
+    try {
+      const response = await api.get('/admin/platform-settings');
+      return response;
+    } catch (error) {
+      // Fallback to stripe-settings if platform-settings not available
+      try {
+        const stripeResponse = await api.get('/admin/stripe-settings');
+        return { data: { ...stripeResponse.data, vote_packages: [], smtp_voting: {}, smtp_user: {} } };
+      } catch {
+        return { data: {} };
+      }
+    }
+  },
+  update: async (data) => {
+    try {
+      const response = await api.put('/admin/platform-settings', data);
+      return response;
+    } catch (error) {
+      // Fallback to stripe-settings
+      if (data.stripe_publishable_key || data.stripe_secret_key) {
+        return api.put('/admin/stripe-settings', {
+          stripe_publishable_key: data.stripe_publishable_key,
+          stripe_secret_key: data.stripe_secret_key,
+          stripe_test_mode: data.stripe_test_mode
+        });
+      }
+      throw error;
+    }
+  },
   testSMTP: (data) => api.post('/admin/test-smtp', data),
 };
 
