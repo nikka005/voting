@@ -3181,6 +3181,7 @@ async def get_my_payment_status(current_user: dict = Depends(get_current_user)):
     
     return {
         "has_paid": payment is not None,
+        "entry_fee_paid": payment is not None or (contestant.get("entry_fee_paid", False) if contestant else False),
         "payment": payment,
         "contestant_status": contestant.get("status") if contestant else None,
         "payment_status": contestant.get("payment_status", "unpaid") if contestant else "unpaid"
