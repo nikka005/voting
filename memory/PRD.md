@@ -228,10 +228,10 @@ curl -X DELETE "https://glowingstar.net/api/admin/contests/df2437b7-96d5-47b1-9e
 ### Public Voting Site (glowingstar.vote)
 | Page | URL |
 |------|-----|
-| Homepage | https://contest-admin.preview.emergentagent.com/ |
-| Contestants | https://contest-admin.preview.emergentagent.com/contestants |
-| Leaderboard | https://contest-admin.preview.emergentagent.com/leaderboard |
-| Vote for Contestant | https://contest-admin.preview.emergentagent.com/2026/{slug} |
+| Homepage | https://contest-admin-1.preview.emergentagent.com/ |
+| Contestants | https://contest-admin-1.preview.emergentagent.com/contestants |
+| Leaderboard | https://contest-admin-1.preview.emergentagent.com/leaderboard |
+| Vote for Contestant | https://contest-admin-1.preview.emergentagent.com/2026/{slug} |
 
 ### Management Portal (glowingstar.net)
 | Page | URL | Credentials |

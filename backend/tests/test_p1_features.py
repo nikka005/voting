@@ -10,7 +10,7 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://contest-admin.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://contest-admin-1.preview.emergentagent.com')
 
 # Test credentials
 ADMIN_EMAIL = "admin@glowingstar.net"
@@ -204,7 +204,7 @@ class TestEntryFeePaymentFlow:
         """Test POST /api/payments/entry-fee creates Stripe checkout session"""
         payload = {
             "contest_id": "default",
-            "origin_url": "https://contest-admin.preview.emergentagent.com"
+            "origin_url": "https://contest-admin-1.preview.emergentagent.com"
         }
         response = requests.post(f"{BASE_URL}/api/payments/entry-fee", json=payload, headers=self.headers)
         
@@ -235,7 +235,7 @@ class TestEntryFeePaymentFlow:
         """Test that entry fee endpoint requires authentication"""
         payload = {
             "contest_id": "default",
-            "origin_url": "https://contest-admin.preview.emergentagent.com"
+            "origin_url": "https://contest-admin-1.preview.emergentagent.com"
         }
         response = requests.post(f"{BASE_URL}/api/payments/entry-fee", json=payload)
         assert response.status_code in [401, 403], "Should require authentication"
