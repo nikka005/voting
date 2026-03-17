@@ -766,7 +766,48 @@ async def require_contestant(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Contestant access required")
     return current_user
 
-# MOCKED Email function - Replace with SendGrid later
+# Helper function to send emails via SMTP using dynamic settings from database
+async def send_email_smtp(to_email: str, subject: str, html_body: str, site_type: str = "voting"):
+    """Send email via SMTP using settings from platform_settings collection"""
+    settings = await db.platform_settings.find_one({"_id": "main"})
+    
+    if not settings:
+        print(f"[EMAIL] No platform settings - logging email to console")
+        print(f"[EMAIL] To: {to_email}, Subject: {subject}")
+        return False
+    
+    smtp_config = settings.get(f"smtp_{site_type}", {})
+    
+    if not smtp_config.get("host") or not smtp_config.get("password"):
+        print(f"[EMAIL] SMTP not configured for {site_type} - logging to console")
+        print(f"[EMAIL] To: {to_email}, Subject: {subject}")
+        return False
+    
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = f"{smtp_config.get('from_name', 'Glowing Star')} <{smtp_config.get('from_email', '')}>"
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(html_body, 'html'))
+        
+        if smtp_config.get("use_tls", True):
+            server = smtplib.SMTP(smtp_config["host"], smtp_config.get("port", 587))
+            server.starttls()
+        else:
+            server = smtplib.SMTP_SSL(smtp_config["host"], smtp_config.get("port", 465))
+        
+        server.login(smtp_config["username"], smtp_config["password"])
+        server.sendmail(smtp_config["from_email"], to_email, msg.as_string())
+        server.quit()
+        
+        print(f"[EMAIL] Sent successfully to {to_email}")
+        return True
+    
+    except Exception as e:
+        print(f"[EMAIL] Failed to send: {str(e)}")
+        return False
+
+# Email sending functions using dynamic SMTP
 async def send_otp_email(email: str, otp: str, contestant_name: str = "the contestant") -> bool:
     """Send OTP via email using dynamic SMTP settings"""
     template = email_templates.otp_template(otp, contestant_name)
