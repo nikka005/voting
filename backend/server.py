@@ -2834,6 +2834,25 @@ async def complete_contest(contest_id: str, admin: dict = Depends(require_admin)
         raise HTTPException(status_code=404, detail="Contest not found")
     return {"success": True, "message": "Contest completed"}
 
+@api_router.delete("/admin/contests/{contest_id}")
+async def delete_contest(contest_id: str, admin: dict = Depends(require_admin)):
+    """Delete a contest (Admin only) - Only allows deletion of draft/cancelled contests"""
+    contest = await db.contests.find_one({"id": contest_id})
+    if not contest:
+        raise HTTPException(status_code=404, detail="Contest not found")
+    
+    # Only allow deletion of draft or cancelled contests for safety
+    if contest.get("status") not in ["draft", "cancelled", "completed"]:
+        # For active contests, archive instead of delete
+        result = await db.contests.update_one(
+            {"id": contest_id},
+            {"$set": {"status": "archived", "archived_at": datetime.now(timezone.utc).isoformat()}}
+        )
+        return {"success": True, "message": "Contest archived (active contests cannot be deleted)"}
+    
+    result = await db.contests.delete_one({"id": contest_id})
+    return {"success": True, "message": "Contest deleted"}
+
 # ============ ENTRY FEE PAYMENT SYSTEM ============
 
 @api_router.post("/payments/entry-fee")
