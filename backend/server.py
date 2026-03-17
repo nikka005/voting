@@ -1081,7 +1081,7 @@ async def get_contestants(
     category_id: Optional[str] = None,
     round_name: Optional[str] = None,
     search: Optional[str] = None,
-    limit: int = Query(50, le=100),
+    limit: int = Query(100, le=200),
     skip: int = 0
 ):
     """Get contestants with filters"""
