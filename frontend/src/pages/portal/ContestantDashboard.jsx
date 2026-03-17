@@ -271,6 +271,7 @@ export default function ContestantDashboard() {
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'gallery', label: 'Gallery', icon: Camera },
     { id: 'voting-link', label: 'Voting Link', icon: LinkIcon },
+    { id: 'wallet', label: 'Wallet', icon: CreditCard },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp },
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
     { id: 'notifications', label: 'Notifications', icon: Bell, badge: notifications.filter(n => !n.read).length },
