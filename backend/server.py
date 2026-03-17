@@ -2493,11 +2493,11 @@ async def get_contest_settings():
     """Get current contest settings"""
     settings = await db.contest_settings.find_one({"active": True}, {"_id": 0})
     if not settings:
-        # Return default settings - Glomer Beauty Contest
+        # Return default settings - Glamour Beauty Contest
         return {
-            "contest_name": "Glomer Beauty Contest 2026",
+            "contest_name": "Glamour Beauty Contest 2026",
             "contest_tagline": "Where Beauty Meets Excellence",
-            "contest_description": """Welcome to Glomer Beauty Contest 2026 - the world's most prestigious online beauty competition!
+            "contest_description": """Welcome to Glamour Beauty Contest 2026 - the world's most prestigious online beauty competition!
 
 Join thousands of stunning contestants from around the globe as they compete for the ultimate crown and a share of our $35,000 USD prize pool.
 
