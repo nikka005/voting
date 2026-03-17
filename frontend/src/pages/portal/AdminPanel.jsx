@@ -3568,28 +3568,65 @@ PRIZES:
         </div>
       </GlassCard>
 
-      {/* Email/SMTP Configuration */}
-      <GlassCard title="Email Configuration (SMTP)" icon={Mail}>
+      {/* Email/SMTP Configuration - Voting Site */}
+      <GlassCard title="Email Configuration - Voting Site (glowingstar.vote)" icon={Mail}>
         <div className="space-y-4">
-          <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-                <Mail className="w-5 h-5 text-cyan-400" />
+          <div className="p-4 rounded-xl bg-gradient-to-r from-pink-500/10 to-rose-500/10 border border-pink-500/20">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center">
+                <Mail className="w-5 h-5 text-pink-400" />
               </div>
               <div>
-                <p className="font-medium text-white">SendGrid Integration</p>
-                <p className="text-xs text-slate-400">Send transactional emails via SendGrid</p>
+                <p className="font-medium text-white">Voting Site Emails</p>
+                <p className="text-xs text-slate-400">OTP verification, vote confirmation emails</p>
               </div>
+              {platformSettings.smtp_voting?.password_set && (
+                <span className="ml-auto px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded-full">Configured</span>
+              )}
             </div>
           </div>
 
-          <div>
-            <Label className="text-slate-300">SendGrid API Key</Label>
-            <Input 
-              type="password"
-              placeholder="SG.xxxxxxxxx..."
-              className="bg-white/5 border-white/10 text-white mt-1 font-mono text-sm" 
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-slate-300">SMTP Host</Label>
+              <Input 
+                value={platformSettings.smtp_voting?.host || ''}
+                onChange={(e) => updateSMTP('voting', 'host', e.target.value)}
+                placeholder="smtp.gmail.com"
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+            <div>
+              <Label className="text-slate-300">SMTP Port</Label>
+              <Input 
+                type="number"
+                value={platformSettings.smtp_voting?.port || 587}
+                onChange={(e) => updateSMTP('voting', 'port', parseInt(e.target.value))}
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-slate-300">SMTP Username</Label>
+              <Input 
+                value={platformSettings.smtp_voting?.username || ''}
+                onChange={(e) => updateSMTP('voting', 'username', e.target.value)}
+                placeholder="your-email@gmail.com"
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+            <div>
+              <Label className="text-slate-300">SMTP Password / App Password</Label>
+              <Input 
+                type="password"
+                value={platformSettings.smtp_voting?.password || ''}
+                onChange={(e) => updateSMTP('voting', 'password', e.target.value)}
+                placeholder={platformSettings.smtp_voting?.password_set ? "••••••••" : "Enter password"}
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -3597,6 +3634,115 @@ PRIZES:
               <Label className="text-slate-300">From Email</Label>
               <Input 
                 type="email"
+                value={platformSettings.smtp_voting?.from_email || ''}
+                onChange={(e) => updateSMTP('voting', 'from_email', e.target.value)}
+                placeholder="noreply@glowingstar.vote"
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+            <div>
+              <Label className="text-slate-300">From Name</Label>
+              <Input 
+                value={platformSettings.smtp_voting?.from_name || ''}
+                onChange={(e) => updateSMTP('voting', 'from_name', e.target.value)}
+                placeholder="Glowing Star Voting"
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
+            <div>
+              <p className="font-medium">Use TLS</p>
+              <p className="text-sm text-slate-500">Enable TLS encryption (recommended)</p>
+            </div>
+            <Switch 
+              checked={platformSettings.smtp_voting?.use_tls !== false}
+              onCheckedChange={(checked) => updateSMTP('voting', 'use_tls', checked)}
+            />
+          </div>
+
+          <div className="flex gap-3">
+            <Button onClick={handleSavePlatformSettings} disabled={saving} className="flex-1 bg-gradient-to-r from-pink-500 to-rose-600">
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
+              Save
+            </Button>
+            <Button onClick={() => handleTestSMTP('voting')} disabled={testingEmail} variant="outline" className="border-pink-500/30 text-pink-400 hover:bg-pink-500/10">
+              {testingEmail ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+              Test Email
+            </Button>
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* Email/SMTP Configuration - User Site */}
+      <GlassCard title="Email Configuration - User Site (glowingstar.net)" icon={Mail}>
+        <div className="space-y-4">
+          <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                <Mail className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div>
+                <p className="font-medium text-white">User Site Emails</p>
+                <p className="text-xs text-slate-400">Registration, approval, payment emails</p>
+              </div>
+              {platformSettings.smtp_user?.password_set && (
+                <span className="ml-auto px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded-full">Configured</span>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-slate-300">SMTP Host</Label>
+              <Input 
+                value={platformSettings.smtp_user?.host || ''}
+                onChange={(e) => updateSMTP('user', 'host', e.target.value)}
+                placeholder="smtp.gmail.com"
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+            <div>
+              <Label className="text-slate-300">SMTP Port</Label>
+              <Input 
+                type="number"
+                value={platformSettings.smtp_user?.port || 587}
+                onChange={(e) => updateSMTP('user', 'port', parseInt(e.target.value))}
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-slate-300">SMTP Username</Label>
+              <Input 
+                value={platformSettings.smtp_user?.username || ''}
+                onChange={(e) => updateSMTP('user', 'username', e.target.value)}
+                placeholder="your-email@gmail.com"
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+            <div>
+              <Label className="text-slate-300">SMTP Password / App Password</Label>
+              <Input 
+                type="password"
+                value={platformSettings.smtp_user?.password || ''}
+                onChange={(e) => updateSMTP('user', 'password', e.target.value)}
+                placeholder={platformSettings.smtp_user?.password_set ? "••••••••" : "Enter password"}
+                className="bg-white/5 border-white/10 text-white mt-1" 
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-slate-300">From Email</Label>
+              <Input 
+                type="email"
+                value={platformSettings.smtp_user?.from_email || ''}
+                onChange={(e) => updateSMTP('user', 'from_email', e.target.value)}
                 placeholder="noreply@glowingstar.net"
                 className="bg-white/5 border-white/10 text-white mt-1" 
               />
@@ -3604,7 +3750,8 @@ PRIZES:
             <div>
               <Label className="text-slate-300">From Name</Label>
               <Input 
-                type="text"
+                value={platformSettings.smtp_user?.from_name || ''}
+                onChange={(e) => updateSMTP('user', 'from_name', e.target.value)}
                 placeholder="Glowing Star Contest"
                 className="bg-white/5 border-white/10 text-white mt-1" 
               />
@@ -3613,16 +3760,25 @@ PRIZES:
 
           <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
             <div>
-              <p className="font-medium">Email Verification Required</p>
-              <p className="text-sm text-slate-500">Require OTP verification for voting</p>
+              <p className="font-medium">Use TLS</p>
+              <p className="text-sm text-slate-500">Enable TLS encryption (recommended)</p>
             </div>
-            <Switch defaultChecked />
+            <Switch 
+              checked={platformSettings.smtp_user?.use_tls !== false}
+              onCheckedChange={(checked) => updateSMTP('user', 'use_tls', checked)}
+            />
           </div>
 
-          <Button variant="outline" className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10">
-            <Send className="w-4 h-4 mr-2" />
-            Send Test Email
-          </Button>
+          <div className="flex gap-3">
+            <Button onClick={handleSavePlatformSettings} disabled={saving} className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600">
+              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
+              Save
+            </Button>
+            <Button onClick={() => handleTestSMTP('user')} disabled={testingEmail} variant="outline" className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10">
+              {testingEmail ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+              Test Email
+            </Button>
+          </div>
         </div>
       </GlassCard>
 
