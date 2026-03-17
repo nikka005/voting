@@ -2763,6 +2763,49 @@ async def update_contest_settings(settings: ContestSettings, admin: dict = Depen
     updated = await db.contest_settings.find_one({"active": True}, {"_id": 0})
     return {"success": True, "message": "Contest settings updated", "settings": updated}
 
+# ============ STRIPE SETTINGS (SIMPLE) ============
+
+@api_router.get("/admin/stripe-settings")
+async def get_stripe_settings(admin: dict = Depends(require_admin)):
+    """Get Stripe settings"""
+    settings = await db.stripe_settings.find_one({"_id": "main"})
+    if not settings:
+        return {
+            "stripe_publishable_key": "",
+            "stripe_secret_key_masked": "",
+            "stripe_test_mode": True
+        }
+    return {
+        "stripe_publishable_key": settings.get("stripe_publishable_key", ""),
+        "stripe_secret_key_masked": "••••••" + settings.get("stripe_secret_key", "")[-4:] if settings.get("stripe_secret_key") else "",
+        "stripe_test_mode": settings.get("stripe_test_mode", True)
+    }
+
+@api_router.put("/admin/stripe-settings")
+async def update_stripe_settings(settings: dict, admin: dict = Depends(require_admin)):
+    """Update Stripe settings"""
+    global STRIPE_API_KEY
+    
+    existing = await db.stripe_settings.find_one({"_id": "main"}) or {}
+    
+    update_data = {
+        "_id": "main",
+        "stripe_publishable_key": settings.get("stripe_publishable_key", existing.get("stripe_publishable_key", "")),
+        "stripe_test_mode": settings.get("stripe_test_mode", existing.get("stripe_test_mode", True)),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Only update secret key if provided and not masked
+    if settings.get("stripe_secret_key") and not settings["stripe_secret_key"].startswith("••"):
+        update_data["stripe_secret_key"] = settings["stripe_secret_key"]
+        STRIPE_API_KEY = settings["stripe_secret_key"]
+    else:
+        update_data["stripe_secret_key"] = existing.get("stripe_secret_key", "")
+    
+    await db.stripe_settings.replace_one({"_id": "main"}, update_data, upsert=True)
+    
+    return {"success": True, "message": "Stripe settings saved"}
+
 # ============ PROMOTIONAL BANNER SYSTEM ============
 
 class PromoBanner(BaseModel):
