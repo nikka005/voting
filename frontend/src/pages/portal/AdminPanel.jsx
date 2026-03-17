@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/dialog';
 import { Switch } from '../../components/ui/switch';
-import { adminAPI, contestantsAPI, categoriesAPI, roundsAPI, contestsAPI } from '../../lib/api';
+import { adminAPI, contestantsAPI, categoriesAPI, roundsAPI, contestsAPI, platformSettingsAPI } from '../../lib/api';
 import { formatNumber, formatDate } from '../../lib/utils';
 import { useVoteUpdates } from '../../hooks/useWebSocket';
 import { toast } from 'sonner';
