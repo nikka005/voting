@@ -768,21 +768,49 @@ async def require_contestant(current_user: dict = Depends(get_current_user)):
 
 # MOCKED Email function - Replace with SendGrid later
 async def send_otp_email(email: str, otp: str, contestant_name: str = "the contestant") -> bool:
-    """
-    MOCKED: Send OTP via email
-    TODO: Replace with actual SendGrid implementation
-    """
+    """Send OTP via email using dynamic SMTP settings"""
     template = email_templates.otp_template(otp, contestant_name)
-    logging.info(f"[MOCKED EMAIL] Subject: {template['subject']}")
-    logging.info(f"[MOCKED EMAIL] To: {email}")
-    logging.info(f"[MOCKED EMAIL] OTP: {otp}")
-    return True
+    
+    # Use dynamic SMTP settings from database
+    result = await send_email_smtp(email, template['subject'], template['html'], site_type="voting")
+    
+    if not result:
+        # Log for debugging if SMTP not configured
+        logging.info(f"[EMAIL] OTP email to {email} - OTP: {otp}")
+    
+    return result
 
 async def send_vote_confirmation_email(email: str, contestant_name: str, vote_count: int) -> bool:
-    """Send vote confirmation email"""
+    """Send vote confirmation email using dynamic SMTP settings"""
     template = email_templates.vote_confirmation_template(contestant_name, vote_count)
-    logging.info(f"[MOCKED EMAIL] Vote confirmation sent to {email}")
-    return True
+    
+    # Use dynamic SMTP settings from database
+    result = await send_email_smtp(email, template['subject'], template['html'], site_type="voting")
+    
+    if not result:
+        logging.info(f"[EMAIL] Vote confirmation to {email} for {contestant_name}")
+    
+    return result
+
+async def send_welcome_email(email: str, full_name: str) -> bool:
+    """Send welcome email to new contestant using dynamic SMTP settings"""
+    template = email_templates.welcome_template(full_name)
+    return await send_email_smtp(email, template['subject'], template['html'], site_type="user")
+
+async def send_approval_email(email: str, full_name: str, voting_link: str) -> bool:
+    """Send profile approval email using dynamic SMTP settings"""
+    template = email_templates.profile_approved_template(full_name, voting_link)
+    return await send_email_smtp(email, template['subject'], template['html'], site_type="user")
+
+async def send_round_qualification_email(email: str, full_name: str, round_name: str) -> bool:
+    """Send round qualification notification using dynamic SMTP settings"""
+    template = email_templates.round_qualification_template(full_name, round_name)
+    return await send_email_smtp(email, template['subject'], template['html'], site_type="user")
+
+async def send_payment_confirmation_email(email: str, full_name: str, amount: float, votes: int, transaction_id: str) -> bool:
+    """Send payment confirmation email using dynamic SMTP settings"""
+    template = email_templates.payment_confirmation_template(full_name, amount, votes, transaction_id)
+    return await send_email_smtp(email, template['subject'], template['html'], site_type="voting")
 
 # ============ AUTH ROUTES ============
 
